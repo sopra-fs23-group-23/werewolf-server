@@ -52,10 +52,10 @@ public class UserService {
     return newUser;
   }
 
-  public User loginUser(User newUser){
+/*  public User loginUser(User newUser){
 
 
-  }
+}*/
 
   /**
    * This is a helper method that will check the uniqueness criteria of the
