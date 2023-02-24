@@ -4,7 +4,6 @@ import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDate;
 
 
 /**
@@ -14,7 +13,7 @@ import java.time.LocalDate;
  * Every variable will be mapped into a database field with the @Column
  * annotation
  * - nullable = false -> this cannot be left empty
- * - unique = true -> this value must be unqiue across the database -> composes
+ * - unique = true -> this value must be unique across the database -> composes
  * the primary key
  */
 @Entity
@@ -43,7 +42,7 @@ public class User implements Serializable {
   private String creation_date;
 
   @Column
-  private LocalDate birthday;
+  private String birthday;
 
   public Long getId() {
     return id;
@@ -84,4 +83,18 @@ public class User implements Serializable {
   public void setStatus(UserStatus status) {
     this.status = status;
   }
+
+  public void setCreationDate(String creationDate){
+      this.creation_date = creationDate;
+  }
+  public String getCreationDate(){
+      return creation_date;
+  }
+  public void setBirthday(String birthday){
+      this.birthday = birthday;
+  }
+  public String getBirthday(){
+      return birthday;
+  }
+
 }

@@ -13,7 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * User Service
@@ -40,8 +43,13 @@ public class UserService {
   }
 
   public User createUser(User newUser) {
+    Date date = new Date();
+    SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+    String strDate = formatter.format(date);
+
     newUser.setToken(UUID.randomUUID().toString());
     newUser.setStatus(UserStatus.ONLINE);
+    newUser.setCreationDate(strDate);
     checkIfUserExists(newUser);
     // saves the given entity but data is only persisted in the database once
     // flush() is called
@@ -58,7 +66,7 @@ public User loginUser(User userToLogin){
     if (userByUsername == null){
         throw  new ResponseStatusException(HttpStatus.CONFLICT, String.format("The %s is not yet registered. Please first sign up before trying to log in.", userToLogin.getUsername()));
     }
-    else if (userByUsername.getPassword() != userToLogin.getPassword()) {
+    else if (!Objects.equals(userByUsername.getPassword(), userToLogin.getPassword())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT,"The password provided is not correct.");
     }else{
         userToLogin.setToken(UUID.randomUUID().toString());
@@ -89,7 +97,7 @@ public User loginUser(User userToLogin){
     } else if (userByUsername != null) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
     }
-    // Not needed.. because users can have the same password, but not the same username
+    // Not needed. because users can have the same password, but not the same username
     /*
     else if (userByPassword != null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "name", "is"));
