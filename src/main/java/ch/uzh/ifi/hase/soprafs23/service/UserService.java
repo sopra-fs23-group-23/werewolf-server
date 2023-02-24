@@ -41,7 +41,7 @@ public class UserService {
 
   public User createUser(User newUser) {
     newUser.setToken(UUID.randomUUID().toString());
-    newUser.setStatus(UserStatus.OFFLINE);
+    newUser.setStatus(UserStatus.ONLINE);
     checkIfUserExists(newUser);
     // saves the given entity but data is only persisted in the database once
     // flush() is called
@@ -52,10 +52,21 @@ public class UserService {
     return newUser;
   }
 
-/*  public User loginUser(User newUser){
+public User loginUser(User userToLogin){
+    User userByUsername = userRepository.findByUsername(userToLogin.getUsername());
 
+    if (userByUsername == null){
+        throw  new ResponseStatusException(HttpStatus.CONFLICT, String.format("The %s is not yet registered. Please first sign up before trying to log in.", userToLogin.getUsername()));
+    }
+    else if (userByUsername.getPassword() != userToLogin.getPassword()) {
+        throw new ResponseStatusException(HttpStatus.CONFLICT,"The password provided is not correct.");
+    }else{
+        userToLogin.setToken(UUID.randomUUID().toString());
+        userToLogin.setStatus(UserStatus.ONLINE);
+        return userToLogin;
+    }
 
-}*/
+}
 
   /**
    * This is a helper method that will check the uniqueness criteria of the
