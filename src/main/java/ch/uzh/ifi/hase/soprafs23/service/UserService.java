@@ -64,7 +64,7 @@ public User loginUser(User userToLogin){
     User userByUsername = userRepository.findByUsername(userToLogin.getUsername());
 
     if (userByUsername == null){
-        throw  new ResponseStatusException(HttpStatus.CONFLICT, String.format("The %s is not yet registered. Please first sign up before trying to log in.", userToLogin.getUsername()));
+        throw  new ResponseStatusException(HttpStatus.CONFLICT, String.format("The user %s is not yet registered. Please first sign up before trying to log in.", userToLogin.getUsername()));
     }
     else if (!Objects.equals(userByUsername.getPassword(), userToLogin.getPassword())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT,"The password provided is not correct.");
@@ -97,11 +97,5 @@ public User loginUser(User userToLogin){
     } else if (userByUsername != null) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
     }
-    // Not needed. because users can have the same password, but not the same username
-    /*
-    else if (userByPassword != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "name", "is"));
-    }
-    */
   }
 }
