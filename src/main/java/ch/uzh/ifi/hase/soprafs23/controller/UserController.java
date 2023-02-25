@@ -69,4 +69,8 @@ public class UserController {
   }
 }
 
+/*  TODO:
+ *      -create logout where user status is set to OFFLINE
+ *      -
+*/
 
