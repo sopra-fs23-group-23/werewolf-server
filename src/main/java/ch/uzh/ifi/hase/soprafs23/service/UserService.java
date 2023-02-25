@@ -69,9 +69,10 @@ public User loginUser(User userToLogin){
     else if (!Objects.equals(userByUsername.getPassword(), userToLogin.getPassword())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT,"The password provided is not correct.");
     }else{
-        userToLogin.setToken(UUID.randomUUID().toString());
-        userToLogin.setStatus(UserStatus.ONLINE);
-        return userToLogin;
+        userByUsername.setToken(UUID.randomUUID().toString());
+        userByUsername.setStatus(UserStatus.ONLINE);
+        userRepository.save(userByUsername);
+        return userByUsername;
     }
 
 }
