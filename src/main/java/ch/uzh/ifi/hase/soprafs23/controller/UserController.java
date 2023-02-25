@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.controller;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPostDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.UserDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -30,41 +31,41 @@ public class UserController {
   @GetMapping("/users")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<UserGetDTO> getAllUsers() {
+  public List<UserDTO> getAllUsers() {
     // fetch all users in the internal representation
     List<User> users = userService.getUsers();
-    List<UserGetDTO> userGetDTOs = new ArrayList<>();
+    List<UserDTO> userDTOs = new ArrayList<>();
 
     // convert each user to the API representation
     for (User user : users) {
-      userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+      userDTOs.add(DTOMapper.INSTANCE.convertEntityToUserDTO(user));
     }
-    return userGetDTOs;
+    return userDTOs;
   }
 
   @PostMapping("/users")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public UserGetDTO createUser(@RequestBody UserPostDTO userPostDTO) {
+  public UserDTO createUser(@RequestBody UserPostDTO userPostDTO) {
     // convert API user to internal representation
     User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
     // create user
     User createdUser = userService.createUser(userInput);
     // convert internal representation of user back to API
-    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
+    return DTOMapper.INSTANCE.convertEntityToUserDTO(createdUser);
   }
   @PostMapping("/login")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public UserGetDTO loginUser(@RequestBody UserPostDTO userPostDTO){
+  public UserDTO loginUser(@RequestBody UserPostDTO userPostDTO){
     // convert API user to internal representation
     User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
     // call logIn method
     User user = userService.loginUser(userInput);
 
-    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+    return DTOMapper.INSTANCE.convertEntityToUserDTO(user);
   }
 }
 
