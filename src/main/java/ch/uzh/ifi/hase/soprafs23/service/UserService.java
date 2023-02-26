@@ -74,7 +74,14 @@ public User loginUser(User userToLogin){
         userRepository.save(userByUsername);
         return userByUsername;
     }
-
+}
+public void logoutUser(long id){
+      User userById = userRepository.findById(id);
+      if (userById == null){
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User could not be found.");
+      }
+      userById.setStatus(UserStatus.OFFLINE);
+      userRepository.save(userById);
 }
 
   /**
