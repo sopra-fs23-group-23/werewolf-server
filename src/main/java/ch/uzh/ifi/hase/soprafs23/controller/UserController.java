@@ -21,61 +21,63 @@ import java.util.List;
 @RestController
 public class UserController {
 
-  private final UserService userService;
+    private final UserService userService;
 
-  UserController(UserService userService) {
-    this.userService = userService;
-  }
-
-  @GetMapping("/users")
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public List<UserDTO> getAllUsers() {
-    // fetch all users in the internal representation
-    List<User> users = userService.getUsers();
-    List<UserDTO> userDTOs = new ArrayList<>();
-
-    // convert each user to the API representation
-    for (User user : users) {
-      userDTOs.add(DTOMapper.INSTANCE.convertEntityToUserDTO(user));
+    UserController(UserService userService) {
+        this.userService = userService;
     }
-    return userDTOs;
-  }
 
-  @PostMapping("/users")
-  @ResponseStatus(HttpStatus.CREATED)
-  @ResponseBody
-  public UserDTO createUser(@RequestBody UserPostDTO userPostDTO) {
-    // convert API user to internal representation
-    User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
-
-    // create user
-    User createdUser = userService.createUser(userInput);
-    // convert internal representation of user back to API
-    return DTOMapper.INSTANCE.convertEntityToUserDTO(createdUser);
-  }
-  @PostMapping("/login")
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public UserDTO loginUser(@RequestBody UserPostDTO userPostDTO){
-    // convert API user to internal representation
-    User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
-
-    // call logIn method
-    User user = userService.loginUser(userInput);
-
-    return DTOMapper.INSTANCE.convertEntityToUserDTO(user);
-  }
-  @PutMapping("/users/{id}")
+    @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public void logoutUser(@PathVariable("id") String id){
+    public List<UserDTO> getAllUsers() {
+        // fetch all users in the internal representation
+        List<User> users = userService.getUsers();
+        List<UserDTO> userDTOs = new ArrayList<>();
+
+        // convert each user to the API representation
+        for (User user : users) {
+            userDTOs.add(DTOMapper.INSTANCE.convertEntityToUserDTO(user));
+        }
+        return userDTOs;
+    }
+
+    @PostMapping("/users")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public UserDTO createUser(@RequestBody UserPostDTO userPostDTO) {
+        // convert API user to internal representation
+        User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+
+        // create user
+        User createdUser = userService.createUser(userInput);
+        // convert internal representation of user back to API
+        return DTOMapper.INSTANCE.convertEntityToUserDTO(createdUser);
+    }
+
+    @PostMapping("/login")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public UserDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
+        // convert API user to internal representation
+        User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+
+        // call logIn method
+        User user = userService.loginUser(userInput);
+
+        return DTOMapper.INSTANCE.convertEntityToUserDTO(user);
+    }
+
+    @PutMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void logoutUser(@PathVariable("id") String id) {
         userService.logoutUser(Long.parseLong(id));
-  }
+    }
 }
 
 /*  TODO:
  *      -create logout where user status is set to OFFLINE
  *      -
-*/
+ */
 
