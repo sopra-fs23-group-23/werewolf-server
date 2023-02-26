@@ -69,9 +69,8 @@ public class UserController {
   @PutMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public UserDTO logoutUser(@PathVariable("id") String id){
-        User user = userService.logoutUser(Long.parseLong(id));
-        return DTOMapper.INSTANCE.convertEntityToUserDTO(user);
+    public void logoutUser(@PathVariable("id") String id){
+        userService.logoutUser(Long.parseLong(id));
   }
 }
 
