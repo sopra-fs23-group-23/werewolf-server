@@ -1,12 +1,14 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
+import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.UserDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +24,12 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
-    UserController(UserService userService) {
+    UserController(UserService userService,
+                   UserRepository userRepository) {
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/users")
@@ -40,6 +45,15 @@ public class UserController {
             userDTOs.add(DTOMapper.INSTANCE.convertEntityToUserDTO(user));
         }
         return userDTOs;
+    }
+    @GetMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserDTO getSingleUser(@PathVariable("id") String id){
+        User user = userRepository.findById(Long.parseLong(id));
+        if (user == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with id: %s could not be found."));
+        }
+        return DTOMapper.INSTANCE.convertEntityToUserDTO(user);
     }
 
     @PostMapping("/users")
