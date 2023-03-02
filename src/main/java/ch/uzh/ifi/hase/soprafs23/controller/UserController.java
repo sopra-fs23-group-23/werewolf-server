@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.UserDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPutDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -69,7 +70,7 @@ public class UserController {
         return DTOMapper.INSTANCE.convertEntityToUserDTO(createdUser);
     }
 
-    @PostMapping("/login")
+    @PostMapping("/users/login")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public UserDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
@@ -82,16 +83,17 @@ public class UserController {
         return DTOMapper.INSTANCE.convertEntityToUserDTO(user);
     }
 
-    @PutMapping("/users/{id}")
+    @PutMapping("/users/logout/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public void logoutUser(@PathVariable("id") String id) {
         userService.logoutUser(Long.parseLong(id));
     }
-}
 
-/*  TODO:
- *      -create logout where user status is set to OFFLINE
- *      -
- */
+    @PutMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateUserData(@PathVariable("id") String id, @RequestBody UserPutDTO userPutDTO){
+        User updatedUser = DTOMapper.INSTANCE.convertUserPutDTOToEntitiy(userPutDTO);
+        userService.updateUser(updatedUser, Long.parseLong(id));
+    }
+}
 

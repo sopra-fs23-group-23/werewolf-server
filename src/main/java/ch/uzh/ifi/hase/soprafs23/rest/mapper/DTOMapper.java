@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.UserDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPutDTO;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -33,6 +34,11 @@ public interface DTOMapper {
     @Mapping(source = "birthday", target = "birthday")
     @Mapping(source = "creationDate", target = "creationDate")
     UserDTO convertEntityToUserDTO(User user);
+
+
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "birthday", target = "birthday")
+    User convertUserPutDTOToEntitiy(UserPutDTO userPutDTO);
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "password", target = "password")

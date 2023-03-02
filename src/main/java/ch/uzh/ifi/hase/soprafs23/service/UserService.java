@@ -86,6 +86,28 @@ public class UserService {
         userRepository.save(userById);
     }
 
+    public void updateUser(User updatedUser, long id){
+        User userById = userRepository.findById(id);
+        User userByUsername = userRepository.findByUsername(updatedUser.getUsername());
+        if (userById == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with id %d could not be found.", id));
+        }
+        // check if username actually changed
+        if (!(Objects.equals(userById.getUsername(), updatedUser.getUsername()))){
+            if(!(userByUsername == null)){
+                throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("User with username %s already exists, please choose a different name.", updatedUser.getUsername()));
+            }else{
+                userById.setUsername(updatedUser.getUsername());
+            }
+        }
+        // check if birthday changed
+        if  (!(Objects.equals(userById.getBirthday(), updatedUser.getBirthday()))) {
+            userById.setBirthday(updatedUser.getBirthday());
+        }
+        userRepository.save(userById);
+        userRepository.flush();
+    }
+
     /**
      * This is a helper method that will check the uniqueness criteria of the
      * username and the name
