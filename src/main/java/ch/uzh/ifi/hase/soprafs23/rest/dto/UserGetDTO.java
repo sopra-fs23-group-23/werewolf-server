@@ -10,6 +10,7 @@ public class UserGetDTO {
     private UserStatus status;
     private String birthday;
     private String creationDate;
+    private String token;
 
     public Long getId() {
         return id;
@@ -57,6 +58,12 @@ public class UserGetDTO {
 
     public void setCreationDate(String creationDate) {
         this.creationDate = creationDate;
+    }
+    public String getToken(){
+        return token;
+    }
+    public void setToken(String token){
+        this.token = token;
     }
 }
 
