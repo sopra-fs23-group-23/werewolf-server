@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * User Controller
@@ -86,13 +87,24 @@ public class UserController {
 
     @PutMapping("/users/logout/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void logoutUser(@PathVariable("id") String id) {
+    public void logoutUser(@PathVariable("id") String id, @RequestHeader("Authorization") String token) {
+        User user = userRepository.findById(Long.parseLong(id));
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User could not be found.");
+        }
+        if (!(Objects.equals(user.getToken(), token))) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, String.format("Authorization failed. User token is not valid."));
+        }
         userService.logoutUser(Long.parseLong(id));
     }
 
     @PutMapping("/users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateUserData(@PathVariable("id") String id, @RequestBody UserPutDTO userPutDTO){
+    public void updateUserData(@PathVariable("id") String id, @RequestBody UserPutDTO userPutDTO, @RequestHeader("Authorization") String token){
+        User user = userRepository.findById(Long.parseLong(id));
+        if (!(Objects.equals(user.getToken(), token))){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, String.format("Authorization failed. User token is not valid."));
+        }
         User updatedUser = DTOMapper.INSTANCE.convertUserPutDTOToEntitiy(userPutDTO);
         userService.updateUser(updatedUser, Long.parseLong(id));
     }
