@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +39,11 @@ public class UserController {
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<UserDTO> getAllUsers() {
+    public List<UserDTO> getAllUsers(@RequestHeader("token") String token) {
+        User userByToken = userRepository.findByToken(token);
+        if (userByToken == null){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not authorized to access the dashboard.");
+        }
         // fetch all users in the internal representation
         List<User> users = userService.getUsers();
         List<UserDTO> userDTOs = new ArrayList<>();
@@ -51,8 +56,12 @@ public class UserController {
     }
     @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO getSingleUser(@PathVariable("id") String id){
+    public UserDTO getSingleUser(@PathVariable("id") String id, @RequestHeader("token") String token){
         User user = userRepository.findById(Long.parseLong(id));
+        User userByToken = userRepository.findByToken(token);
+        if (userByToken == null){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not authorized to access the dashboard.");
+        }
         if (user == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with id: %s could not be found."));
         }
@@ -87,12 +96,15 @@ public class UserController {
 
     @PutMapping("/users/logout/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void logoutUser(@PathVariable("id") String id, @RequestHeader("Authorization") String token) {
+    public void logoutUser(@PathVariable("id") String id, @RequestHeader("token") String token) {
         User user = userRepository.findById(Long.parseLong(id));
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User could not be found.");
         }
         if (!(Objects.equals(user.getToken(), token))) {
+            System.out.println("\n\nlogout user:");
+            System.out.println("local storage: " +token);
+            System.out.println("jpa: "+user.getToken());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, String.format("Authorization failed. User token is not valid."));
         }
         userService.logoutUser(Long.parseLong(id));
@@ -100,13 +112,15 @@ public class UserController {
 
     @PutMapping("/users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateUserData(@PathVariable("id") String id, @RequestBody UserPutDTO userPutDTO, @RequestHeader("Authorization") String token){
+    public void updateUserData(@PathVariable("id") String id, @RequestBody UserPutDTO userPutDTO, @RequestHeader("token") String token) throws ParseException {
         User user = userRepository.findById(Long.parseLong(id));
         if (!(Objects.equals(user.getToken(), token))){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, String.format("Authorization failed. User token is not valid."));
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, String.format("Authorization failed. User token is not valid. You cannot access and modify %s.", user.getUsername()));
         }
         User updatedUser = DTOMapper.INSTANCE.convertUserPutDTOToEntitiy(userPutDTO);
+        if (updatedUser.getUsername() == null){
+            updatedUser.setUsername(user.getUsername());
+        }
         userService.updateUser(updatedUser, Long.parseLong(id));
     }
 }
-

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -73,6 +74,7 @@ public class UserService {
             userByUsername.setToken(UUID.randomUUID().toString());
             userByUsername.setStatus(UserStatus.ONLINE);
             userRepository.save(userByUsername);
+            userRepository.flush();
             return userByUsername;
         }
     }
@@ -83,7 +85,7 @@ public class UserService {
         userRepository.save(userById);
     }
 
-    public void updateUser(User updatedUser, long id){
+    public void updateUser(User updatedUser, long id) throws ParseException {
         User userById = userRepository.findById(id);
         User userByUsername = userRepository.findByUsername(updatedUser.getUsername());
         if (userById == null){
@@ -98,8 +100,15 @@ public class UserService {
             }
         }
         // check if birthday changed
-        if  (!(Objects.equals(userById.getBirthday(), updatedUser.getBirthday()))) {
-            userById.setBirthday(updatedUser.getBirthday());
+        if  (!(Objects.equals(userById.getBirthday(), updatedUser.getBirthday())) && updatedUser.getBirthday() != null) {
+            final String OLD_FORMAT = "yyyy-MM-dd";
+            final String NEW_FORMAT = "dd.MM.yyyy";
+            String oldDateString = updatedUser.getBirthday();
+            SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
+            Date d = sdf.parse(oldDateString);
+            sdf.applyPattern(NEW_FORMAT);
+            String newDateString = sdf.format(d);
+            userById.setBirthday(newDateString);
         }
         userRepository.save(userById);
         userRepository.flush();
