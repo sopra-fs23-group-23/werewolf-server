@@ -1,4 +1,4 @@
-/*
+
 package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
@@ -31,7 +31,7 @@ public class UserServiceTest {
     // given
     testUser = new User();
     testUser.setId(1L);
-    testUser.setName("testName");
+    testUser.setPassword("password");
     testUser.setUsername("testUsername");
 
     // when -> any object is being save in the userRepository -> return the dummy
@@ -49,10 +49,10 @@ public class UserServiceTest {
     Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any());
 
     assertEquals(testUser.getId(), createdUser.getId());
-    assertEquals(testUser.getName(), createdUser.getName());
+    assertEquals(testUser.getPassword(), createdUser.getPassword());
     assertEquals(testUser.getUsername(), createdUser.getUsername());
     assertNotNull(createdUser.getToken());
-    assertEquals(UserStatus.OFFLINE, createdUser.getStatus());
+    assertEquals(UserStatus.ONLINE, createdUser.getStatus()); // changed to ONLINE because after user signed up he should be online and is redirected to dashboard
   }
 
   @Test
@@ -61,8 +61,8 @@ public class UserServiceTest {
     userService.createUser(testUser);
 
     // when -> setup additional mocks for UserRepository
-    Mockito.when(userRepository.findByName(Mockito.any())).thenReturn(testUser);
-    Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(null);
+    Mockito.when(userRepository.findByPassword(Mockito.any())).thenReturn(testUser);
+    Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(testUser);
 
     // then -> attempt to create second user with same user -> check that an error
     // is thrown
@@ -75,7 +75,7 @@ public class UserServiceTest {
     userService.createUser(testUser);
 
     // when -> setup additional mocks for UserRepository
-    Mockito.when(userRepository.findByName(Mockito.any())).thenReturn(testUser);
+    Mockito.when(userRepository.findByPassword(Mockito.any())).thenReturn(testUser);
     Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(testUser);
 
     // then -> attempt to create second user with same user -> check that an error
@@ -84,4 +84,4 @@ public class UserServiceTest {
   }
 
 }
-*/
+

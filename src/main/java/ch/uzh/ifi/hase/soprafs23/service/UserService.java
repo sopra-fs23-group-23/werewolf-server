@@ -89,7 +89,7 @@ public class UserService {
         User userById = userRepository.findById(id);
         User userByUsername = userRepository.findByUsername(updatedUser.getUsername());
         if (userById == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with id %d could not be found.", id));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User could not be found.", id));
         }
         // check if username actually changed
         if (!(Objects.equals(userById.getUsername(), updatedUser.getUsername()))){

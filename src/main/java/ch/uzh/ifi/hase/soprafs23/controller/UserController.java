@@ -63,7 +63,7 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not authorized to access the dashboard.");
         }
         if (user == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with id: %s could not be found."));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User could not be found."));
         }
         return DTOMapper.INSTANCE.convertEntityToUserDTO(user);
     }
@@ -102,9 +102,6 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User could not be found.");
         }
         if (!(Objects.equals(user.getToken(), token))) {
-            System.out.println("\n\nlogout user:");
-            System.out.println("local storage: " +token);
-            System.out.println("jpa: "+user.getToken());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, String.format("Authorization failed. User token is not valid."));
         }
         userService.logoutUser(Long.parseLong(id));
