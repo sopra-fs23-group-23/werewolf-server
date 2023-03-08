@@ -10,12 +10,10 @@ import ch.uzh.ifi.hase.soprafs23.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * User Controller
@@ -40,7 +38,10 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<UserDTO> getAllUsers(@RequestHeader("token") String token) {
+
+        // check if a user with this token exists
         userService.getUserByToken(token);
+
         // fetch all users in the internal representation
         List<User> users = userService.getUsers();
         List<UserDTO> userDTOs = new ArrayList<>();
@@ -55,7 +56,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public UserDTO getSingleUser(@PathVariable("id") String id, @RequestHeader("token") String token){
 
-        User user = userService.getUserById(Long.parseLong(id));
+        User user = userService.getUser(Long.parseLong(id));
         userService.getUserByToken(token);
 
         return DTOMapper.INSTANCE.convertEntityToUserDTO(user);
@@ -90,7 +91,7 @@ public class UserController {
     @PutMapping("/users/logout/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void logoutUser(@PathVariable("id") String id, @RequestHeader("token") String token) {
-        User user = userService.getUserById(Long.parseLong(id));
+        User user = userService.getUser(Long.parseLong(id));
 
         userService.validateTokenMatch(user, token);
 
@@ -100,11 +101,11 @@ public class UserController {
     @PutMapping("/users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateUserData(@PathVariable("id") String id, @RequestBody UserPutDTO userPutDTO, @RequestHeader("token") String token) throws ParseException {
-        User user = userService.getUserById(Long.parseLong(id));
+        User user = userService.getUser(Long.parseLong(id));
 
         userService.validateTokenMatch(user, token);
 
-        User updatedUser = DTOMapper.INSTANCE.convertUserPutDTOToEntitiy(userPutDTO);
+        User updatedUser = DTOMapper.INSTANCE.convertUserPutDTOToEntity(userPutDTO);
         if (updatedUser.getUsername() == null){
             updatedUser.setUsername(user.getUsername());
         }

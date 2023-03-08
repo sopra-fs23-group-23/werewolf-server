@@ -77,7 +77,7 @@ public class UserService {
     }
 
     public void logoutUser(Long id) {
-        User userById = userRepository.findById(id);
+        User userById = getUser(id);
         userById.setStatus(UserStatus.OFFLINE);
         userRepository.save(userById);
     }
@@ -85,16 +85,16 @@ public class UserService {
     public void getUserByToken(String token){
         User userByToken = userRepository.findByToken(token);
         if (userByToken == null){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not authorized.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with this token does not exist.");
         }
     }
 
-    public User getUserById(Long id){
-        User userById = userRepository.findById(id);
-        if (userById == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User could not be found.");
+    public User getUser(Long id) {
+        Optional<User> user = this.userRepository.findById(id);
+        if (!user.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with userId %d was not found.", id));
         }
-        return userById;
+        return user.get();
     }
 
     public void validateTokenMatch(User user, String token){
@@ -104,7 +104,7 @@ public class UserService {
     }
 
     public void updateUser(User updatedUser, Long id) throws ParseException {
-        User userById = getUserById(id);
+        User userById = getUser(id);
         User userByUsername = userRepository.findByUsername(updatedUser.getUsername());
 
         // check if username actually changed

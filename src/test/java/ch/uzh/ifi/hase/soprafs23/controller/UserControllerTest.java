@@ -31,6 +31,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -72,7 +73,7 @@ public class UserControllerTest {
 
     // this mocks the UserService -> we define above what the userService should
     // return when getUsers() is called
-      given(userRepository.findByToken(Mockito.any())).willReturn(user);
+
     given(userService.getUsers()).willReturn(allUsers);
 
 
@@ -130,7 +131,7 @@ public class UserControllerTest {
       userPostDTO.setPassword("password");
       userPostDTO.setUsername("username");
 
-      given(userService.createUser(Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.CONFLICT, String.format("The %s provided %s not unique. Therefore, the user could not be created!", "username", "is")));
+      given(userService.createUser(Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.CONFLICT, "The username provided is not unique. Therefore, the user could not be created!"));
 
       // do request and validate result
       MockHttpServletRequestBuilder postRequest = post("/users")
@@ -148,16 +149,13 @@ public class UserControllerTest {
       User user = new User();
       user.setId(1L);
       user.setUsername("username");
-      user.setCreationDate("20.04.1999");
+      user.setCreationDate("07.03.2023");
       user.setStatus(UserStatus.ONLINE);
       user.setBirthday("20.04.1999");
       user.setPassword("password");
       user.setToken("12345");
 
-      Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(user);
-
-      //given(userRepository.findById(Mockito.any())).willReturn(user);
-      given(userRepository.findByToken(Mockito.any())).willReturn(user);
+      Mockito.when(userService.getUser(Mockito.anyLong())).thenReturn(user);
 
 
       // when/then -> do the request + validate the result
@@ -170,7 +168,7 @@ public class UserControllerTest {
               .andExpect(status().isOk())
               .andExpect(jsonPath("$.id", is(user.getId().intValue())))
               .andExpect(jsonPath("$.username", is(user.getUsername())))
-              .andExpect(jsonPath("$.creation_date", is(user.getCreationDate())))
+              .andExpect(jsonPath("$.creationDate", is(user.getCreationDate())))
               .andExpect(jsonPath("$.status", is(user.getStatus().toString())))
               .andExpect(jsonPath("$.birthday", is(user.getBirthday())));
   }
@@ -178,7 +176,7 @@ public class UserControllerTest {
   @Test
   public void getSingleUser_throwResponseStatusException() throws Exception {
 
-      given(userRepository.findByToken(Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "User could not be found."));
+      given(userService.getUser(Mockito.anyLong())).willThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "User could not be found."));
 
       // when/then -> do the request + validate the result
       MockHttpServletRequestBuilder getRequest = get("/users/" + 1)
@@ -186,34 +184,23 @@ public class UserControllerTest {
               .header("token", "12345");
       // then
       mockMvc.perform(getRequest)
-              .andExpect(status().isBadRequest());
+              .andExpect(status().isNotFound());
   }
 
   @Test
   public void updateUser_success() throws Exception{
       //given
-/*      User user = new User();
-      user.setId(1L);
-      user.setUsername("username");
-      user.setCreationDate("20.04.1999");
-      user.setStatus(UserStatus.ONLINE);
-      user.setBirthday("20.04.2000");
-      user.setPassword("password");
-      user.setToken("12345");
-
-      given(userRepository.save(Mockito.any())).willReturn(user);*/
-
       UserPutDTO userPutDTO = new UserPutDTO();
       userPutDTO.setUsername("username2");
       userPutDTO.setBirthday("20.04.1999");
 
-      // TODO HTTP 400 Bad Request instead of 204
-
+      //when
       MockHttpServletRequestBuilder putRequest = MockMvcRequestBuilders.put("/users/" + 1)
               .contentType(MediaType.APPLICATION_JSON)
               .header("token", "12345")
               .content(asJsonString(userPutDTO));
 
+      // then
       mockMvc.perform(putRequest)
               .andExpect(status().isNoContent());
   }
