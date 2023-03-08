@@ -85,6 +85,8 @@ public class UserService {
         userRepository.save(userById);
     }
 
+
+    // TODO validation and getUser
     public void updateUser(User updatedUser, long id) throws ParseException {
         User userById = userRepository.findById(id);
         User userByUsername = userRepository.findByUsername(updatedUser.getUsername());

@@ -10,6 +10,7 @@ import ch.uzh.ifi.hase.soprafs23.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -71,7 +72,9 @@ public class UserControllerTest {
 
     // this mocks the UserService -> we define above what the userService should
     // return when getUsers() is called
+      given(userRepository.findByToken(Mockito.any())).willReturn(user);
     given(userService.getUsers()).willReturn(allUsers);
+
 
     // when
     MockHttpServletRequestBuilder getRequest = get("/users")
@@ -151,16 +154,16 @@ public class UserControllerTest {
       user.setPassword("password");
       user.setToken("12345");
 
-      given(userRepository.findById(Mockito.any())).willReturn(Optional.of(user));
+      Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(user);
+
+      //given(userRepository.findById(Mockito.any())).willReturn(user);
       given(userRepository.findByToken(Mockito.any())).willReturn(user);
 
 
       // when/then -> do the request + validate the result
-      MockHttpServletRequestBuilder getRequest = get("/users/1")
+      MockHttpServletRequestBuilder getRequest = get("/users/" + 1)
               .contentType(MediaType.APPLICATION_JSON)
               .header("token", "12345");
-
-      // TODO Error message = You are not authorized to access the dashboard.
 
       // then
       mockMvc.perform(getRequest)
