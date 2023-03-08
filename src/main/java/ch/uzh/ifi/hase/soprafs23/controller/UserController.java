@@ -40,10 +40,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<UserDTO> getAllUsers(@RequestHeader("token") String token) {
-        User userByToken = userRepository.findByToken(token);
-        if (userByToken == null){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not authorized to access the dashboard.");
-        }
+        userService.getUserByToken(token);
         // fetch all users in the internal representation
         List<User> users = userService.getUsers();
         List<UserDTO> userDTOs = new ArrayList<>();
@@ -57,14 +54,10 @@ public class UserController {
     @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO getSingleUser(@PathVariable("id") String id, @RequestHeader("token") String token){
-        User user = userRepository.findById(Long.parseLong(id));
-        User userByToken = userRepository.findByToken(token);
-        if (userByToken == null){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not authorized to access the dashboard.");
-        }
-        if (user == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User could not be found."));
-        }
+
+        User user = userService.getUserById(Long.parseLong(id));
+        userService.getUserByToken(token);
+
         return DTOMapper.INSTANCE.convertEntityToUserDTO(user);
     }
 
@@ -97,23 +90,20 @@ public class UserController {
     @PutMapping("/users/logout/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void logoutUser(@PathVariable("id") String id, @RequestHeader("token") String token) {
-        User user = userRepository.findById(Long.parseLong(id));
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User could not be found.");
-        }
-        if (!(Objects.equals(user.getToken(), token))) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, String.format("Authorization failed. User token is not valid."));
-        }
+        User user = userService.getUserById(Long.parseLong(id));
+
+        userService.validateTokenMatch(user, token);
+
         userService.logoutUser(Long.parseLong(id));
     }
 
     @PutMapping("/users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateUserData(@PathVariable("id") String id, @RequestBody UserPutDTO userPutDTO, @RequestHeader("token") String token) throws ParseException {
-        User user = userRepository.findById(Long.parseLong(id));
-        if (!(Objects.equals(user.getToken(), token))){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, String.format("Authorization failed. User token is not valid. You cannot access and modify %s.", user.getUsername()));
-        }
+        User user = userService.getUserById(Long.parseLong(id));
+
+        userService.validateTokenMatch(user, token);
+
         User updatedUser = DTOMapper.INSTANCE.convertUserPutDTOToEntitiy(userPutDTO);
         if (updatedUser.getUsername() == null){
             updatedUser.setUsername(user.getUsername());

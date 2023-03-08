@@ -13,11 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.text.ParseException;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * User Service
@@ -79,20 +76,37 @@ public class UserService {
         }
     }
 
-    public void logoutUser(long id) {
+    public void logoutUser(Long id) {
         User userById = userRepository.findById(id);
         userById.setStatus(UserStatus.OFFLINE);
         userRepository.save(userById);
     }
 
-
-    // TODO validation and getUser
-    public void updateUser(User updatedUser, long id) throws ParseException {
-        User userById = userRepository.findById(id);
-        User userByUsername = userRepository.findByUsername(updatedUser.getUsername());
-        if (userById == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User could not be found.", id));
+    public void getUserByToken(String token){
+        User userByToken = userRepository.findByToken(token);
+        if (userByToken == null){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not authorized.");
         }
+    }
+
+    public User getUserById(Long id){
+        User userById = userRepository.findById(id);
+        if (userById == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User could not be found.");
+        }
+        return userById;
+    }
+
+    public void validateTokenMatch(User user, String token){
+        if (!(Objects.equals(user.getToken(), token))){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. User token is not valid.");
+        }
+    }
+
+    public void updateUser(User updatedUser, Long id) throws ParseException {
+        User userById = getUserById(id);
+        User userByUsername = userRepository.findByUsername(updatedUser.getUsername());
+
         // check if username actually changed
         if (!(Objects.equals(userById.getUsername(), updatedUser.getUsername()))){
             if(!(userByUsername == null)){
@@ -135,5 +149,3 @@ public class UserService {
         }
     }
 }
-
-// TODO: error messages
