@@ -8,7 +8,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.PlayerObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.TiedPollDecider;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;

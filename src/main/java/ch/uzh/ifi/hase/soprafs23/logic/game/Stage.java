@@ -5,8 +5,8 @@ import java.util.Queue;
 import java.util.function.Supplier;
 
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollObserver;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 
 public class Stage implements PollObserver{
 
