@@ -1,32 +1,46 @@
 package ch.uzh.ifi.hase.soprafs23.logic.lobby;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 
 public class Lobby {
-    private String id;
+    private Long id;
     private Player admin;
-    private List<Player> players;
+    private Set<Player> players;
     private Map<Class<? extends Role>, Role> roles;
     private boolean open;
 
-    public Lobby(String id, Player admin) {
+    public Lobby(Long id, Player admin) {
         this.id = id;
         this.admin = admin;
+        this.players = new HashSet<>();
+        players.add(admin);
+        this.open = true;
     }
 
     public void addPlayer(Player player) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addPlayer'");
+        if(!players.add(player)) {
+            throw new IllegalArgumentException(String.format("Player with user id %d is already in Lobby.", player.getId()));
+        }
     }
 
     public void removePlayer(Player player) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'removePlayer'");
+        if(!players.remove(player)) {
+            throw new IllegalArgumentException(String.format("Player with user id %d is not in Lobby and could not be removed.", player.getId()));
+        }
+    }
+
+    public Iterable<Player> getPlayers() {
+        return players;
+    }
+
+    public Player getAdmin() {
+        return admin;
     }
 
     public Collection<Role> getRoles() {
