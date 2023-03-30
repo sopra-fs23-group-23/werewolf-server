@@ -31,7 +31,13 @@ public class Player {
     }
 
     public void killPlayer() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'killPlayer'");
+        this.alive = false;
+        notifyObservers();
+    }
+
+    private void notifyObservers() {
+        for (PlayerObserver playerObserver : observers) {
+            playerObserver.onPlayerKilled();
+        }
     }
 }
