@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
-    private String id;
+    private Long id;
     private String name;
     private boolean alive = true;
     private List<PlayerObserver> observers = new ArrayList<>();
 
-    public Player(String id, String name) {
+    public Player(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 

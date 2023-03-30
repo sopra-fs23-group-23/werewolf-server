@@ -10,19 +10,19 @@ public class PlayerTest {
 
     @Test
     public void getNameTest() {
-        Player player = new Player("12", "Test");
+        Player player = new Player(12l, "Test");
         assertEquals("Test", player.getName());
     }
 
     @Test
     public void getIdTest() {
-        Player player = new Player("12", "Test");
-        assertEquals("12", player.getId());
+        Player player = new Player(12l, "Test");
+        assertEquals(12l, player.getId());
     }
 
     @Test
     public void killPlayerTest() {
-        Player player = new Player("12", "Test");
+        Player player = new Player(12l, "Test");
         assertTrue(player.isAlive());
         player.killPlayer();
         assertFalse(player.isAlive());
@@ -44,7 +44,7 @@ public class PlayerTest {
 
     @Test
     public void observerTest() {
-        Player player = new Player("12", "Test");
+        Player player = new Player(12l, "Test");
         MockObserver observer = new MockObserver();
         player.addObserver(observer);
         assertTrue(observer.isPlayerAlive());

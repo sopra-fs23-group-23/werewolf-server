@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 public class LobbyTest {
     @Test
     void adminAddedOnCreationTest() {
-        Player admin = new Player("12", "admin");
+        Player admin = new Player(1l, "admin");
         Lobby l = new Lobby(1l, admin);
         assertEquals(admin, l.getAdmin());
         assertEquals(admin, l.getPlayers().iterator().next());
@@ -23,8 +23,8 @@ public class LobbyTest {
 
     @Test
     void addPlayerTest() {
-        Player admin = new Player("12", "admin");
-        Player p = new Player("13", "player");
+        Player admin = new Player(12l, "admin");
+        Player p = new Player(13l, "player");
         Lobby l = new Lobby(1l, admin);
         l.addPlayer(p);
         List<Player> actual = new ArrayList<>();
@@ -35,8 +35,8 @@ public class LobbyTest {
 
     @Test
     void testRemovePlayer() {
-        Player admin = new Player("12", "admin");
-        Player p = new Player("13", "player");
+        Player admin = new Player(12l, "admin");
+        Player p = new Player(13l, "player");
         Lobby l = new Lobby(1l, admin);
         l.addPlayer(p);
         l.removePlayer(p);
