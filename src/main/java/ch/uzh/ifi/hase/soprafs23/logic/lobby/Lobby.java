@@ -43,6 +43,10 @@ public class Lobby {
         return admin;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public Collection<Role> getRoles() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getRoles'");
