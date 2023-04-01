@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
 
 public class LobbyServiceTest {
     LobbyService lobbyService = new LobbyService();
@@ -61,7 +62,7 @@ public class LobbyServiceTest {
         User joiningUser = new User();
         joiningUser.setId(2l);
         joiningUser.setUsername("Test");
-        Lobby lobby = new Lobby(1L, new Player(admin.getId(), admin.getUsername()));
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
         lobbyService.joinUserToLobby(joiningUser, lobby);
         assertTrue(StreamSupport.stream(lobby.getPlayers().spliterator(), false).anyMatch(p->p.getId() == joiningUser.getId()), "Joining player was not added to lobby");
     }

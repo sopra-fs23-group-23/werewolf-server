@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
 
 @Service
 @Transactional
@@ -31,7 +32,7 @@ public class LobbyService {
     }
 
     public Lobby createNewLobby(User creator) {
-        Player admin = new Player(creator.getId(), creator.getUsername());
+        Player admin = LogicEntityMapper.createPlayerFromUser(creator);
         if(lobbies.values().stream().anyMatch(l -> l.getAdmin().equals(admin))) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already has a lobby");
         }
@@ -61,6 +62,6 @@ public class LobbyService {
         if (userInALobby(user)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a lobby");
         }
-        lobby.addPlayer(new Player(user.getId(), user.getUsername()));
+        lobby.addPlayer(LogicEntityMapper.createPlayerFromUser(user));
     }
 }

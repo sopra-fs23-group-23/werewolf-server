@@ -1,11 +1,12 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
+import static org.hamcrest.Matchers.is;
+
 import static org.mockito.Mockito.doNothing;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -17,7 +18,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
-import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
 
@@ -33,11 +34,17 @@ public class LobbyControllerTest {
     @MockBean
     private UserService userService;
 
+    private User createTestUser(String username, Long id) {
+        User user = new User();
+        user.setId(id);
+        user.setUsername(username);
+        return user;
+    }
+
     @Test
     void createNewLobbyTest() throws Exception {
-        User tUser = new User();
-        tUser.setId(1l);
-        Lobby lobby = new Lobby(1L, new Player(1L, "test"));
+        User tUser = createTestUser("test", 1l);
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(tUser));
         Mockito.when(userService.getUser(1l)).thenReturn(tUser);
         Mockito.when(lobbyService.createNewLobby(tUser)).thenReturn(lobby);
 
@@ -45,18 +52,16 @@ public class LobbyControllerTest {
             .header("uid", 1);
 
         mockMvc.perform(postRequest)
-            .andExpect(content().string(Long.toString(lobby.getId())))
-            .andExpect(status().isCreated());
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.lobbyId", is(lobby.getId().intValue())))
+            .andExpect(jsonPath("$.adminUserId", is(tUser.getId().intValue())));
     }
 
     @Test
     void joinLobbyTest() throws Exception {
-        User admin = new User();
-        User joiningUser = new User();
-        joiningUser.setId(2l);
-        admin.setId(1l);
-        admin.setUsername("admin");
-        Lobby lobby = new Lobby(1L, new Player(admin.getId(), admin.getUsername()));
+        User admin = createTestUser("admin", 1l);
+        User joiningUser = createTestUser("joiningUser", 2l);
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
 
         Mockito.when(userService.getUser(Mockito.anyLong())).thenReturn(joiningUser);
         Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
