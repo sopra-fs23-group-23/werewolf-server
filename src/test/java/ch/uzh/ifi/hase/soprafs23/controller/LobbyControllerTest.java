@@ -53,8 +53,8 @@ public class LobbyControllerTest {
 
         mockMvc.perform(postRequest)
             .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.lobbyId", is(lobby.getId().intValue())))
-            .andExpect(jsonPath("$.adminUserId", is(tUser.getId().intValue())));
+            .andExpect(jsonPath("$.id", is(lobby.getId().intValue())))
+            .andExpect(jsonPath("$.admin.id", is(tUser.getId().intValue())));
     }
 
     @Test

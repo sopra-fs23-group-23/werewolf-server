@@ -1,21 +1,28 @@
 package ch.uzh.ifi.hase.soprafs23.rest.dto;
 
-public class LobbyGetDTO {
-    private Long lobbyId;
-    private Long adminUserId;
-    
-    public Long getLobbyId() {
-        return lobbyId;
-    }
-    public void setLobbyId(Long lobbyId) {
-        this.lobbyId = lobbyId;
-    }
-    public Long getAdminUserId() {
-        return adminUserId;
-    }
-    public void setAdminUserId(Long adminUserId) {
-        this.adminUserId = adminUserId;
-    }
+import java.util.List;
 
-    
+public class LobbyGetDTO {
+    private Long id;
+    private PlayerGetDTO admin;
+    private List<PlayerGetDTO> players;
+
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public PlayerGetDTO getAdmin() {
+        return admin;
+    }
+    public void setAdmin(PlayerGetDTO admin) {
+        this.admin = admin;
+    }
+    public List<PlayerGetDTO> getPlayers() {
+        return players;
+    }
+    public void setPlayers(List<PlayerGetDTO> players) {
+        this.players = players;
+    }
 }
