@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbyGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
 
@@ -32,10 +35,10 @@ public class LobbyController {
     @PostMapping("/lobbies")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public Long createNewLobby(@RequestHeader("uid") Long userId) {
+    public LobbyGetDTO createNewLobby(@RequestHeader("uid") Long userId) {
         User user = userService.getUser(userId);
         Lobby l = lobbyService.createNewLobby(user);
-        return l.getId();
+        return LogicDTOMapper.convertLobbyToLobbyGetDTO(l);
     }
 
     @PutMapping("/lobbies/{lobbyId}")
@@ -45,5 +48,15 @@ public class LobbyController {
         User user = userService.getUser(userId);
         Lobby lobby = lobbyService.getLobbyById(LobbyId);
         lobbyService.joinUserToLobby(user, lobby);
+    }
+
+    @GetMapping("/lobbies/{lobbyId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public LobbyGetDTO getLobbyInformation(@PathVariable("lobbyId") Long LobbyId, @RequestHeader("uid") Long userId) {
+        User user = userService.getUser(userId);
+        Lobby lobby = lobbyService.getLobbyById(LobbyId);
+        lobbyService.validateUserIsInLobby(user, lobby);
+        return LogicDTOMapper.convertLobbyToLobbyGetDTO(lobby);
     }
 }

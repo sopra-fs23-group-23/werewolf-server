@@ -50,6 +50,21 @@ public class PlayerTest {
         assertTrue(observer.isPlayerAlive());
         player.killPlayer();
         assertFalse(observer.isPlayerAlive());
+    }
 
+    @Test
+    void testEquality() {
+        Player p1 = new Player(1l, "a");
+        Player p2 = new Player(1l, "a");
+        assertTrue(p1.equals(p2), "Players, which are equal not considered equal by .equal()");
+        assertTrue(p1.hashCode() == p2.hashCode(), "Equal players do not have equal hashcodes");
+    }
+
+    @Test
+    void testInequality() {
+        Player p1 = new Player(1l, "a");
+        Player p2 = new Player(2l, "a");
+        assertFalse(p1.equals(p2), "Players, which are not equal considered equal by .equal()");
+        assertFalse(p1.hashCode() == p2.hashCode(), "Inequal players have equal hashcodes");
     }
 }

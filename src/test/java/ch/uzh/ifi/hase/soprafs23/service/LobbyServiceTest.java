@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
 
 public class LobbyServiceTest {
     LobbyService lobbyService = new LobbyService();
@@ -61,7 +62,7 @@ public class LobbyServiceTest {
         User joiningUser = new User();
         joiningUser.setId(2l);
         joiningUser.setUsername("Test");
-        Lobby lobby = new Lobby(1L, new Player(admin.getId(), admin.getUsername()));
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
         lobbyService.joinUserToLobby(joiningUser, lobby);
         assertTrue(StreamSupport.stream(lobby.getPlayers().spliterator(), false).anyMatch(p->p.getId() == joiningUser.getId()), "Joining player was not added to lobby");
     }
@@ -80,5 +81,22 @@ public class LobbyServiceTest {
         lobbyService.joinUserToLobby(joiningUser, lobby1);
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.joinUserToLobby(joiningUser, lobby2));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+    }
+
+    @Test
+    void testValidateUserIsInLobby() {
+        User admin = createTestAdmin();
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
+        lobbyService.validateUserIsInLobby(admin, lobby);
+    }
+
+    @Test
+    void testValidateUserIsInLobby_userNotInLobby() {
+        User admin = createTestAdmin();
+        User randoUser = new User();
+        randoUser.setId(2l);
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.validateUserIsInLobby(randoUser, lobby));
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
     }
 }
