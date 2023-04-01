@@ -51,15 +51,11 @@ public class Player {
         if (getClass() != obj.getClass())
             return false;
         final Player other = (Player) obj;
-        return id == other.id && alive == other.alive && name == other.name;
+        return id == other.id;
     }
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(new Object[] {
-            id,
-            alive,
-            name
-        });
+        return id.hashCode();
     }
 }
