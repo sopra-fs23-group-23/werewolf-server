@@ -19,6 +19,14 @@ public class Lobby {
         this.admin = admin;
     }
 
+    public static int getLobbySize(Lobby lobby){
+        int playerCount = 0;
+        for (Player player: lobby.players) {
+            playerCount++;
+        }
+        return playerCount;
+    }
+
     public void addPlayer(Player player) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addPlayer'");
