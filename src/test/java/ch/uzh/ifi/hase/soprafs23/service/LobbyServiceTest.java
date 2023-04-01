@@ -82,4 +82,21 @@ public class LobbyServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.joinUserToLobby(joiningUser, lobby2));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
     }
+
+    @Test
+    void testValidateUserIsInLobby() {
+        User admin = createTestAdmin();
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
+        lobbyService.validateUserIsInLobby(admin, lobby);
+    }
+
+    @Test
+    void testValidateUserIsInLobby_userNotInLobby() {
+        User admin = createTestAdmin();
+        User randoUser = new User();
+        randoUser.setId(2l);
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.validateUserIsInLobby(randoUser, lobby));
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
+    }
 }

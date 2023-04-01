@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -72,5 +73,26 @@ public class LobbyControllerTest {
 
         mockMvc.perform(putRequest)
             .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void testGetLobbyInformation() throws Exception {
+        User admin = createTestUser("admin", 1l);
+        User usr = createTestUser("user", 2l);
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
+        lobby.addPlayer(LogicEntityMapper.createPlayerFromUser(usr));
+
+        Mockito.when(userService.getUser(1l)).thenReturn(usr);
+        Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
+        doNothing().when(lobbyService).validateUserIsInLobby(usr, lobby);
+
+        MockHttpServletRequestBuilder getRequest = get("/lobbies/1")
+            .header("uid", 2);
+
+        mockMvc.perform(getRequest)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(lobby.getId().intValue())))
+            .andExpect(jsonPath("$.admin.id", is(admin.getId().intValue())))
+            .andExpect(jsonPath(String.format("$.players[?(@.id == %d)]", usr.getId())).exists());
     }
 }

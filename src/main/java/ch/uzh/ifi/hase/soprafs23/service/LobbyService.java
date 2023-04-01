@@ -58,6 +58,16 @@ public class LobbyService {
         );
     }
 
+    private boolean userIsInLobby(User user, Lobby lobby) {
+        return StreamSupport.stream(lobby.getPlayers().spliterator(), false).anyMatch(p->p.getId()==user.getId());
+    }
+
+    public void validateUserIsInLobby(User user, Lobby lobby) {
+        if (!userIsInLobby(user, lobby)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not part of this lobby");
+        }
+    }
+
     public void joinUserToLobby(User user, Lobby lobby) {
         if (userInALobby(user)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a lobby");
