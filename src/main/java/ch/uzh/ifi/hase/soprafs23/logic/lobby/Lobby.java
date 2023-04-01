@@ -23,6 +23,14 @@ public class Lobby {
         this.open = true;
     }
 
+    public static int getLobbySize(Lobby lobby){
+        int playerCount = 0;
+        for (Player player: lobby.players) {
+            playerCount++;
+        }
+        return playerCount;
+    }
+
     public void addPlayer(Player player) {
         if(!players.add(player)) {
             throw new IllegalArgumentException(String.format("Player with user id %d is already in Lobby.", player.getId()));
