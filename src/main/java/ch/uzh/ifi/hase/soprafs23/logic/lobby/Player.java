@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.logic.lobby;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Player {
@@ -50,11 +51,15 @@ public class Player {
         if (getClass() != obj.getClass())
             return false;
         final Player other = (Player) obj;
-        return id == other.id;
+        return id == other.id && alive == other.alive && name == other.name;
     }
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return Arrays.hashCode(new Object[] {
+            id,
+            alive,
+            name
+        });
     }
 }
