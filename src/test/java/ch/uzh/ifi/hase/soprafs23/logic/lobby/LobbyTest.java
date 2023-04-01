@@ -42,4 +42,50 @@ public class LobbyTest {
         l.removePlayer(p);
         assertThat(l.getPlayers(), not(hasItem(p)));
     }
+
+    @Test
+    void testGetLobbySize(){
+        Player admin = new Player(12l, "admin");
+        Lobby l = new Lobby(1l, admin);
+        int actual = l.getLobbySize();
+        int expected = 1;
+        assertEquals(actual, expected);
+    }
+
+    @Test
+    void testGetAlivePlayers(){
+        Player admin = new Player(12l, "admin");
+        Player p = new Player(13l, "player");
+        Lobby l = new Lobby(1l, admin);
+        l.addPlayer(p);
+        List<Player> actual = l.getAlivePlayers();
+        List<Player> expected = Arrays.asList(p, admin);
+        assertThat("List equality without order", actual, containsInAnyOrder(expected.toArray()));
+    }
+
+    @Test
+    void testAddPlayerToRole(){
+        // TODO implement
+    }
+
+    @Test
+    void testInstantiateRoles(){
+        // TODO implement
+    }
+
+    @Test
+    void testShufflePlayer(){
+        Player admin = new Player(12l, "admin");
+        Player p1 = new Player(13l, "player1");
+        Player p2 = new Player(14l, "player2");
+        Player p3 = new Player(15l, "player3");
+        Lobby l = new Lobby(1l, admin);
+        l.addPlayer(p1);
+        l.addPlayer(p2);
+        l.addPlayer(p3);
+
+        ArrayList<Player> actual = l.shufflePlayers();
+        List<Player> expected = Arrays.asList(p1,p2,p3,admin);
+        assertThat("List equality without order", actual, containsInAnyOrder(expected.toArray()));
+    }
 }
