@@ -1,17 +1,21 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.StreamSupport;
 
 import javax.transaction.Transactional;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
@@ -21,7 +25,26 @@ import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
 @Service
 @Transactional
 public class LobbyService {
+    private class LobbyEmitter {
+        private SseEmitter emitter;
+        private String token;
+
+        public LobbyEmitter(SseEmitter emitter) {
+            this.emitter = emitter;
+            this.token = UUID.randomUUID().toString();
+        }
+
+        public SseEmitter getEmitter() {
+            return emitter;
+        }
+
+        public String getToken() {
+            return token;
+        }
+    }
+
     private Map<Long, Lobby> lobbies = new HashMap<>();
+    private Map<Long, LobbyEmitter> lobbyEmitterMap = new HashMap<>();
 
     private Long createLobbyId() {
         Long newId = ThreadLocalRandom.current().nextLong(100000, 999999);
@@ -74,4 +97,35 @@ public class LobbyService {
         }
         lobby.addPlayer(LogicEntityMapper.createPlayerFromUser(user));
     }
+
+    public SseEmitter createLobbyEmitter(Lobby lobby) {
+        SseEmitter emitter = new SseEmitter(-1l);
+        lobbyEmitterMap.put(lobby.getId(), new LobbyEmitter(emitter));
+        return emitter;
+    }
+
+    public String getLobbyEmitterToken (Lobby lobby) {
+        return lobbyEmitterMap.get(lobby.getId()).getToken();
+    }
+
+    public void validateLobbyEmitterToken (Lobby lobby, String token) {
+        if(!lobbyEmitterMap.get(lobby.getId()).getToken().equals(token)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid token");
+        }
+    }
+
+    public SseEmitter getLobbyEmitter (Lobby lobby) {
+        return lobbyEmitterMap.get(lobby.getId()).getEmitter();
+    }
+
+    public void sendEmitterUpdate(SseEmitter emitter, String data) throws IOException {
+        SseEventBuilder event;
+        event = SseEmitter.event()
+            .data( data + "\n", MediaType.APPLICATION_JSON)
+            .id(UUID.randomUUID().toString())
+            .name("lobby update event");
+            emitter.send(event);
+    }
+
+
 }

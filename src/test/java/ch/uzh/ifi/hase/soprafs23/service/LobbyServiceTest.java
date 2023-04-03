@@ -3,16 +3,20 @@ package ch.uzh.ifi.hase.soprafs23.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
+import java.io.IOException;
 import java.util.stream.StreamSupport;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
-import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
 
 public class LobbyServiceTest {
@@ -98,5 +102,22 @@ public class LobbyServiceTest {
         Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.validateUserIsInLobby(randoUser, lobby));
         assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
+    }
+
+    @Test
+    void testCreateAndGetLobbyEmitter() {
+        User admin = createTestAdmin();
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
+        SseEmitter emitter = lobbyService.createLobbyEmitter(lobby);
+        assertEquals(emitter, lobbyService.getLobbyEmitter(lobby));
+
+
+    }
+
+    @Test
+    void testSendEmitterUpdate() throws IOException {
+        SseEmitter mockEmitter = mock(SseEmitter.class);
+        lobbyService.sendEmitterUpdate(mockEmitter, "test");
+        Mockito.verify(mockEmitter).send(Mockito.any(SseEventBuilder.class));
     }
 }
