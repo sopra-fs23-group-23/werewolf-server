@@ -61,6 +61,19 @@ public class LobbyService {
         }
         Lobby l = new Lobby(createLobbyId(), admin);
         lobbies.put(l.getId(), l);
+        /* TODO Miro
+
+            static String appId = "348d6a205d75436e916896366c5e315c";
+            static String appCertificate = "2e1e585ed3f74218ae249f7d14656fe2";
+            static String channelName = LOBBYID;
+            static int uid = USER_ID;
+            static int expirationTimeInSeconds = 3600;
+
+         * create new RTCTokenBuilder here:
+         *  RtcTokenBuilder token = new RtcTokenBuilder();
+         *  int timestamp = (int)(System.currentTimeMillis() / 1000 + expirationTimeInSeconds);
+         *  String result = token.buildTokenWithUid(appId, appCertificate, channelName, uid, Role.Role_Publisher, timestamp);
+         */
         return l;
     }
 
