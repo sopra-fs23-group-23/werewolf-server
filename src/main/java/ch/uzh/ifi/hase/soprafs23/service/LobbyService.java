@@ -21,32 +21,15 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
+import ch.uzh.ifi.hase.soprafs23.service.wrapper.LobbyEmitterWrapper;
 import ch.uzh.ifi.hase.soprafs23.service.wrapper.LobbyVoiceWrapper;
 
 @Service
 @Transactional
 public class LobbyService {
-    // TODO this will be moved to its own wrapper
-    private class LobbyEmitter {
-        private SseEmitter emitter;
-        private String token;
-
-        public LobbyEmitter(SseEmitter emitter) {
-            this.emitter = emitter;
-            this.token = UUID.randomUUID().toString();
-        }
-
-        public SseEmitter getEmitter() {
-            return emitter;
-        }
-
-        public String getToken() {
-            return token;
-        }
-    }
 
     private Map<Long, Lobby> lobbies = new HashMap<>();
-    private Map<Long, LobbyEmitter> lobbyEmitterMap = new HashMap<>();
+    private Map<Long, LobbyEmitterWrapper> lobbyEmitterMap = new HashMap<>();
     private Map<Long, LobbyVoiceWrapper> lobbyVoiceMap = new HashMap<>();
 
     private Long createLobbyId() {
@@ -103,7 +86,7 @@ public class LobbyService {
 
     public SseEmitter createLobbyEmitter(Lobby lobby) {
         SseEmitter emitter = new SseEmitter(-1l);
-        lobbyEmitterMap.put(lobby.getId(), new LobbyEmitter(emitter));
+        lobbyEmitterMap.put(lobby.getId(), new LobbyEmitterWrapper(emitter, UUID.randomUUID().toString()));
         return emitter;
     }
 
