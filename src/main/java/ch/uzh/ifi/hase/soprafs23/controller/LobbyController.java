@@ -90,4 +90,7 @@ public class LobbyController {
         lobbyService.validateLobbyEmitterToken(lobby, token);
         return lobbyService.getLobbyEmitter(lobby);
     }
+
+    // get
+    // /lobbies/{lobbyId}/voice
 }

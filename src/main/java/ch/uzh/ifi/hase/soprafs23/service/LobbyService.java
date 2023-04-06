@@ -147,5 +147,8 @@ public class LobbyService {
         throw new UnsupportedOperationException("Method not yet implemented");
     }
 
-
+    // mute
+    // kick
+    // get
+    // delete
 }
