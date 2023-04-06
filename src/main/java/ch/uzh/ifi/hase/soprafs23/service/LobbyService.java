@@ -21,10 +21,12 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
+import ch.uzh.ifi.hase.soprafs23.service.wrapper.LobbyVoiceWrapper;
 
 @Service
 @Transactional
 public class LobbyService {
+    // TODO this will be moved to its own wrapper
     private class LobbyEmitter {
         private SseEmitter emitter;
         private String token;
@@ -45,6 +47,7 @@ public class LobbyService {
 
     private Map<Long, Lobby> lobbies = new HashMap<>();
     private Map<Long, LobbyEmitter> lobbyEmitterMap = new HashMap<>();
+    private Map<Long, LobbyVoiceWrapper> lobbyVoiceMap = new HashMap<>();
 
     private Long createLobbyId() {
         Long newId = ThreadLocalRandom.current().nextLong(100000, 999999);
@@ -61,19 +64,6 @@ public class LobbyService {
         }
         Lobby l = new Lobby(createLobbyId(), admin);
         lobbies.put(l.getId(), l);
-        /* TODO Miro
-
-            static String appId = "348d6a205d75436e916896366c5e315c";
-            static String appCertificate = "2e1e585ed3f74218ae249f7d14656fe2";
-            static String channelName = LOBBYID;
-            static int uid = USER_ID;
-            static int expirationTimeInSeconds = 3600;
-
-         * create new RTCTokenBuilder here:
-         *  RtcTokenBuilder token = new RtcTokenBuilder();
-         *  int timestamp = (int)(System.currentTimeMillis() / 1000 + expirationTimeInSeconds);
-         *  String result = token.buildTokenWithUid(appId, appCertificate, channelName, uid, Role.Role_Publisher, timestamp);
-         */
         return l;
     }
 
@@ -138,6 +128,23 @@ public class LobbyService {
             .id(UUID.randomUUID().toString())
             .name("lobby update event");
             emitter.send(event);
+    }
+
+    public LobbyVoiceWrapper createLobbyVoice(Lobby lobby) {
+        /* TODO Miro
+
+            static String appId = "348d6a205d75436e916896366c5e315c";
+            static String appCertificate = "2e1e585ed3f74218ae249f7d14656fe2";
+            static String channelName = LOBBYID;
+            static int uid = USER_ID;
+            static int expirationTimeInSeconds = 3600;
+
+         * create new RTCTokenBuilder here:
+         *  RtcTokenBuilder token = new RtcTokenBuilder();
+         *  int timestamp = (int)(System.currentTimeMillis() / 1000 + expirationTimeInSeconds);
+         *  String result = token.buildTokenWithUid(appId, appCertificate, channelName, uid, Role.Role_Publisher, timestamp);
+         */
+        throw new UnsupportedOperationException("Method not yet implemented");
     }
 
 
