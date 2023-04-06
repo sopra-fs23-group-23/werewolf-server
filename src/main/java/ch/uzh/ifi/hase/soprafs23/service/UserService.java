@@ -82,11 +82,12 @@ public class UserService {
         userRepository.save(userById);
     }
 
-    public void getUserByToken(String token){
+    public User getUserByToken(String token){
         User userByToken = userRepository.findByToken(token);
         if (userByToken == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with this token does not exist.");
         }
+        return userByToken;
     }
 
     public User getUser(Long id) {
