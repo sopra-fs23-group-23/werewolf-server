@@ -4,20 +4,19 @@ import ch.uzh.ifi.hase.soprafs23.constant.VoiceChatRole;
 
 public class RTCTokenBuilder {
 
+    private static String appId = "348d6a205d75436e916896366c5e315c";
+    private static String appCertificate = "2e1e585ed3f74218ae249f7d14656fe2";
+    private static int expirationTimeInSeconds = 3600;
 
+    public String buildTokenWithUserAccount(String channelName, String account, VoiceChatRole role) {
 
-    public String buildTokenFromUid(String appId, String appCertificate, String channelName, int uid, VoiceChatRole role, int privilegeTs){
-        String account = uid == 0 ? "" : String.valueOf(uid);
-        return buildTokenWithUserAccount(appId, appCertificate, channelName,
-                account, role, privilegeTs);
-    }
-    public String buildTokenWithUserAccount(String appId, String appCertificate, String channelName, String account, VoiceChatRole role, int privilegeTs) {
-
+        int privilegeTs = (int)(System.currentTimeMillis() / 1000 + expirationTimeInSeconds);
         // Assign appropriate access privileges to each role.
         AccessToken builder = new AccessToken(appId, appCertificate, channelName, account);
         builder.addPrivilege(AccessToken.Privileges.kJoinChannel, privilegeTs);
         if (role == VoiceChatRole.Role_Publisher || role == VoiceChatRole.Role_Subscriber || role == VoiceChatRole.Role_Admin) {
             builder.addPrivilege(AccessToken.Privileges.kPublishAudioStream, privilegeTs);
+
             // not needed
             /*
             builder.addPrivilege(AccessToken.Privileges.kPublishVideoStream, privilegeTs);

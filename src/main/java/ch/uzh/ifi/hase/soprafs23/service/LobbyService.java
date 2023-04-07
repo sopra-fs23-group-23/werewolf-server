@@ -10,6 +10,8 @@ import java.util.stream.StreamSupport;
 
 import javax.transaction.Transactional;
 
+import ch.uzh.ifi.hase.soprafs23.agora.RTCTokenBuilder;
+import ch.uzh.ifi.hase.soprafs23.constant.VoiceChatRole;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -22,7 +24,6 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
 import ch.uzh.ifi.hase.soprafs23.service.wrapper.LobbyEmitterWrapper;
-import ch.uzh.ifi.hase.soprafs23.service.wrapper.LobbyVoiceWrapper;
 
 @Service
 @Transactional
@@ -30,7 +31,7 @@ public class LobbyService {
 
     private Map<Long, Lobby> lobbies = new HashMap<>();
     private Map<Long, LobbyEmitterWrapper> lobbyEmitterMap = new HashMap<>();
-    private Map<Long, LobbyVoiceWrapper> lobbyVoiceMap = new HashMap<>();
+    private Map<Long, String> lobbyVoiceMap = new HashMap<>();
 
     private Long createLobbyId() {
         Long newId = ThreadLocalRandom.current().nextLong(100000, 999999);
@@ -113,22 +114,13 @@ public class LobbyService {
             emitter.send(event);
     }
 
-    public LobbyVoiceWrapper createLobbyVoice(Lobby lobby) {
-        /* TODO Miro
-
-            static String appId = "348d6a205d75436e916896366c5e315c";
-            static String appCertificate = "2e1e585ed3f74218ae249f7d14656fe2";
-            static String channelName = LOBBYID;
-            static int uid = USER_ID;
-            static int expirationTimeInSeconds = 3600;
-
-         * create new RTCTokenBuilder here:
-         *  RtcTokenBuilder token = new RtcTokenBuilder();
-         *  int timestamp = (int)(System.currentTimeMillis() / 1000 + expirationTimeInSeconds);
-         *  String result = token.buildTokenWithUid(appId, appCertificate, channelName, uid, Role.Role_Publisher, timestamp);
-         */
-        throw new UnsupportedOperationException("Method not yet implemented");
+    public void createLobbyVoice(Lobby lobby){
+        RTCTokenBuilder newToken = new RTCTokenBuilder();
+        String token = newToken.buildTokenWithUserAccount(lobby.getId().toString(), lobby.getAdmin().getId().toString(), VoiceChatRole.Role_Publisher);
+        lobbyVoiceMap.put(lobby.getId(), token);
     }
+
+    // TODO Dave implement following rest calls for channel management
 
     // mute
     // kick
