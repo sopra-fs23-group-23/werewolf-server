@@ -1,10 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.StreamSupport;
 
@@ -118,6 +115,13 @@ public class LobbyService {
         RTCTokenBuilder newToken = new RTCTokenBuilder();
         String token = newToken.buildTokenWithUserAccount(lobby.getId().toString(), lobby.getAdmin().getId().toString(), VoiceChatRole.Role_Publisher);
         lobbyVoiceMap.put(lobby.getId(), token);
+    }
+
+    public String getLobbyVoiceToken(Lobby lobby){
+        if(Objects.equals(lobbyVoiceMap.get(lobby.getId()), "")){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return lobbyVoiceMap.get(lobby.getId());
     }
 
     // TODO Dave implement following rest calls for channel management

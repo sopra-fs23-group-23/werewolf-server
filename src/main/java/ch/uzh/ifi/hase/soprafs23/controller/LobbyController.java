@@ -91,6 +91,11 @@ public class LobbyController {
         return lobbyService.getLobbyEmitter(lobby);
     }
 
-    // get
-    // /lobbies/{lobbyId}/voice
+    @GetMapping("/lobbies/{lobbyId}/channel")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public String getVoiceChannelToken(@PathVariable("lobbyId") Long lobbyId, @RequestHeader("token") String token){
+        Lobby lobby = lobbyService.getLobbyById(lobbyId);
+        return lobbyService.getLobbyVoiceToken(lobby);
+    }
 }
