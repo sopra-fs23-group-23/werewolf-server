@@ -21,7 +21,6 @@ import java.io.Serializable;
 @Table(name = "USER")
 public class User implements Serializable {
 
-
   private static final long serialVersionUID = 1L;
 
   @Id
@@ -36,15 +35,6 @@ public class User implements Serializable {
 
   @Column(nullable = false, unique = true)
   private String token;
-
-  @Column(nullable = false)
-  private UserStatus status;
-
-  @Column(nullable = false)
-  private String creationDate;
-
-  @Column
-  private String birthday;
 
   public Long getId() {
     return id;
@@ -76,27 +66,6 @@ public class User implements Serializable {
 
   public void setToken(String token) {
     this.token = token;
-  }
-
-  public UserStatus getStatus() {
-    return status;
-  }
-
-  public void setStatus(UserStatus status) {
-    this.status = status;
-  }
-
-  public void setCreationDate(String creationDate){
-      this.creationDate = creationDate;
-  }
-  public String getCreationDate(){
-      return creationDate;
-  }
-  public void setBirthday(String birthday){
-      this.birthday = birthday;
-  }
-  public String getBirthday(){
-      return birthday;
   }
 
 }

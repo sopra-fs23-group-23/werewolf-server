@@ -41,16 +41,10 @@ public class UserService {
     }
 
     public User createUser(User newUser) {
-        Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        String strDate = formatter.format(date);
-
-        newUser.setToken(UUID.randomUUID().toString());
-        newUser.setStatus(UserStatus.ONLINE);
-        newUser.setCreationDate(strDate);
         checkIfUserExists(newUser);
-        // saves the given entity but data is only persisted in the database once
-        // flush() is called
+        newUser.setToken(UUID.randomUUID().toString());
+        //newUser.setId((long) (this.userRepository.findAll()).size() + 1);
+
         newUser = userRepository.save(newUser);
         userRepository.flush();
 
@@ -74,12 +68,6 @@ public class UserService {
             userRepository.flush();
             return userByUsername;
         }
-    }
-
-    public void logoutUser(Long id) {
-        User userById = getUser(id);
-        userById.setStatus(UserStatus.OFFLINE);
-        userRepository.save(userById);
     }
 
     public void getUserByToken(String token){
@@ -142,10 +130,9 @@ public class UserService {
      */
     private void checkIfUserExists(User userToBeCreated) {
         User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-
-        String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
+        String baseErrorMessage = "Sorry, there already exists a User with username %s";
         if (userByUsername != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
+            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, userToBeCreated.getUsername()));
         }
     }
 }
