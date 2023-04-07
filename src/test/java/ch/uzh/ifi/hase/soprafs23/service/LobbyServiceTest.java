@@ -8,6 +8,8 @@ import static org.mockito.Mockito.mock;
 import java.io.IOException;
 import java.util.stream.StreamSupport;
 
+import ch.uzh.ifi.hase.soprafs23.agora.RTCTokenBuilder;
+import ch.uzh.ifi.hase.soprafs23.constant.VoiceChatRole;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
@@ -119,5 +121,15 @@ public class LobbyServiceTest {
         SseEmitter mockEmitter = mock(SseEmitter.class);
         lobbyService.sendEmitterUpdate(mockEmitter, "test");
         Mockito.verify(mockEmitter).send(Mockito.any(SseEventBuilder.class));
+    }
+
+
+    @Test
+    void testCreateLobbyVoice(){
+        User admin = createTestAdmin();
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
+        String token = lobbyService.createLobbyVoice(lobby);
+        assertEquals(lobbyService.getLobbyVoiceToken(lobby), token);
+
     }
 }

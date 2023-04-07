@@ -44,6 +44,7 @@ public class LobbyController {
         User user = userService.getUser(userId);
         Lobby l = lobbyService.createNewLobby(user);
         lobbyService.createLobbyEmitter(l);
+        lobbyService.createLobbyVoice(l);
         return LogicDTOMapper.convertLobbyToLobbyGetDTO(l);
     }
 
@@ -91,10 +92,10 @@ public class LobbyController {
         return lobbyService.getLobbyEmitter(lobby);
     }
 
-    @GetMapping("/lobbies/{lobbyId}/channel")
+    @GetMapping("/lobbies/{lobbyId}/channels")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public String getVoiceChannelToken(@PathVariable("lobbyId") Long lobbyId, @RequestHeader("token") String token){
+    public String getVoiceChannelToken(@PathVariable("lobbyId") Long lobbyId/*, @RequestHeader("token") String token*/){
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
         return lobbyService.getLobbyVoiceToken(lobby);
     }

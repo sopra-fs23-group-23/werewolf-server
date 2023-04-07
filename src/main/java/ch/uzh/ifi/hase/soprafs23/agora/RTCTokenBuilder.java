@@ -16,10 +16,9 @@ public class RTCTokenBuilder {
         builder.addPrivilege(AccessToken.Privileges.kJoinChannel, privilegeTs);
         if (role == VoiceChatRole.Role_Publisher || role == VoiceChatRole.Role_Subscriber || role == VoiceChatRole.Role_Admin) {
             builder.addPrivilege(AccessToken.Privileges.kPublishAudioStream, privilegeTs);
-
+            builder.addPrivilege(AccessToken.Privileges.kPublishVideoStream, privilegeTs);
             // not needed
             /*
-            builder.addPrivilege(AccessToken.Privileges.kPublishVideoStream, privilegeTs);
             builder.addPrivilege(AccessToken.Privileges.kPublishDataStream, privilegeTs);
              */
         }

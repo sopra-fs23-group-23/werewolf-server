@@ -11,6 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import ch.uzh.ifi.hase.soprafs23.agora.RTCTokenBuilder;
+import ch.uzh.ifi.hase.soprafs23.constant.VoiceChatRole;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,4 +139,22 @@ public class LobbyControllerTest {
             .andExpect(status().isOk());
         
     }
+
+    // commentet out because it actually creats a token.. maybe mock or leave out
+
+//    @Test
+//    void testGetVoiceChannelToken() throws Exception{
+//        User user = createTestUser("test", 1l);
+//        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(user));
+//        RTCTokenBuilder newtoken = new RTCTokenBuilder();
+//        String token = newtoken.buildTokenWithUserAccount(lobby.getId().toString(), user.getId().toString(), VoiceChatRole.Role_Publisher);
+//        Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
+//        Mockito.when(lobbyService.getLobbyVoiceToken(lobby)).thenReturn(token);
+//
+//        MockHttpServletRequestBuilder getRequest = get("/lobbies/1/channels");
+//
+//        mockMvc.perform(getRequest)
+//                .andExpect(status().isOk())
+//                .andExpect(content().string(token));
+//    }
 }
