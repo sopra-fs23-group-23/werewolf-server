@@ -140,21 +140,19 @@ public class LobbyControllerTest {
         
     }
 
-    // commentet out because it actually creats a token.. maybe mock or leave out
+    @Test
+    void testGetVoiceChannelToken() throws Exception{
+        User user = createTestUser("test", 1l);
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(user));
+        RTCTokenBuilder newtoken = new RTCTokenBuilder();
+        String token = newtoken.buildTokenWithUserAccount(lobby.getId().toString(), user.getId().toString(), VoiceChatRole.Role_Publisher);
+        Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
+        Mockito.when(lobbyService.getLobbyVoiceToken(lobby)).thenReturn(token);
 
-//    @Test
-//    void testGetVoiceChannelToken() throws Exception{
-//        User user = createTestUser("test", 1l);
-//        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(user));
-//        RTCTokenBuilder newtoken = new RTCTokenBuilder();
-//        String token = newtoken.buildTokenWithUserAccount(lobby.getId().toString(), user.getId().toString(), VoiceChatRole.Role_Publisher);
-//        Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
-//        Mockito.when(lobbyService.getLobbyVoiceToken(lobby)).thenReturn(token);
-//
-//        MockHttpServletRequestBuilder getRequest = get("/lobbies/1/channels");
-//
-//        mockMvc.perform(getRequest)
-//                .andExpect(status().isOk())
-//                .andExpect(content().string(token));
-//    }
+        MockHttpServletRequestBuilder getRequest = get("/lobbies/1/channels");
+
+        mockMvc.perform(getRequest)
+                .andExpect(status().isOk())
+                .andExpect(content().string(token));
+    }
 }
