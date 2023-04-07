@@ -16,6 +16,10 @@ public class Villager extends Role implements FirstDayVoter, DayVoter, Fraction{
     private BiConsumer<Player, Class<? extends Role>> addPlayerToRole;
     private Supplier<List<Player>> alivePlayersGetter;
     private TiedPollDecider tiedPollDecider;
+    private final static String description = "Since a few days there are hidden werewolves among you villagers. " +
+            "These pose a threat to peaceful village life. Therefore, the villagers win as soon as there are no " +
+            "werewolves left alive. Every day there is the possibility to democratically choose a person to be " +
+            "executed. Through this execution you will be able to rid the village of werewolves.";
 
     public Villager(BiConsumer<Player, Class<? extends Role>> addPlayerToRole,
             Supplier<List<Player>> alivePlayersGetter, TiedPollDecider tiedPollDecider) {
@@ -56,8 +60,7 @@ public class Villager extends Role implements FirstDayVoter, DayVoter, Fraction{
 
     @Override
     public String getDescription() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getDescription'");
+        return description;
     }
     
 }
