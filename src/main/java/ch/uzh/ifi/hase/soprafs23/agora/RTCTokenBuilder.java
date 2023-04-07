@@ -6,7 +6,7 @@ public class RTCTokenBuilder {
 
     private static String appId = "348d6a205d75436e916896366c5e315c";
     private static String appCertificate = "2e1e585ed3f74218ae249f7d14656fe2";
-    private static int expirationTimeInSeconds = 3600;
+    private static int expirationTimeInSeconds = 7200;
 
     public String buildTokenWithUserAccount(String channelName, String account, VoiceChatRole role) {
 
