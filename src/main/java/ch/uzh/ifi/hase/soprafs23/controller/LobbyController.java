@@ -44,7 +44,7 @@ public class LobbyController {
         User user = userService.getUser(userId);
         Lobby l = lobbyService.createNewLobby(user);
         lobbyService.createLobbyEmitter(l);
-        lobbyService.createLobbyVoice(l);
+        lobbyService.createVoiceChannelToken(l);
         return LogicDTOMapper.convertLobbyToLobbyGetDTO(l);
     }
 

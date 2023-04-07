@@ -111,7 +111,7 @@ public class LobbyService {
             emitter.send(event);
     }
 
-    public String createLobbyVoice(Lobby lobby){
+    public String createVoiceChannelToken(Lobby lobby){
         RTCTokenBuilder newToken = new RTCTokenBuilder();
         String token = newToken.buildTokenWithUserAccount(lobby.getId().toString(), lobby.getAdmin().getId().toString(), VoiceChatRole.Role_Publisher);
         lobbyVoiceMap.put(lobby.getId(), token);

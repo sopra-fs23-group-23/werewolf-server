@@ -8,8 +8,6 @@ import static org.mockito.Mockito.mock;
 import java.io.IOException;
 import java.util.stream.StreamSupport;
 
-import ch.uzh.ifi.hase.soprafs23.agora.RTCTokenBuilder;
-import ch.uzh.ifi.hase.soprafs23.constant.VoiceChatRole;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
@@ -125,10 +123,10 @@ public class LobbyServiceTest {
 
 
     @Test
-    void testCreateLobbyVoice(){
+    void testCreateVoiceChannelToken(){
         User admin = createTestAdmin();
         Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
-        String token = lobbyService.createLobbyVoice(lobby);
+        String token = lobbyService.createVoiceChannelToken(lobby);
         assertEquals(lobbyService.getLobbyVoiceToken(lobby), token);
 
     }
