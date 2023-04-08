@@ -51,12 +51,12 @@ public class LobbyControllerTest {
     void createNewLobbyTest() throws Exception {
         User tUser = createTestUser("test", 1l);
         Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(tUser));
-        Mockito.when(userService.getUser(1l)).thenReturn(tUser);
+        Mockito.when(userService.getUserByToken("token")).thenReturn(tUser);
         Mockito.when(lobbyService.createNewLobby(tUser)).thenReturn(lobby);
         Mockito.when(lobbyService.createLobbyEmitter(lobby)).thenReturn(null);
 
         MockHttpServletRequestBuilder postRequest = post("/lobbies")
-            .header("uid", 1);
+            .header(LobbyController.USERAUTH_HEADER, "token");
 
         mockMvc.perform(postRequest)
             .andExpect(status().isCreated())
