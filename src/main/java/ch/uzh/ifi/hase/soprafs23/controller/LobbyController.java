@@ -35,13 +35,10 @@ public class LobbyController {
 
     private final UserService userService;
     private final LobbyService lobbyService;
-    private final UserRepository userRepository;
 
-    public LobbyController(UserService userService, LobbyService lobbyService,
-                           UserRepository userRepository) {
+    public LobbyController(UserService userService, LobbyService lobbyService) {
         this.userService = userService;
         this.lobbyService = lobbyService;
-        this.userRepository = userRepository;
     }
 
     @PostMapping("/lobbies")
@@ -102,7 +99,7 @@ public class LobbyController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public String getVoiceChannelToken(@PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @RequestHeader(USERAUTH_HEADER) String userToken){
-        User user = userRepository.findByToken(userToken);
+        User user = userService.getUserByToken(userToken);
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
         lobbyService.validateUserIsInLobby(user, lobby);
         return lobbyService.createVoiceChannelToken(lobby, user);
