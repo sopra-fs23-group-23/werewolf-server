@@ -28,7 +28,6 @@ public class LobbyService {
 
     private Map<Long, Lobby> lobbies = new HashMap<>();
     private Map<Long, LobbyEmitterWrapper> lobbyEmitterMap = new HashMap<>();
-    private Map<Long, String> lobbyVoiceMap = new HashMap<>();
 
     private Long createLobbyId() {
         Long newId = ThreadLocalRandom.current().nextLong(100000, 999999);
@@ -111,24 +110,12 @@ public class LobbyService {
             emitter.send(event);
     }
 
-    public String createVoiceChannelToken(Lobby lobby){
+    public String createVoiceChannelToken(Lobby lobby, User user) {
         RTCTokenBuilder newToken = new RTCTokenBuilder();
-        String token = newToken.buildTokenWithUserAccount(lobby.getId().toString(), lobby.getAdmin().getId().toString(), VoiceChatRole.Role_Publisher);
-        lobbyVoiceMap.put(lobby.getId(), token);
-        return token;
-    }
-
-    public String getLobbyVoiceToken(Lobby lobby){
-        if(Objects.equals(lobbyVoiceMap.get(lobby.getId()), "")){
+        String token = newToken.buildTokenWithUserAccount(lobby.getId().toString(), user.getId().toString(), VoiceChatRole.Role_Publisher);
+        if (Objects.equals(token, "")) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        return lobbyVoiceMap.get(lobby.getId());
+        return token;
     }
-
-    // TODO Dave implement following rest calls for channel management
-
-    // mute
-    // kick
-    // get
-    // delete
 }

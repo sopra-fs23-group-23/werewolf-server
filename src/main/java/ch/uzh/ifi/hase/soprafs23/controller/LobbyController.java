@@ -1,6 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
 import java.io.IOException;
+
+import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,10 +33,13 @@ public class LobbyController {
 
     private final UserService userService;
     private final LobbyService lobbyService;
+    private final UserRepository userRepository;
 
-    public LobbyController(UserService userService, LobbyService lobbyService) {
+    public LobbyController(UserService userService, LobbyService lobbyService,
+                           UserRepository userRepository) {
         this.userService = userService;
         this.lobbyService = lobbyService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/lobbies")
@@ -44,7 +49,6 @@ public class LobbyController {
         User user = userService.getUser(userId);
         Lobby l = lobbyService.createNewLobby(user);
         lobbyService.createLobbyEmitter(l);
-        lobbyService.createVoiceChannelToken(l);
         return LogicDTOMapper.convertLobbyToLobbyGetDTO(l);
     }
 
@@ -95,8 +99,10 @@ public class LobbyController {
     @GetMapping("/lobbies/{lobbyId}/channels")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public String getVoiceChannelToken(@PathVariable("lobbyId") Long lobbyId/*, @RequestHeader("token") String token*/){
+    public String getVoiceChannelToken(@PathVariable("lobbyId") Long lobbyId, @RequestHeader("token") String token){
+        User user = userRepository.findByToken(token);
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
-        return lobbyService.getLobbyVoiceToken(lobby);
+        lobbyService.validateUserIsInLobby(user, lobby);
+        return lobbyService.createVoiceChannelToken(lobby, user);
     }
 }
