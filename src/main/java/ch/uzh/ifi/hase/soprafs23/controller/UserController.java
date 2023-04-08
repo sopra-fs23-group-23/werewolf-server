@@ -8,7 +8,8 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.UserDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPutDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatus;import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;

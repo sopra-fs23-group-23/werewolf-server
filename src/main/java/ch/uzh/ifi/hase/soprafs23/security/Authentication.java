@@ -12,7 +12,6 @@ import java.util.stream.StreamSupport;
 
 public class Authentication {
 
-
     private final UserRepository userRepository;
 
     private final LobbyService lobbyService;
@@ -24,7 +23,7 @@ public class Authentication {
 
     public void authenticateUser(String token){
         if (this.userRepository.findByToken(token) == null){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User with this token does not exist.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User with this token does not exist. 1");
         }
     }
 
