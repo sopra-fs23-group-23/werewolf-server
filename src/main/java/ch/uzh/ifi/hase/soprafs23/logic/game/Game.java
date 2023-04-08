@@ -12,15 +12,12 @@ public class Game implements StageObserver{
     private Lobby lobby;
     private Stage currentStage;
 
-    private static final int minLobbySize = 5;
-    private static final int maxLobbySize = 20;
-
+    /**
+     * @pre lobby.getLobbySize() <= Lobby.MAX_SIZE && lobby.getLobbySize() >= Lobby.MIN_SIZE
+     * @param lobby
+     */
     public Game(Lobby lobby) {
-        int lobbySize = lobby.getLobbySize();
-        // check if lobby has at least 5 and at most 20 players
-        if (minLobbySize > lobbySize || lobbySize > maxLobbySize){
-            throw new IllegalStateException("Lobby size either to big or to small to create game instance.");
-        }
+        assert lobby.getLobbySize() <= Lobby.MAX_SIZE && lobby.getLobbySize() >= Lobby.MIN_SIZE;
         this.lobby = lobby;
     }
 
