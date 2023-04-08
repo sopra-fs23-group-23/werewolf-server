@@ -58,7 +58,7 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("The user %s is not yet registered. Please first sign up before trying to log in.", userToLogin.getUsername()));
         }
         else if (!Objects.equals(userByUsername.getPassword(), userToLogin.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "The password provided is not correct.");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "The password provided is not correct.");
         }
         else {
             userByUsername.setToken(UUID.randomUUID().toString());
@@ -68,41 +68,41 @@ public class UserService {
         }
     }
 
-    public void getUserByToken(String token){
-        User userByToken = userRepository.findByToken(token);
-        if (userByToken == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with this token does not exist.");
-        }
-    }
-
     public User getUser(Long id) {
         Optional<User> user = this.userRepository.findById(id);
         if (!user.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with userId %d was not found.", id));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with userId %d does not exist.", id));
         }
         return user.get();
     }
 
-    public void validateTokenMatch(User user, String token){
-        if (!(Objects.equals(user.getToken(), token))){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. User token is not valid.");
+    public void updateUser(User updatedUser, Long id) throws ParseException {
+        User userById = getUser(id);
+
+        if (!userById.getUsername().equals(updatedUser.getUsername())){
+            checkIfUserExists(updatedUser);
+            userById.setUsername(updatedUser.getUsername());
+        }
+
+        if (!userById.getPassword().equals(updatedUser.getPassword())){
+            userById.setPassword(updatedUser.getPassword());
+        }
+
+        userRepository.save(userById);
+        userRepository.flush();
+    }
+
+    public void validateToken(String token){
+        User userByToken = userRepository.findByToken(token);
+        if (userByToken == null){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. User with this token does not exist.");
         }
     }
 
-    public void updateUser(User updatedUser, Long id) throws ParseException {
-        User userById = getUser(id);
-        User userByUsername = userRepository.findByUsername(updatedUser.getUsername());
-
-        // check if username actually changed
-        if (!(Objects.equals(userById.getUsername(), updatedUser.getUsername()))){
-            if(!(userByUsername == null)){
-                throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("User with username %s already exists, please choose a different name.", updatedUser.getUsername()));
-            }else{
-                userById.setUsername(updatedUser.getUsername());
-            }
+    public void validateTokenMatch(User user, String token){
+        if (!(Objects.equals(user.getToken(), token))){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. User token does not match with user.");
         }
-        userRepository.save(userById);
-        userRepository.flush();
     }
 
     private void checkIfUserExists(User userToBeCreated) {

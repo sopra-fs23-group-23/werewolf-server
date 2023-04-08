@@ -47,37 +47,34 @@ public class UserController {
     @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserGetDTO getSingleUser(@PathVariable("id") String id, @RequestHeader("token") String token){
+        userService.validateToken(token);
+
         User user = userService.getUser(Long.parseLong(id));
-        userService.getUserByToken(token);
 
         return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
     }
 
     @PutMapping("/users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateUserData(@PathVariable("id") String id, @RequestBody UserPostDTO userPutDTO, @RequestHeader("token") String token) throws ParseException {
+    public void updateUserData(@PathVariable("id") String id, @RequestBody UserPostDTO userPostDTO, @RequestHeader("token") String token) throws ParseException {
         User user = userService.getUser(Long.parseLong(id));
 
         userService.validateTokenMatch(user, token);
 
-        User updatedUser = DTOMapper.INSTANCE.convertUserPostDTOToEntity(userPutDTO);
-        if (updatedUser.getUsername() == null){
-            updatedUser.setUsername(user.getUsername());
-        }
+        User updatedUser = DTOMapper.INSTANCE.convertUserPostDTOToEntity(userPostDTO);
         userService.updateUser(updatedUser, Long.parseLong(id));
     }
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public UserGetDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
+    public UserAuthDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
         // convert API user to internal representation
         User userInput = DTOMapper.INSTANCE.convertUserPostDTOToEntity(userPostDTO);
-
         // call logIn method
         User user = userService.loginUser(userInput);
 
-        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+        return DTOMapper.INSTANCE.convertEntityToUserAuthDTO(user);
     }
 
 }
