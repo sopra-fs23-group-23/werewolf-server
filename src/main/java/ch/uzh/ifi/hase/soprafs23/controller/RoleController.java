@@ -5,6 +5,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
+import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.RoleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +15,11 @@ import java.util.ArrayList;
 @RestController
 public class RoleController {
     private final RoleService roleService;
+    private final LobbyService lobbyService;
 
-    public RoleController(RoleService roleService) {
+    public RoleController(RoleService roleService, LobbyService lobbyService) {
         this.roleService = roleService;
+        this.lobbyService = lobbyService;
     }
 
     @GetMapping("/lobbies/{lobbyId}/roles")

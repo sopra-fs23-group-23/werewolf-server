@@ -4,8 +4,10 @@ import java.util.stream.StreamSupport;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.PlayerGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 
 public final class LogicDTOMapper {
     private LogicDTOMapper(){}
@@ -26,5 +28,13 @@ public final class LogicDTOMapper {
         playerGetDTO.setName(player.getName());
         playerGetDTO.setAlive(player.isAlive());
         return playerGetDTO;
+    }
+
+    public static RoleGetDTO convertRoleToRoleGetDTO(Role role, int amount) {
+        RoleGetDTO roleGetDTO = new RoleGetDTO();
+        roleGetDTO.setRoleName(role.getName());
+        roleGetDTO.setDescription(role.getDescription());
+        roleGetDTO.setAmount(amount);
+        return roleGetDTO;
     }
 }
