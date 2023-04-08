@@ -37,11 +37,10 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public UserAuthDTO createUser(@RequestBody UserPostDTO userPostDTO) {
-        // convert API user to internal representation
         User userInput = DTOMapper.INSTANCE.convertUserPostDTOToEntity(userPostDTO);
-        // create user
+
         User createdUser = userService.createUser(userInput);
-        // convert internal representation of user back to API
+
         return DTOMapper.INSTANCE.convertEntityToUserAuthDTO(createdUser);
     }
 
@@ -54,33 +53,14 @@ public class UserController {
         return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
     }
 
-    @GetMapping("/users")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public List<UserAuthDTO> getAllUsers(@RequestHeader("token") String token) {
-
-        // check if a user with this token exists
-        userService.getUserByToken(token);
-
-        // fetch all users in the internal representation
-        List<User> users = userService.getUsers();
-        List<UserAuthDTO> userDTOs = new ArrayList<>();
-
-        // convert each user to the API representation
-        for (User user : users) {
-            userDTOs.add(DTOMapper.INSTANCE.convertEntityToUserDTO(user));
-        }
-        return userDTOs;
-    }
-
     @PutMapping("/users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateUserData(@PathVariable("id") String id, @RequestBody UserPutDTO userPutDTO, @RequestHeader("token") String token) throws ParseException {
+    public void updateUserData(@PathVariable("id") String id, @RequestBody UserPostDTO userPutDTO, @RequestHeader("token") String token) throws ParseException {
         User user = userService.getUser(Long.parseLong(id));
 
         userService.validateTokenMatch(user, token);
 
-        User updatedUser = DTOMapper.INSTANCE.convertUserPutDTOToEntity(userPutDTO);
+        User updatedUser = DTOMapper.INSTANCE.convertUserPostDTOToEntity(userPutDTO);
         if (updatedUser.getUsername() == null){
             updatedUser.setUsername(user.getUsername());
         }
@@ -92,7 +72,7 @@ public class UserController {
     @ResponseBody
     public UserGetDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
         // convert API user to internal representation
-        User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+        User userInput = DTOMapper.INSTANCE.convertUserPostDTOToEntity(userPostDTO);
 
         // call logIn method
         User user = userService.loginUser(userInput);

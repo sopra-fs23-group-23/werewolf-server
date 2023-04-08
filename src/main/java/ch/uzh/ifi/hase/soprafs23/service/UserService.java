@@ -43,7 +43,6 @@ public class UserService {
     public User createUser(User newUser) {
         checkIfUserExists(newUser);
         newUser.setToken(UUID.randomUUID().toString());
-        //newUser.setId((long) (this.userRepository.findAll()).size() + 1);
 
         newUser = userRepository.save(newUser);
         userRepository.flush();
@@ -63,7 +62,6 @@ public class UserService {
         }
         else {
             userByUsername.setToken(UUID.randomUUID().toString());
-            userByUsername.setStatus(UserStatus.ONLINE);
             userRepository.save(userByUsername);
             userRepository.flush();
             return userByUsername;
@@ -103,31 +101,10 @@ public class UserService {
                 userById.setUsername(updatedUser.getUsername());
             }
         }
-        // check if birthday changed
-        if  (!(Objects.equals(userById.getBirthday(), updatedUser.getBirthday())) && updatedUser.getBirthday() != null) {
-            final String OLD_FORMAT = "yyyy-MM-dd";
-            final String NEW_FORMAT = "dd.MM.yyyy";
-            String oldDateString = updatedUser.getBirthday();
-            SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
-            Date d = sdf.parse(oldDateString);
-            sdf.applyPattern(NEW_FORMAT);
-            String newDateString = sdf.format(d);
-            userById.setBirthday(newDateString);
-        }
         userRepository.save(userById);
         userRepository.flush();
     }
 
-    /**
-     * This is a helper method that will check the uniqueness criteria of the
-     * username and the name
-     * defined in the User entity. The method will do nothing if the input is unique
-     * and throw an error otherwise.
-     *
-     * @param userToBeCreated
-     * @throws org.springframework.web.server.ResponseStatusException
-     * @see User
-     */
     private void checkIfUserExists(User userToBeCreated) {
         User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
         String baseErrorMessage = "Sorry, there already exists a User with username %s";
