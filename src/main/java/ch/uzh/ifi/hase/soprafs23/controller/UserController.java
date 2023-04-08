@@ -65,7 +65,7 @@ public class UserController {
         userService.updateUser(updatedUser, Long.parseLong(id));
     }
 
-    @PostMapping("/login")
+    @PostMapping("/users/login")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public UserAuthDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
