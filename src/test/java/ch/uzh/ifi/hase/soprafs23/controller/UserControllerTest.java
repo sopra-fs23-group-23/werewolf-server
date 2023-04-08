@@ -4,6 +4,8 @@ package ch.uzh.ifi.hase.soprafs23.controller;
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.UserAuthDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,6 +53,52 @@ public class UserControllerTest {
   @MockBean
   private UserRepository userRepository;
 
+    @Test
+    public void createUser_validInput_userCreated() throws Exception {
+        // given
+        User user = new User();
+        user.setId(1L);
+        user.setPassword("password");
+        user.setUsername("testUsername");
+        user.setToken("1");
+
+        UserPostDTO userPostDTO = new UserPostDTO();
+        userPostDTO.setPassword("password");
+        userPostDTO.setUsername("testUsername");
+
+        given(userService.createUser(Mockito.any())).willReturn(user);
+
+        // when/then -> do the request + validate the result
+        MockHttpServletRequestBuilder postRequest = post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(userPostDTO));
+
+        // then
+        mockMvc.perform(postRequest)
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+                .andExpect(jsonPath("$.username", is(user.getUsername())))
+                .andExpect(jsonPath("$.token", is(user.getToken())));
+    }
+
+    @Test
+    public void createUser_duplicateUser_throwsError() throws Exception{
+        UserPostDTO userPostDTO = new UserPostDTO();
+        userPostDTO.setPassword("password");
+        userPostDTO.setUsername("username");
+
+        given(userService.createUser(Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.CONFLICT, "Sorry, there already exists a User with username %s"));
+
+        // do request and validate result
+        MockHttpServletRequestBuilder postRequest = post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(userPostDTO));
+
+        // then
+        mockMvc.perform(postRequest)
+                .andExpect(status().isConflict());
+    }
+
   @Test
   public void givenUsers_whenGetUsers_thenReturnJsonArray() throws Exception {
     // given
@@ -58,7 +106,7 @@ public class UserControllerTest {
     user.setId(1L);
     user.setPassword("password");
     user.setUsername("firstname@lastname");
-    user.setStatus(UserStatus.ONLINE);
+    user .setStatus(UserStatus.ONLINE);
     user.setToken("12345");
     user.setCreationDate("20.03.2023");
 
@@ -82,60 +130,7 @@ public class UserControllerTest {
         .andExpect(jsonPath("$[0].username", is(user.getUsername())));
   }
 
-  @Test
-  public void createUser_validInput_userCreated() throws Exception {
-    // given
-    User user = new User();
-    user.setId(1L);
-    user.setPassword("password");
-    user.setUsername("testUsername");
-    user.setToken("1");
-    user.setStatus(UserStatus.ONLINE);
 
-    UserPostDTO userPostDTO = new UserPostDTO();
-    userPostDTO.setPassword("password");
-    userPostDTO.setUsername("testUsername");
-
-    given(userService.createUser(Mockito.any())).willReturn(user);
-
-    // when/then -> do the request + validate the result
-    MockHttpServletRequestBuilder postRequest = post("/users")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(asJsonString(userPostDTO));
-
-    // then
-    mockMvc.perform(postRequest)
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.id", is(user.getId().intValue())))
-        .andExpect(jsonPath("$.password", is(user.getPassword())))
-        .andExpect(jsonPath("$.username", is(user.getUsername())))
-        .andExpect(jsonPath("$.status", is(user.getStatus().toString())));
-  }
-
-  @Test
-  public void createUser_duplicateUser_throwsError() throws Exception{
-      // given
-      User user = new User();
-      user.setUsername("username");
-      user.setPassword("password");
-      user.setId(1L);
-      user.setStatus(UserStatus.ONLINE);
-
-      UserPostDTO userPostDTO = new UserPostDTO();
-      userPostDTO.setPassword("password");
-      userPostDTO.setUsername("username");
-
-      given(userService.createUser(Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.CONFLICT, "The username provided is not unique. Therefore, the user could not be created!"));
-
-      // do request and validate result
-      MockHttpServletRequestBuilder postRequest = post("/users")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(asJsonString(userPostDTO));
-
-      // then
-      mockMvc.perform(postRequest)
-              .andExpect(status().isConflict());
-  }
 
   @Test
   public void getSingleUser_success_returnJsonArray() throws Exception{
