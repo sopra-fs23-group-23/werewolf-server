@@ -23,14 +23,14 @@ public class Authentication {
     }
 
     public void authenticateUser(String token){
-        if (userRepository.findByToken(token) == null){
+        if (this.userRepository.findByToken(token) == null){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User with this token does not exist.");
         }
     }
 
     public void validateUserInLobby(String token, String lobbyId) {
         authenticateUser(token);
-        User authUser = userRepository.findByToken(token);
+        User authUser = this.userRepository.findByToken(token);
         Lobby aLobby = this.lobbyService.getLobbyById(Long.parseLong(lobbyId)); // Throws exception if Lobby doesn't exist
 
         if (!StreamSupport.stream(aLobby.getPlayers().spliterator(), false).anyMatch(p->p.getId()==authUser.getId())){
