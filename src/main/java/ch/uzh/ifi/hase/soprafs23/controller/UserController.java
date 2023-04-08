@@ -56,7 +56,6 @@ public class UserController {
 
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
-    @Secured("authenticateUser(header.token)")
     @ResponseBody
     public List<UserAuthDTO> getAllUsers(@RequestHeader("token") String token) {
 
