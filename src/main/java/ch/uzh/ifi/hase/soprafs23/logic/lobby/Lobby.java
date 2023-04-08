@@ -2,7 +2,6 @@ package ch.uzh.ifi.hase.soprafs23.logic.lobby;
 
 import java.util.*;
 
-import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.NullResultPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
@@ -14,6 +13,9 @@ public class Lobby {
     private Set<Player> players;
     private Map<Class<? extends Role>, Role> roles;
     private boolean open;
+
+    public static final int MIN_SIZE = 5;
+    public static final int MAX_SIZE = 20;
 
     public Lobby(Long id, Player admin) {
         this.id = id;
@@ -27,10 +29,21 @@ public class Lobby {
         return this.players.size();
     }
 
+    public boolean isOpen() {
+        return open;
+    }
+
+    public void setOpen(boolean open) {
+        this.open = open;
+    }
+
+    /**
+     * @pre getLobbySize() <= MAX_SIZE && isOpen() && !players.contains(player)
+     * @param player
+     */
     public void addPlayer(Player player) {
-        if(!players.add(player)) {
-            throw new IllegalArgumentException(String.format("Player with user id %d is already in Lobby.", player.getId()));
-        }
+        assert getLobbySize() <= MAX_SIZE && isOpen() && !players.contains(player);
+        players.add(player);
     }
 
     public void removePlayer(Player player) {

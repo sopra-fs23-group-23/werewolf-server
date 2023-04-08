@@ -75,8 +75,17 @@ public class LobbyService {
     }
 
     public void joinUserToLobby(User user, Lobby lobby) {
+        if (lobby.getLobbySize() >= Lobby.MAX_SIZE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby is already full.");
+        }
+        if (!lobby.isOpen()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby is closed.");
+        }
+        if (StreamSupport.stream(lobby.getPlayers().spliterator(), false).anyMatch(p->p.getId()==user.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in this lobby.");
+        }
         if (userInALobby(user)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a lobby");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a lobby.");
         }
         lobby.addPlayer(LogicEntityMapper.createPlayerFromUser(user));
     }
