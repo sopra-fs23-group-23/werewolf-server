@@ -1,5 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23;
 
+import ch.uzh.ifi.hase.soprafs23.agora.RTCTokenBuilder;
+import ch.uzh.ifi.hase.soprafs23.constant.VoiceChatRole;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +17,9 @@ public class Application {
 
     public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
+        RTCTokenBuilder tokenBuilder = new RTCTokenBuilder();
+        String token = tokenBuilder.buildTokenWithUserAccount("123456", "11 ", VoiceChatRole.Role_Publisher);
+        System.out.println(token);
   }
 
   @GetMapping(value = "/", produces = MediaType.TEXT_PLAIN_VALUE)

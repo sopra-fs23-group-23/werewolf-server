@@ -30,10 +30,10 @@ public class AgoraService {
         Map<String, Object> requestBodyMap = new HashMap<>();
         requestBodyMap.put("appid", appId);
         requestBodyMap.put("uid", playerId); // Placeholder for the dynamic value
-        requestBodyMap.put("time", 120);
+        requestBodyMap.put("time_in_seconds", 10);
         List<String> privileges = Arrays.asList("join_channel");
         requestBodyMap.put("privileges", privileges);
-        requestBodyMap.put("reason", Reason.Kick_Villager);
+        requestBodyMap.put("reason", 1);
 
         String requestBody = objectMapper.writeValueAsString(requestBodyMap);
 
@@ -44,6 +44,7 @@ public class AgoraService {
                 .uri(URI.create("https://api.agora.io/dev/v1/kicking-rule"))
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .header("Content-Type", "application/json")
+                .header("Authorization", authorizationHeader)
                 .build();
         // Send HTTP request
         HttpResponse<String> response = client.send(request,
@@ -59,10 +60,10 @@ public class AgoraService {
         Map<String, Object> requestBodyMap = new HashMap<>();
         requestBodyMap.put("appid", appId);
         requestBodyMap.put("uid", playerId); // Placeholder for the dynamic value
-        requestBodyMap.put("time", 120);
+        requestBodyMap.put("time_in_seconds", 10);
         List<String> privileges = Arrays.asList("publish_audio");
         requestBodyMap.put("privileges", privileges);
-        requestBodyMap.put("reason", Reason.Got_Killed);
+        requestBodyMap.put("reason", 2);
 
         String requestBody = objectMapper.writeValueAsString(requestBodyMap);
 
@@ -73,6 +74,7 @@ public class AgoraService {
                 .uri(URI.create("https://api.agora.io/dev/v1/kicking-rule"))
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .header("Content-Type", "application/json")
+                .header("Authorization", authorizationHeader)
                 .build();
         // Send HTTP request
         HttpResponse<String> response = client.send(request,
@@ -88,10 +90,10 @@ public class AgoraService {
         Map<String, Object> requestBodyMap = new HashMap<>();
         requestBodyMap.put("appid", appId);
         requestBodyMap.put("uid", playerId); // Placeholder for the dynamic value
-        requestBodyMap.put("time", 120);
+        requestBodyMap.put("time_in_seconds", 10);
         List<String> privileges = Arrays.asList("publish_audio");
         requestBodyMap.put("privileges", privileges);
-        requestBodyMap.put("reason", Reason.Is_Troll);
+        requestBodyMap.put("reason", 3);
 
         String requestBody = objectMapper.writeValueAsString(requestBodyMap);
 
@@ -102,27 +104,29 @@ public class AgoraService {
                 .uri(URI.create("https://api.agora.io/dev/v1/kicking-rule"))
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .header("Content-Type", "application/json")
+                .header("Authorization", authorizationHeader)
                 .build();
         // Send HTTP request
         HttpResponse<String> response = client.send(request,
                 HttpResponse.BodyHandlers.ofString());
 
         System.out.println(response.body());
+        System.out.println(response.headers());
     }
 
 
 
-    public void kickAll(Lobby lobby) throws IOException, InterruptedException{
+    public void kickAll(String cname) throws IOException, InterruptedException{
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         Map<String, Object> requestBodyMap = new HashMap<>();
         requestBodyMap.put("appid", appId);
-        requestBodyMap.put("cname", lobby); // Placeholder for the dynamic value
+        requestBodyMap.put("cname", cname); // Placeholder for the dynamic value
         requestBodyMap.put("time", 120);
         List<String> privileges = Arrays.asList("join_channel");
         requestBodyMap.put("privileges", privileges);
-        requestBodyMap.put("reason", Reason.Kick_Villager);
+        requestBodyMap.put("reason", 4);
 
         String requestBody = objectMapper.writeValueAsString(requestBodyMap);
 
@@ -133,6 +137,7 @@ public class AgoraService {
                 .uri(URI.create("https://api.agora.io/dev/v1/kicking-rule"))
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .header("Content-Type", "application/json")
+                .header("Authorization", authorizationHeader)
                 .build();
         // Send HTTP request
         HttpResponse<String> response = client.send(request,
