@@ -41,16 +41,9 @@ public class UserService {
     }
 
     public User createUser(User newUser) {
-        Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        String strDate = formatter.format(date);
-
-        newUser.setToken(UUID.randomUUID().toString());
-        newUser.setStatus(UserStatus.ONLINE);
-        newUser.setCreationDate(strDate);
         checkIfUserExists(newUser);
-        // saves the given entity but data is only persisted in the database once
-        // flush() is called
+        newUser.setToken(UUID.randomUUID().toString());
+
         newUser = userRepository.save(newUser);
         userRepository.flush();
 
@@ -65,87 +58,58 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("The user %s is not yet registered. Please first sign up before trying to log in.", userToLogin.getUsername()));
         }
         else if (!Objects.equals(userByUsername.getPassword(), userToLogin.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "The password provided is not correct.");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "The password provided is not correct.");
         }
         else {
             userByUsername.setToken(UUID.randomUUID().toString());
-            userByUsername.setStatus(UserStatus.ONLINE);
             userRepository.save(userByUsername);
             userRepository.flush();
             return userByUsername;
         }
     }
 
-    public void logoutUser(Long id) {
-        User userById = getUser(id);
-        userById.setStatus(UserStatus.OFFLINE);
-        userRepository.save(userById);
-    }
-
-    public void getUserByToken(String token){
-        User userByToken = userRepository.findByToken(token);
-        if (userByToken == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with this token does not exist.");
-        }
-    }
-
     public User getUser(Long id) {
         Optional<User> user = this.userRepository.findById(id);
         if (!user.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with userId %d was not found.", id));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with userId %d does not exist.", id));
         }
         return user.get();
     }
 
-    public void validateTokenMatch(User user, String token){
-        if (!(Objects.equals(user.getToken(), token))){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. User token is not valid.");
-        }
-    }
-
     public void updateUser(User updatedUser, Long id) throws ParseException {
         User userById = getUser(id);
-        User userByUsername = userRepository.findByUsername(updatedUser.getUsername());
 
-        // check if username actually changed
-        if (!(Objects.equals(userById.getUsername(), updatedUser.getUsername()))){
-            if(!(userByUsername == null)){
-                throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("User with username %s already exists, please choose a different name.", updatedUser.getUsername()));
-            }else{
-                userById.setUsername(updatedUser.getUsername());
-            }
+        if (!userById.getUsername().equals(updatedUser.getUsername())){
+            checkIfUserExists(updatedUser);
+            userById.setUsername(updatedUser.getUsername());
         }
-        // check if birthday changed
-        if  (!(Objects.equals(userById.getBirthday(), updatedUser.getBirthday())) && updatedUser.getBirthday() != null) {
-            final String OLD_FORMAT = "yyyy-MM-dd";
-            final String NEW_FORMAT = "dd.MM.yyyy";
-            String oldDateString = updatedUser.getBirthday();
-            SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
-            Date d = sdf.parse(oldDateString);
-            sdf.applyPattern(NEW_FORMAT);
-            String newDateString = sdf.format(d);
-            userById.setBirthday(newDateString);
+
+        if (!userById.getPassword().equals(updatedUser.getPassword())){
+            userById.setPassword(updatedUser.getPassword());
         }
+
         userRepository.save(userById);
         userRepository.flush();
     }
 
-    /**
-     * This is a helper method that will check the uniqueness criteria of the
-     * username and the name
-     * defined in the User entity. The method will do nothing if the input is unique
-     * and throw an error otherwise.
-     *
-     * @param userToBeCreated
-     * @throws org.springframework.web.server.ResponseStatusException
-     * @see User
-     */
+    public void validateToken(String token){
+        User userByToken = userRepository.findByToken(token);
+        if (userByToken == null){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. User with this token does not exist.");
+        }
+    }
+
+    public void validateTokenMatch(User user, String token){
+        if (!(Objects.equals(user.getToken(), token))){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. User token does not match with user.");
+        }
+    }
+
     private void checkIfUserExists(User userToBeCreated) {
         User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-
-        String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
+        String baseErrorMessage = "Sorry, there already exists a User with username %s";
         if (userByUsername != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
+            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, userToBeCreated.getUsername()));
         }
     }
 }
