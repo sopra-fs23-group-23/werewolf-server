@@ -2,7 +2,11 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.Reason;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
+import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.bytebuddy.dynamic.DynamicType;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 
@@ -12,6 +16,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static javax.xml.bind.DatatypeConverter.parseString;
 
 // HTTP basic authentication example in Java using the <Vg k="VSDK" /> Server RESTful API
 
@@ -23,72 +31,96 @@ public class AgoraService {
 
     private final String appId = "348d6a205d75436e916896366c5e315c";
 
-    private String createRequestBody(String playerId, String privilege, Reason reason) throws IOException, InterruptedException {
+    private String createRequestBody(Optional<Player> player, Optional<String> cname, String privilege, Reason reason) throws IOException, InterruptedException {
         ObjectMapper objectMapper = new ObjectMapper();
 
         Map<String, Object> requestBodyMap = new HashMap<>();
         requestBodyMap.put("appid", appId);
-        requestBodyMap.put("uid", playerId); // Placeholder for the dynamic value
-        requestBodyMap.put("time_in_seconds", 120);
+        player.ifPresent(value -> requestBodyMap.put("uid", value.getId()));
+        cname.ifPresent(s -> requestBodyMap.put("cname", s));
+        requestBodyMap.put("time", 120);
         List<String> privileges = Arrays.asList(privilege);
         requestBodyMap.put("privileges", privileges);
-        requestBodyMap.put("reason", reason.ordinal() + 1);
+        requestBodyMap.put("reason", (reason.ordinal() + 1));
+        System.out.println("Reason: " + (reason.ordinal() + 1));
 
         return objectMapper.writeValueAsString(requestBodyMap);
     }
 
-    private HttpResponse<String> sendHttpRequest(String requestBody) {
+    private JsonNode createHttpRequest(HttpMethod method, String requestBody) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
 
-        // Create HTTP request object
-        HttpRequest request = HttpRequest.newBuilder()
+        // Create HTTP request builder object
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.agora.io/dev/v1/kicking-rule"))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .header("Content-Type", "application/json")
-                .header("Authorization", authorizationHeader)
-                .build();
+                .header("Authorization", authorizationHeader);
+
+        if (method == HttpMethod.GET) {
+            requestBuilder.uri(URI.create("https://api.agora.io/dev/v1/kicking-rule?appid=" + appId));
+            requestBuilder.GET();
+        } else if (method == HttpMethod.DELETE) {
+            HttpRequest.BodyPublisher requestBodyPublisher = HttpRequest.BodyPublishers.ofString(requestBody);
+            requestBuilder.method("DELETE", requestBodyPublisher);
+        } else if (method == HttpMethod.POST){
+            requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestBody));
+        } else {
+            throw new IllegalArgumentException("HTTP method is not allowed " + method);
+        }
+        HttpRequest request = requestBuilder.build();
+
         // Send HTTP request
         HttpResponse<String> response = client.send(request,
                 HttpResponse.BodyHandlers.ofString());
 
-        return response;
+        ObjectMapper objectMapper = new ObjectMapper();
+        System.out.println(objectMapper.readTree(response.body()));
+        return objectMapper.readTree(response.body());
     }
 
-    public void kickVillager(String playerId) throws IOException, InterruptedException{
-        String requestBody = createRequestBody(playerId, "join_channel", Reason.Kick_Villager);
-        HttpResponse<String> response = sendHttpRequest(requestBody);
-        System.out.println(response.body());
+    //deletes rules that were made by certain reasons
+    //Optional Player can be added to just delete a rule concerning one player
+    public void deleteRules(Reason reason, Optional<Player> player) throws IOException, InterruptedException {
+        JsonNode allRules = createHttpRequest(HttpMethod.GET, "").get("rules");
+        List<JsonNode> reasonRules = StreamSupport.stream(allRules.spliterator(), false)
+                                            .filter(r -> r.get("reason").asInt() == reason.ordinal() + 1)
+                                            .map(JsonNode.class::cast)
+                                            .collect(Collectors.toList());
+
+        if (player.isPresent()){
+            reasonRules = StreamSupport.stream(reasonRules.spliterator(), false)
+                    .filter(r -> r.get("uid").asInt() == player.get().getId())
+                    .map(JsonNode.class::cast)
+                    .collect(Collectors.toList());
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        for (JsonNode rule : reasonRules) {
+            System.out.println("Deleting JSON Node " + rule);
+            String requestBody = objectMapper.writeValueAsString(Map.of("appid", appId, "id", String.valueOf(rule.get("id"))));
+            createHttpRequest(HttpMethod.DELETE, requestBody);
+        }
     }
 
-    public void muteDeadPlayer(String playerId) throws IOException, InterruptedException {
-        String requestBody = createRequestBody(playerId, "publish_audio", Reason.Got_Killed);
-        HttpResponse<String> response = sendHttpRequest(requestBody);
-        System.out.println(response.body());
-    }
-
-    public void muteTroll(String playerId) throws IOException, InterruptedException {
-        String requestBody = createRequestBody(playerId, "publish_audio", Reason.Is_Troll);
-        HttpResponse<String> response = sendHttpRequest(requestBody);
-        System.out.println(response.body());
+    public void kickVillager(Player player) throws IOException, InterruptedException{
+        String requestBody = createRequestBody(Optional.of(player), Optional.empty(), "join_channel", Reason.KICK_VILLAGER);
+        createHttpRequest(HttpMethod.POST, requestBody);
     }
 
     public void kickAll(String cname) throws IOException, InterruptedException{
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        Map<String, Object> requestBodyMap = new HashMap<>();
-        requestBodyMap.put("appid", appId);
-        requestBodyMap.put("cname", cname); // Placeholder for the dynamic value
-        requestBodyMap.put("time", 120);
-        List<String> privileges = Arrays.asList("join_channel");
-        requestBodyMap.put("privileges", privileges);
-        requestBodyMap.put("reason", 4);
-
-        String requestBody = objectMapper.writeValueAsString(requestBodyMap);
-
-        HttpResponse<String> response = sendHttpRequest(requestBody);
-
-        System.out.println(response.body());
-
+        String requestBody = createRequestBody(Optional.empty(), Optional.of(cname), "join_channel", Reason.KICK_ALL);
+        createHttpRequest(HttpMethod.POST, requestBody);
     }
+
+    public void muteDeadPlayer(Player player) throws IOException, InterruptedException {
+        String requestBody = createRequestBody(Optional.of(player), Optional.empty(), "publish_audio", Reason.MUTE_DEAD);
+        createHttpRequest(HttpMethod.POST, requestBody);
+    }
+
+    public void muteTroll(Player player) throws IOException, InterruptedException {
+        String requestBody = createRequestBody(Optional.of(player), Optional.empty(), "publish_audio", Reason.MUTE_TROLL);
+        createHttpRequest(HttpMethod.POST, requestBody);
+    }
+
+
 }
