@@ -17,9 +17,6 @@ public class Application {
 
     public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
-        RTCTokenBuilder tokenBuilder = new RTCTokenBuilder();
-        String token = tokenBuilder.buildTokenWithUserAccount("123456", "11 ", VoiceChatRole.Role_Publisher);
-        System.out.println(token);
   }
 
   @GetMapping(value = "/", produces = MediaType.TEXT_PLAIN_VALUE)
