@@ -127,7 +127,7 @@ public class LobbyService {
             emitter.send(event);
     }
 
-    public Player getPlayerByUser(Lobby lobby, User user) {
+    public Player getPlayerByUser(User user, Lobby lobby) {
         Iterable<Player> players = lobby.getPlayers();
         for(Player player: players) {
             if(player.getId().equals(user.getId())) {

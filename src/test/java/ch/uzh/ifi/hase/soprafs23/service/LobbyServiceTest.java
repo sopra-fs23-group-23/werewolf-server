@@ -120,4 +120,26 @@ public class LobbyServiceTest {
         lobbyService.sendEmitterUpdate(mockEmitter, "test");
         Mockito.verify(mockEmitter).send(Mockito.any(SseEventBuilder.class));
     }
+
+    @Test
+    void testGetPlayerByUser_Valid() {
+        User admin = createTestAdmin();
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
+        User joiningUser = new User();
+        joiningUser.setId(3L);
+        joiningUser.setUsername("TestUser");
+        lobbyService.joinUserToLobby(joiningUser, lobby);
+        assertEquals(lobbyService.getPlayerByUser(joiningUser, lobby).getId(), joiningUser.getId());
+    }
+
+    @Test
+    void testGetPlayerByUser_NotInLobby() {
+        User admin = createTestAdmin();
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
+        User notJoiningUser = new User();
+        notJoiningUser.setId(3L);
+        notJoiningUser.setUsername("TestUser");
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.getPlayerByUser(notJoiningUser, lobby));
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
+    }
 }
