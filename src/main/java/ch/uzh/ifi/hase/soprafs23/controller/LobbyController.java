@@ -95,13 +95,4 @@ public class LobbyController {
         return lobbyService.getLobbyEmitter(lobby);
     }
 
-    @GetMapping("/lobbies/{lobbyId}/channels")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public String getVoiceChannelToken(@PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @RequestHeader(USERAUTH_HEADER) String userToken){
-        User user = userService.getUserByToken(userToken);
-        Lobby lobby = lobbyService.getLobbyById(lobbyId);
-        lobbyService.validateUserIsInLobby(user, lobby);
-        return lobbyService.createVoiceChannelToken(lobby, user);
-    }
 }

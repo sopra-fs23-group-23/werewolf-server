@@ -1,13 +1,19 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.agora.RTCTokenBuilder;
 import ch.uzh.ifi.hase.soprafs23.constant.Reason;
+import ch.uzh.ifi.hase.soprafs23.constant.VoiceChatRole;
+import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.bytebuddy.dynamic.DynamicType;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import javax.transaction.Transactional;
 
 import java.io.IOException;
@@ -120,6 +126,15 @@ public class AgoraService {
     public void muteTroll(Player player) throws IOException, InterruptedException {
         String requestBody = createRequestBody(Optional.of(player), Optional.empty(), "publish_audio", Reason.MUTE_TROLL);
         createHttpRequest(HttpMethod.POST, requestBody);
+    }
+
+    public String createVoiceChannelToken(Lobby lobby, User user) {
+        RTCTokenBuilder newToken = new RTCTokenBuilder();
+        String token = newToken.buildTokenWithUserAccount(lobby.getId().toString(), user.getId().toString(), VoiceChatRole.Role_Publisher);
+        if (Objects.equals(token, "")) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return token;
     }
 
 
