@@ -9,6 +9,8 @@ import javax.transaction.Transactional;
 
 import ch.uzh.ifi.hase.soprafs23.agora.RTCTokenBuilder;
 import ch.uzh.ifi.hase.soprafs23.constant.VoiceChatRole;
+import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -110,13 +112,13 @@ public class LobbyService {
         return lobbyEmitterMap.get(lobby.getId()).getEmitter();
     }
 
-    public void sendEmitterUpdate(SseEmitter emitter, String data) throws IOException {
-        SseEventBuilder event;
-        event = SseEmitter.event()
+    public void sendEmitterUpdate(SseEmitter emitter, String data, LobbySseEvent eventType) throws IOException {
+        // ordering matters!!! .name needs to be before .data
+        SseEventBuilder event = SseEmitter.event()
+            .name(eventType.toString())
             .data( data + "\n", MediaType.APPLICATION_JSON)
-            .id(UUID.randomUUID().toString())
-            .name("lobby update event");
-            emitter.send(event);
+            .id(UUID.randomUUID().toString());
+        emitter.send(event);
     }
 
     public String createVoiceChannelToken(Lobby lobby, User user) {
