@@ -127,5 +127,13 @@ public class LobbyService {
             emitter.send(event);
     }
 
-
+    public Player getPlayerByUser(Lobby lobby, User user) {
+        Iterable<Player> players = lobby.getPlayers();
+        for(Player player: players) {
+            if(player.getId().equals(user.getId())) {
+                return player;
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not part of this lobby");
+    }
 }
