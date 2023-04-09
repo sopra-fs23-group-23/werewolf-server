@@ -21,6 +21,7 @@ public class Lobby {
         this.players = new HashSet<>();
         players.add(admin);
         this.open = true;
+        this.roles = new HashMap<>();
     }
 
     public int getLobbySize(){
