@@ -23,98 +23,54 @@ public class AgoraService {
 
     private final String appId = "348d6a205d75436e916896366c5e315c";
 
+    private String createRequestBody(String playerId, String privilege, Reason reason) throws IOException, InterruptedException {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        Map<String, Object> requestBodyMap = new HashMap<>();
+        requestBodyMap.put("appid", appId);
+        requestBodyMap.put("uid", playerId); // Placeholder for the dynamic value
+        requestBodyMap.put("time_in_seconds", 120);
+        List<String> privileges = Arrays.asList(privilege);
+        requestBodyMap.put("privileges", privileges);
+        requestBodyMap.put("reason", reason.ordinal() + 1);
+
+        return objectMapper.writeValueAsString(requestBodyMap);
+    }
+
+    private HttpResponse<String> sendHttpRequest(String requestBody) {
+        HttpClient client = HttpClient.newHttpClient();
+
+        // Create HTTP request object
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.agora.io/dev/v1/kicking-rule"))
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .header("Content-Type", "application/json")
+                .header("Authorization", authorizationHeader)
+                .build();
+        // Send HTTP request
+        HttpResponse<String> response = client.send(request,
+                HttpResponse.BodyHandlers.ofString());
+
+        return response;
+    }
+
     public void kickVillager(String playerId) throws IOException, InterruptedException{
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        Map<String, Object> requestBodyMap = new HashMap<>();
-        requestBodyMap.put("appid", appId);
-        requestBodyMap.put("uid", playerId); // Placeholder for the dynamic value
-        requestBodyMap.put("time_in_seconds", 10);
-        List<String> privileges = Arrays.asList("join_channel");
-        requestBodyMap.put("privileges", privileges);
-        requestBodyMap.put("reason", 1);
-
-        String requestBody = objectMapper.writeValueAsString(requestBodyMap);
-
-        HttpClient client = HttpClient.newHttpClient();
-
-        // Create HTTP request object
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.agora.io/dev/v1/kicking-rule"))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .header("Content-Type", "application/json")
-                .header("Authorization", authorizationHeader)
-                .build();
-        // Send HTTP request
-        HttpResponse<String> response = client.send(request,
-                HttpResponse.BodyHandlers.ofString());
-
+        String requestBody = createRequestBody(playerId, "join_channel", Reason.Kick_Villager);
+        HttpResponse<String> response = sendHttpRequest(requestBody);
         System.out.println(response.body());
     }
 
-    public void muteDeadPlayer(String playerId) throws IOException, InterruptedException{
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        Map<String, Object> requestBodyMap = new HashMap<>();
-        requestBodyMap.put("appid", appId);
-        requestBodyMap.put("uid", playerId); // Placeholder for the dynamic value
-        requestBodyMap.put("time_in_seconds", 10);
-        List<String> privileges = Arrays.asList("publish_audio");
-        requestBodyMap.put("privileges", privileges);
-        requestBodyMap.put("reason", 2);
-
-        String requestBody = objectMapper.writeValueAsString(requestBodyMap);
-
-        HttpClient client = HttpClient.newHttpClient();
-
-        // Create HTTP request object
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.agora.io/dev/v1/kicking-rule"))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .header("Content-Type", "application/json")
-                .header("Authorization", authorizationHeader)
-                .build();
-        // Send HTTP request
-        HttpResponse<String> response = client.send(request,
-                HttpResponse.BodyHandlers.ofString());
-
+    public void muteDeadPlayer(String playerId) throws IOException, InterruptedException {
+        String requestBody = createRequestBody(playerId, "publish_audio", Reason.Got_Killed);
+        HttpResponse<String> response = sendHttpRequest(requestBody);
         System.out.println(response.body());
     }
 
-    public void muteTroll(String playerId) throws IOException, InterruptedException{
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        Map<String, Object> requestBodyMap = new HashMap<>();
-        requestBodyMap.put("appid", appId);
-        requestBodyMap.put("uid", playerId); // Placeholder for the dynamic value
-        requestBodyMap.put("time_in_seconds", 10);
-        List<String> privileges = Arrays.asList("publish_audio");
-        requestBodyMap.put("privileges", privileges);
-        requestBodyMap.put("reason", 3);
-
-        String requestBody = objectMapper.writeValueAsString(requestBodyMap);
-
-        HttpClient client = HttpClient.newHttpClient();
-
-        // Create HTTP request object
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.agora.io/dev/v1/kicking-rule"))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .header("Content-Type", "application/json")
-                .header("Authorization", authorizationHeader)
-                .build();
-        // Send HTTP request
-        HttpResponse<String> response = client.send(request,
-                HttpResponse.BodyHandlers.ofString());
-
+    public void muteTroll(String playerId) throws IOException, InterruptedException {
+        String requestBody = createRequestBody(playerId, "publish_audio", Reason.Is_Troll);
+        HttpResponse<String> response = sendHttpRequest(requestBody);
         System.out.println(response.body());
-        System.out.println(response.headers());
     }
-
-
 
     public void kickAll(String cname) throws IOException, InterruptedException{
 
@@ -130,18 +86,7 @@ public class AgoraService {
 
         String requestBody = objectMapper.writeValueAsString(requestBodyMap);
 
-        HttpClient client = HttpClient.newHttpClient();
-
-        // Create HTTP request object
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.agora.io/dev/v1/kicking-rule"))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .header("Content-Type", "application/json")
-                .header("Authorization", authorizationHeader)
-                .build();
-        // Send HTTP request
-        HttpResponse<String> response = client.send(request,
-                HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = sendHttpRequest(requestBody);
 
         System.out.println(response.body());
 
