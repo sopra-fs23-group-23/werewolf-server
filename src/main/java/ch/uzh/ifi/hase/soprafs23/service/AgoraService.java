@@ -47,7 +47,7 @@ public class AgoraService {
         return objectMapper.writeValueAsString(requestBodyMap);
     }
 
-    private JsonNode createHttpRequest(HttpMethod method, String requestBody) throws IOException, InterruptedException {
+    JsonNode createHttpRequest(HttpMethod method, String requestBody) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
 
         // Create HTTP request builder object
