@@ -76,6 +76,11 @@ public class UserService {
         return user.get();
     }
 
+    public User getUserByToken(String token) {
+        validateToken(token);
+        return userRepository.findByToken(token);
+    }
+
     public void updateUser(User updatedUser, Long id) throws ParseException {
         User userById = getUser(id);
 

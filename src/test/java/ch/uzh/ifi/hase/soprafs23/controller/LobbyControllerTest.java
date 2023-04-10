@@ -11,6 +11,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import ch.uzh.ifi.hase.soprafs23.agora.RTCTokenBuilder;
+import ch.uzh.ifi.hase.soprafs23.constant.VoiceChatRole;
+import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,12 +53,12 @@ public class LobbyControllerTest {
     void createNewLobbyTest() throws Exception {
         User tUser = createTestUser("test", 1l);
         Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(tUser));
-        Mockito.when(userService.getUser(1l)).thenReturn(tUser);
+        Mockito.when(userService.getUserByToken("token")).thenReturn(tUser);
         Mockito.when(lobbyService.createNewLobby(tUser)).thenReturn(lobby);
         Mockito.when(lobbyService.createLobbyEmitter(lobby)).thenReturn(null);
 
         MockHttpServletRequestBuilder postRequest = post("/lobbies")
-            .header("uid", 1);
+            .header(LobbyController.USERAUTH_HEADER, "token");
 
         mockMvc.perform(postRequest)
             .andExpect(status().isCreated())
@@ -68,15 +72,15 @@ public class LobbyControllerTest {
         User joiningUser = createTestUser("joiningUser", 2l);
         Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
 
-        Mockito.when(userService.getUser(Mockito.anyLong())).thenReturn(joiningUser);
+        Mockito.when(userService.getUserByToken("token")).thenReturn(joiningUser);
         Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
         doNothing().when(lobbyService).joinUserToLobby(joiningUser, lobby);
         SseEmitter mockSseEmitter = mock(SseEmitter.class);
         Mockito.when(lobbyService.getLobbyEmitter(lobby)).thenReturn(mockSseEmitter);
-        doNothing().when(lobbyService).sendEmitterUpdate(Mockito.any(SseEmitter.class), Mockito.anyString());
+        doNothing().when(lobbyService).sendEmitterUpdate(Mockito.any(SseEmitter.class), Mockito.anyString(), Mockito.any(LobbySseEvent.class));
 
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1")
-            .header("uid", 2);
+            .header(LobbyController.USERAUTH_HEADER, "token");
 
         mockMvc.perform(putRequest)
             .andExpect(status().isNoContent());
@@ -89,12 +93,12 @@ public class LobbyControllerTest {
         Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
         lobby.addPlayer(LogicEntityMapper.createPlayerFromUser(usr));
 
-        Mockito.when(userService.getUser(1l)).thenReturn(usr);
+        Mockito.when(userService.getUserByToken("token")).thenReturn(usr);
         Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
         doNothing().when(lobbyService).validateUserIsInLobby(usr, lobby);
 
         MockHttpServletRequestBuilder getRequest = get("/lobbies/1")
-            .header("uid", 2);
+            .header(LobbyController.USERAUTH_HEADER, "token");
 
         mockMvc.perform(getRequest)
             .andExpect(status().isOk())
@@ -108,13 +112,13 @@ public class LobbyControllerTest {
         User user = createTestUser("test", 1l);
         Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(user));
 
-        Mockito.when(userService.getUser(1l)).thenReturn(user);
+        Mockito.when(userService.getUserByToken("token")).thenReturn(user);
         Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
         doNothing().when(lobbyService).validateUserIsInLobby(user, lobby);
         Mockito.when(lobbyService.getLobbyEmitterToken(lobby)).thenReturn("token123");
 
         MockHttpServletRequestBuilder getRequest = get("/lobbies/1/sse")
-            .header("uid", 1);
+            .header(LobbyController.USERAUTH_HEADER, "token");
 
         mockMvc.perform(getRequest)
             .andExpect(status().isOk())
@@ -137,4 +141,24 @@ public class LobbyControllerTest {
             .andExpect(status().isOk());
         
     }
+
+    // @Test
+    // void testGetVoiceChannelToken() throws Exception{
+    //     User user = createTestUser("test", 1l);
+    //     Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(user));
+    //     RTCTokenBuilder newtoken = new RTCTokenBuilder();
+    //     String token = newtoken.buildTokenWithUserAccount(lobby.getId().toString(), user.getId().toString(), VoiceChatRole.Role_Publisher);
+    //     Mockito.when(userService.getUserByToken("token")).thenReturn(user);
+    //     Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
+    //     Mockito.when(lobbyService.getLobbyVoiceToken(lobby)).thenReturn(token);
+    //     doNothing().when(lobbyService).validateUserIsInLobby(user, lobby);
+
+    //     MockHttpServletRequestBuilder getRequest = get("/lobbies/1/channels")
+    //         .header(LobbyController.USERAUTH_HEADER, "token");
+
+
+    //     mockMvc.perform(getRequest)
+    //             .andExpect(status().isOk())
+    //             .andExpect(content().string(token));
+    // }
 }
