@@ -154,6 +154,30 @@ public class UserControllerTest {
               .andExpect(status().isNoContent());
   }
 
+    @Test
+    public void loginUser_success() throws Exception{
+        // given
+        User user = createBasicUser();
+
+        UserPostDTO userPostDTO = new UserPostDTO();
+        userPostDTO.setUsername("username");
+        userPostDTO.setPassword("password");
+
+        given(userService.loginUser(Mockito.any())).willReturn(user);
+
+        // when/then -> do the request + validate the result
+        MockHttpServletRequestBuilder postRequest = post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(userPostDTO));
+
+        // then
+        mockMvc.perform(postRequest)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+                .andExpect(jsonPath("$.username", is(user.getUsername())))
+                .andExpect(jsonPath("$.token", is(user.getToken())));
+    }
+
   private String asJsonString(final Object object) {
     try {
       return new ObjectMapper().writeValueAsString(object);

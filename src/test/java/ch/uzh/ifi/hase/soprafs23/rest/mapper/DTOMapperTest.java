@@ -3,6 +3,9 @@ package ch.uzh.ifi.hase.soprafs23.rest.mapper;
 
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.UserAuthDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.UserGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPostDTO;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +26,7 @@ public class DTOMapperTest {
     userPostDTO.setUsername("username");
 
     // MAP -> Create user
-    User user = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+    User user = DTOMapper.INSTANCE.convertUserPostDTOToEntity(userPostDTO);
 
     // check content
     assertEquals(userPostDTO.getPassword(), user.getPassword());
@@ -31,12 +34,28 @@ public class DTOMapperTest {
   }
 
   @Test
+  public void testGetUser_fromUser_toUserAuthDTO_success() {
+      // create User
+      User user = new User();
+      user.setId(1818L);
+      user.setUsername("username");
+      user.setToken("1");
+
+      // MAP -> Create UserGetDTO
+      UserAuthDTO userAuthDTO = DTOMapper.INSTANCE.convertEntityToUserAuthDTO(user);
+
+      // check content
+      assertEquals(user.getId(), userAuthDTO.getId());
+      assertEquals(user.getUsername(), userAuthDTO.getUsername());
+      assertEquals(user.getToken(), userAuthDTO.getToken());
+  }
+
+  @Test
   public void testGetUser_fromUser_toUserGetDTO_success() {
     // create User
     User user = new User();
-    user.setPassword("password");
-    user.setUsername("firstname@lastname");
-    user.setStatus(UserStatus.OFFLINE);
+    user.setId(1818L);
+    user.setUsername("username");
     user.setToken("1");
 
     // MAP -> Create UserGetDTO
@@ -44,9 +63,7 @@ public class DTOMapperTest {
 
     // check content
     assertEquals(user.getId(), userGetDTO.getId());
-    assertEquals(user.getPassword(), userGetDTO.getPassword());
     assertEquals(user.getUsername(), userGetDTO.getUsername());
-    assertEquals(user.getStatus(), userGetDTO.getStatus());
   }
 }
 

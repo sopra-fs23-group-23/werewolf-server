@@ -51,9 +51,8 @@ public class UserService {
         return newUser;
     }
 
-    public User loginUser(User userToLogin) {
+    public User loginUser(User userToLogin) throws ResponseStatusException{
         User userByUsername = userRepository.findByUsername(userToLogin.getUsername());
-
         if (userByUsername == null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("The user %s is not yet registered. Please first sign up before trying to log in.", userToLogin.getUsername()));
         }
@@ -71,6 +70,7 @@ public class UserService {
     public User getUser(Long id) {
         Optional<User> user = this.userRepository.findById(id);
         if (!user.isPresent()) {
+            System.out.println("MS1");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with userId %d does not exist.", id));
         }
         return user.get();
