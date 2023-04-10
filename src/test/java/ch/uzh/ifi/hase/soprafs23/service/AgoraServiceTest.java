@@ -130,5 +130,15 @@ public class AgoraServiceTest {
         verify(agoraServiceMock).createHttpRequest(HttpMethod.POST, expectedRequestBody);
     }
 
+    // TODO fix this Miro
+//    @Test
+//    void testCreateVoiceChannelToken(){
+//        User admin = createTestAdmin();
+//        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
+//        String token = lobbyService.createVoiceChannelToken(lobby, admin);
+//        assertEquals(lobbyService.getLobbyVoiceToken(lobby), token);
+//
+//    }
+
 
 }

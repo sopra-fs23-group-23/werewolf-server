@@ -156,13 +156,4 @@ public class LobbyServiceTest {
         lobbyService.sendEmitterUpdate(mockEmitter, "test");
         Mockito.verify(mockEmitter).send(Mockito.any(SseEventBuilder.class));
     }
-    // TODO fix this Miro
-//    @Test
-//    void testCreateVoiceChannelToken(){
-//        User admin = createTestAdmin();
-//        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
-//        String token = lobbyService.createVoiceChannelToken(lobby, admin);
-//        assertEquals(lobbyService.getLobbyVoiceToken(lobby), token);
-//
-//    }
 }

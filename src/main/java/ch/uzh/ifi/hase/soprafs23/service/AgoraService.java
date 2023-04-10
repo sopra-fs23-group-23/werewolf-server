@@ -62,6 +62,7 @@ public class AgoraService {
                 .header("Content-Type", "application/json")
                 .header("Authorization", authorizationHeader);
 
+        // TODO: change to switch statement
         if (method == HttpMethod.GET) {
             requestBuilder.uri(URI.create("https://api.agora.io/dev/v1/kicking-rule?appid=" + appId));
             requestBuilder.GET();
