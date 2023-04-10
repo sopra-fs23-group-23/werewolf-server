@@ -11,8 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import ch.uzh.ifi.hase.soprafs23.agora.RTCTokenBuilder;
-import ch.uzh.ifi.hase.soprafs23.constant.VoiceChatRole;
 import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
 
 import org.junit.jupiter.api.Test;
