@@ -108,15 +108,6 @@ public class UserServiceTest {
         assertEquals(testUser.getUsername(), getUser.getUsername());
     }
 
-
-//    @Test
-//    public void getUser_UserNotFound_throwsException() {
-//        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.empty());
-//
-//        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userService.loginUser(testUser));
-//        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
-//    }
-
     @Test
     public void updateUser_ValidUpdate_Success() throws ParseException {
         // Set up
