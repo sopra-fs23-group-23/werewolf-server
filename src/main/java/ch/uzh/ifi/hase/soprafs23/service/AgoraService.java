@@ -66,17 +66,17 @@ public class AgoraService {
                 .header("Content-Type", "application/json")
                 .header("Authorization", authorizationHeader);
 
-        // TODO: change to switch statement
-        if (method == HttpMethod.GET) {
-            requestBuilder.uri(URI.create("https://api.agora.io/dev/v1/kicking-rule?appid=" + appId));
-            requestBuilder.GET();
-        } else if (method == HttpMethod.DELETE) {
-            HttpRequest.BodyPublisher requestBodyPublisher = HttpRequest.BodyPublishers.ofString(requestBody);
-            requestBuilder.method("DELETE", requestBodyPublisher);
-        } else if (method == HttpMethod.POST){
-            requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestBody));
-        } else {
-            throw new IllegalArgumentException("HTTP method is not allowed " + method);
+        switch (method) {
+            case GET -> {
+                requestBuilder.uri(URI.create("https://api.agora.io/dev/v1/kicking-rule?appid=" + appId));
+                requestBuilder.GET();
+            }
+            case DELETE -> {
+                HttpRequest.BodyPublisher requestBodyPublisher = HttpRequest.BodyPublishers.ofString(requestBody);
+                requestBuilder.method("DELETE", requestBodyPublisher);
+            }
+            case POST -> requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestBody));
+            default -> throw new IllegalArgumentException("HTTP method is not allowed " + method);
         }
         HttpRequest request = requestBuilder.build();
 

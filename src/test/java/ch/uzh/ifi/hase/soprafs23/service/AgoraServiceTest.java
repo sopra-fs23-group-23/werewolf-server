@@ -1,27 +1,40 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.Reason;
+import ch.uzh.ifi.hase.soprafs23.entity.User;
+import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.http.HttpMethod;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class AgoraServiceTest {
+
+    AgoraService agoraService = new AgoraService();
+
+    private User createTestAdmin() {
+        return createTestUser(1l, "admin");
+    }
+
+    private User createTestUser(Long id, String username) {
+        User user = new User();
+        user.setId(id);
+        user.setUsername(username);
+        return user;
+    }
 
     @Test
     void createRequestBody() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -130,15 +143,14 @@ public class AgoraServiceTest {
         verify(agoraServiceMock).createHttpRequest(HttpMethod.POST, expectedRequestBody);
     }
 
-    // TODO fix this Miro
-//    @Test
-//    void testCreateVoiceChannelToken(){
-//        User admin = createTestAdmin();
-//        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
-//        String token = lobbyService.createVoiceChannelToken(lobby, admin);
-//        assertEquals(lobbyService.getLobbyVoiceToken(lobby), token);
-//
-//    }
+    @Test
+    void testGetVoiceChannelToken() throws Exception{
+        User user = createTestUser(1l, "test");
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(user));
+        String token = agoraService.createVoiceChannelToken(lobby, user);
+        assertNotNull(token);
+        assertFalse(token.isEmpty());
+    }
 
 
 }
