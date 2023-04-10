@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.logic.lobby;
 
 import java.util.*;
+import java.util.stream.StreamSupport;
 
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.NullResultPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
@@ -54,6 +55,10 @@ public class Lobby {
 
     public Iterable<Player> getPlayers() {
         return players;
+    }
+
+    public Player getPlayerById(Long id){
+        return (Player) players.stream().filter(p -> p.getId() == id);
     }
 
     public Player getAdmin() {

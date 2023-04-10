@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
+import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,5 +117,12 @@ public class UserService {
         if (userByUsername != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, userToBeCreated.getUsername()));
         }
+    }
+
+    public boolean validateUserIsPlayer(User user, Player player){
+        if(Objects.equals(user.getId(), player.getId())){
+            return true;
+        }
+        throw new ResponseStatusException(HttpStatus.CONFLICT, "User does not match to the player.");
     }
 }

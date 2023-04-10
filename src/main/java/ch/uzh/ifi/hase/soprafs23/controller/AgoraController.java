@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 
@@ -43,12 +44,22 @@ public class AgoraController {
         return agoraService.createVoiceChannelToken(lobby, user);
     }
 
-    // TODO: Secure Endpoint, so that just admin can call it correctly
-    @PostMapping("agora/rules/forceMute/{userId}")
+    @PostMapping("/agora/{lobbyId}/rules/audio/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void forceMutePlayerFromChannel(@PathVariable("userId") Long userId) throws IOException, InterruptedException {
-        Player player = new Player(userId, "willy");
-        agoraService.muteTroll(player);
+    public void forceMutePlayerFromChannel(@PathVariable("lobbyId") Long lobbyId, @PathVariable("userId") Long userId, @RequestHeader(USERAUTH_HEADER) String userToken) throws IOException, InterruptedException {
+        Lobby lobby = lobbyService.getLobbyById(lobbyId);
+        User user = userService.getUserByToken(userToken);
+        User userToMute = userService.getUser(userId);
+        Player player = lobby.getAdmin();
+
+        // checks if user is in lobby
+        lobbyService.validateUserIsInLobby(userToMute, lobby);
+        // check if user who sent request is admin
+        userService.validateUserIsPlayer(user,player);
+        // get player
+        Player playerToMute = lobby.getPlayerById(userId);
+        // mutes the user
+        agoraService.muteTroll(playerToMute);
     }
 
     // TODO we tested them but dont need actual endpoints in the controller
