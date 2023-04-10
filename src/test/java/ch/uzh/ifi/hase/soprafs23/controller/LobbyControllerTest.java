@@ -141,24 +141,4 @@ public class LobbyControllerTest {
             .andExpect(status().isOk());
         
     }
-
-    // @Test
-    // void testGetVoiceChannelToken() throws Exception{
-    //     User user = createTestUser("test", 1l);
-    //     Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(user));
-    //     RTCTokenBuilder newtoken = new RTCTokenBuilder();
-    //     String token = newtoken.buildTokenWithUserAccount(lobby.getId().toString(), user.getId().toString(), VoiceChatRole.Role_Publisher);
-    //     Mockito.when(userService.getUserByToken("token")).thenReturn(user);
-    //     Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
-    //     Mockito.when(lobbyService.getLobbyVoiceToken(lobby)).thenReturn(token);
-    //     doNothing().when(lobbyService).validateUserIsInLobby(user, lobby);
-
-    //     MockHttpServletRequestBuilder getRequest = get("/lobbies/1/channels")
-    //         .header(LobbyController.USERAUTH_HEADER, "token");
-
-
-    //     mockMvc.perform(getRequest)
-    //             .andExpect(status().isOk())
-    //             .andExpect(content().string(token));
-    // }
 }
