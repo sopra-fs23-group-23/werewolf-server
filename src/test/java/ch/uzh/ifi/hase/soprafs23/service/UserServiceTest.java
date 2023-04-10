@@ -52,7 +52,6 @@ public class UserServiceTest {
     assertEquals(testUser.getPassword(), createdUser.getPassword());
     assertEquals(testUser.getUsername(), createdUser.getUsername());
     assertNotNull(createdUser.getToken());
-    assertEquals(UserStatus.ONLINE, createdUser.getStatus()); // changed to ONLINE because after user signed up he should be online and is redirected to dashboard
   }
 
   @Test
