@@ -7,8 +7,6 @@ import java.util.stream.StreamSupport;
 
 import javax.transaction.Transactional;
 
-import ch.uzh.ifi.hase.soprafs23.agora.RTCTokenBuilder;
-import ch.uzh.ifi.hase.soprafs23.constant.VoiceChatRole;
 import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
 
 import org.springframework.http.HttpStatus;
@@ -119,14 +117,5 @@ public class LobbyService {
             .data( data + "\n", MediaType.APPLICATION_JSON)
             .id(UUID.randomUUID().toString());
         emitter.send(event);
-    }
-
-    public String createVoiceChannelToken(Lobby lobby, User user) {
-        RTCTokenBuilder newToken = new RTCTokenBuilder();
-        String token = newToken.buildTokenWithUserAccount(lobby.getId().toString(), user.getId().toString(), VoiceChatRole.Role_Publisher);
-        if (Objects.equals(token, "")) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        return token;
     }
 }

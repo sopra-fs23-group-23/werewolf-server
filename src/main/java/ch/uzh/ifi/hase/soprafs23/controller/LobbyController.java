@@ -30,8 +30,8 @@ import ch.uzh.ifi.hase.soprafs23.service.UserService;
 
 @RestController
 public class LobbyController {
-    public final static String USERAUTH_HEADER = "token";
-    public final static String LOBBYID_PATHVARIABLE = "lobbyId";
+    public static final String USERAUTH_HEADER = "token";
+    public static final String LOBBYID_PATHVARIABLE = "lobbyId";
 
     private final UserService userService;
     private final LobbyService lobbyService;
@@ -95,13 +95,4 @@ public class LobbyController {
         return lobbyService.getLobbyEmitter(lobby);
     }
 
-    @GetMapping("/lobbies/{lobbyId}/channels")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public String getVoiceChannelToken(@PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @RequestHeader(USERAUTH_HEADER) String userToken){
-        User user = userService.getUserByToken(userToken);
-        Lobby lobby = lobbyService.getLobbyById(lobbyId);
-        lobbyService.validateUserIsInLobby(user, lobby);
-        return lobbyService.createVoiceChannelToken(lobby, user);
-    }
 }
