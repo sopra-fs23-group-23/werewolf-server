@@ -1,14 +1,13 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.StreamSupport;
 
 import javax.transaction.Transactional;
+
+import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,30 +20,14 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
+import ch.uzh.ifi.hase.soprafs23.service.wrapper.LobbyEmitterWrapper;
 
 @Service
 @Transactional
 public class LobbyService {
-    private class LobbyEmitter {
-        private SseEmitter emitter;
-        private String token;
-
-        public LobbyEmitter(SseEmitter emitter) {
-            this.emitter = emitter;
-            this.token = UUID.randomUUID().toString();
-        }
-
-        public SseEmitter getEmitter() {
-            return emitter;
-        }
-
-        public String getToken() {
-            return token;
-        }
-    }
 
     private Map<Long, Lobby> lobbies = new HashMap<>();
-    private Map<Long, LobbyEmitter> lobbyEmitterMap = new HashMap<>();
+    private Map<Long, LobbyEmitterWrapper> lobbyEmitterMap = new HashMap<>();
 
     private Long createLobbyId() {
         Long newId = ThreadLocalRandom.current().nextLong(100000, 999999);
@@ -92,15 +75,24 @@ public class LobbyService {
     }
 
     public void joinUserToLobby(User user, Lobby lobby) {
+        if (lobby.getLobbySize() >= Lobby.MAX_SIZE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby is already full.");
+        }
+        if (!lobby.isOpen()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby is closed.");
+        }
+        if (StreamSupport.stream(lobby.getPlayers().spliterator(), false).anyMatch(p->p.getId()==user.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in this lobby.");
+        }
         if (userInALobby(user)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a lobby");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a lobby.");
         }
         lobby.addPlayer(LogicEntityMapper.createPlayerFromUser(user));
     }
 
     public SseEmitter createLobbyEmitter(Lobby lobby) {
         SseEmitter emitter = new SseEmitter(-1l);
-        lobbyEmitterMap.put(lobby.getId(), new LobbyEmitter(emitter));
+        lobbyEmitterMap.put(lobby.getId(), new LobbyEmitterWrapper(emitter, UUID.randomUUID().toString()));
         return emitter;
     }
 
@@ -118,22 +110,12 @@ public class LobbyService {
         return lobbyEmitterMap.get(lobby.getId()).getEmitter();
     }
 
-    public void sendEmitterUpdate(SseEmitter emitter, String data) throws IOException {
-        SseEventBuilder event;
-        event = SseEmitter.event()
+    public void sendEmitterUpdate(SseEmitter emitter, String data, LobbySseEvent eventType) throws IOException {
+        // ordering matters!!! .name needs to be before .data
+        SseEventBuilder event = SseEmitter.event()
+            .name(eventType.toString())
             .data( data + "\n", MediaType.APPLICATION_JSON)
-            .id(UUID.randomUUID().toString())
-            .name("lobby update event");
-            emitter.send(event);
-    }
-
-    public Player getPlayerByUser(User user, Lobby lobby) {
-        Iterable<Player> players = lobby.getPlayers();
-        for(Player player: players) {
-            if(player.getId().equals(user.getId())) {
-                return player;
-            }
-        }
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not part of this lobby");
+            .id(UUID.randomUUID().toString());
+        emitter.send(event);
     }
 }
