@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
@@ -114,8 +115,9 @@ public class LobbyController {
     public Collection<RoleGetDTO> getOwnRole(@PathVariable(LOBBYID_PATHVARIABLE) Long LobbyId, @PathVariable("uid") Long userId,
                                              @RequestHeader(USERAUTH_HEADER) String token) {
         Lobby lobby = lobbyService.getLobbyById(LobbyId);
-        User user = userService.getUserByToken(token);
+        User user = userService.getUser(userId);
         userService.validateTokenMatch(user, token);
+        lobbyService.validateUserIsInLobby(user, lobby);
         return lobbyService.getOwnRolesInformation(user, lobby);
     }
 
@@ -126,6 +128,15 @@ public class LobbyController {
     public void assignRoles(@PathVariable(LOBBYID_PATHVARIABLE) Long LobbyId, @RequestHeader(USERAUTH_HEADER) String token) {
         Lobby lobby = lobbyService.getLobbyById(LobbyId);
         User user = userService.getUserByToken(token);
+        //TODO: Delete this part but necessary that we can test the role assignment / info screen
+        if (lobby.getLobbySize() < 5) {
+            for (long i = 20; i < 30; i++) {
+                User dummyUser = new User();
+                dummyUser.setUsername(Long.toString(i));
+                dummyUser.setPassword("1234");
+                lobbyService.joinUserToLobby(userService.createUser(dummyUser), lobby);
+            }
+        }
         lobbyService.assignRoles(user, lobby);
     }
 }

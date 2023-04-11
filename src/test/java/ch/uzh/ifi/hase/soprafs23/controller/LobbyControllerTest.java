@@ -170,8 +170,9 @@ public class LobbyControllerTest {
         Collection<RoleGetDTO> mockReturn = new ArrayList<>();
 
         Mockito.when(lobbyService.getLobbyById(1L)).thenReturn(lobby);
-        Mockito.when(userService.getUserByToken(Mockito.anyString())).thenReturn(user);
+        Mockito.when(userService.getUser(1L)).thenReturn(user);
         doNothing().when(userService).validateTokenMatch(user, "token");
+        doNothing().when(lobbyService).validateUserIsInLobby(user, lobby);
 
         MockHttpServletRequestBuilder getRequest = get("/lobbies/1/roles/1").
                 header(LobbyController.USERAUTH_HEADER, "token");
