@@ -154,9 +154,11 @@ public class LobbyService {
     }
 
     private RoleGetDTO roleToRolesGetDTO(Lobby lobby, Role role) {
+        System.out.println(role.getName());
         Iterable<Player> playersOfThatRole = lobby.getPlayersByRole(role.getClass());
         int amount = 0;
         for(Player player: playersOfThatRole) {
+            System.out.println(player.getId());
             amount++;
         }
         return convertRoleToRoleGetDTO(role, amount);

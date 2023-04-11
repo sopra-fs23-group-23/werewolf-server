@@ -19,7 +19,7 @@ public class Villager extends Role implements FirstDayVoter, DayVoter, Fraction{
 
     private final static String name = "Villager";
     private final static String description = "Since a few days there are hidden werewolves among you villagers. " +
-            "These pose a threat to peaceful village life. Therefore, the villagers win as soon as there are no " +
+            "These pose a threat to the peaceful village life. Therefore, the villagers win as soon as there are no " +
             "werewolves left alive. Every day there is the possibility to democratically choose a person to be " +
             "executed. Through this execution you will be able to rid the village of werewolves.";
 

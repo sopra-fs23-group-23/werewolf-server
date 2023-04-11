@@ -59,7 +59,8 @@ public class Lobby {
     }
 
     public Player getPlayerById(Long id){
-        return (Player) players.stream().filter(p -> p.getId() == id);
+        //I would move this to the service, otherways we have to check somehow the precondition that player is in this lobby
+        return players.stream().filter(p -> p.getId() == id).findFirst().get();
     }
 
     public Player getAdmin() {
