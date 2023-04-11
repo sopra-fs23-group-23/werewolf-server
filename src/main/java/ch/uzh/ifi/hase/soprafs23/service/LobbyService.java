@@ -123,16 +123,6 @@ public class LobbyService {
         emitter.send(event);
     }
 
-    public Player getPlayerByUser(User user, Lobby lobby) {
-        Iterable<Player> players = lobby.getPlayers();
-        for(Player player: players) {
-            if(player.getId().equals(user.getId())) {
-                return player;
-            }
-        }
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not part of this lobby");
-    }
-
     public void validateUserIsAdmin(User user, Lobby lobby) {
         if (!user.getId().equals(lobby.getAdmin().getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the admin may perform this action.");
@@ -148,7 +138,8 @@ public class LobbyService {
         return roleGetDTOS;
     }
 
-    public Collection<RoleGetDTO> getOwnRolesInformation(Player player, Lobby lobby) {
+    public Collection<RoleGetDTO> getOwnRolesInformation(User user, Lobby lobby) {
+        Player player = lobby.getPlayerById(user.getId());
         ArrayList<Role> roles = new ArrayList<>(lobby.getRolesOfPlayer(player));
         ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>();
         for (Role role : roles) {

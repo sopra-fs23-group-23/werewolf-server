@@ -101,30 +101,29 @@ public class LobbyController {
     @GetMapping("/lobbies/{lobbyId}/roles")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Collection<RoleGetDTO> getAllRoles(@PathVariable("lobbyId") Long LobbyId, @RequestHeader("token") String token) {
+    public Collection<RoleGetDTO> getAllRoles(@PathVariable(LOBBYID_PATHVARIABLE) Long LobbyId, @RequestHeader(USERAUTH_HEADER) String token) {
         User user = userService.getUserByToken(token);
         Lobby lobby = lobbyService.getLobbyById(LobbyId);
         lobbyService.validateUserIsInLobby(user, lobby);
-        return lobbyService.getAllRoleInformation(lobby);
+        return lobbyService.getAllRolesInformation(lobby);
     }
 
     @GetMapping("/lobbies/{lobbyId}/roles/{uid}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Collection<RoleGetDTO> getOwnRole(@PathVariable("lobbyId") Long LobbyId, @PathVariable("uid") Long userId,
-                                             @RequestHeader("token") String token) {
+    public Collection<RoleGetDTO> getOwnRole(@PathVariable(LOBBYID_PATHVARIABLE) Long LobbyId, @PathVariable("uid") Long userId,
+                                             @RequestHeader(USERAUTH_HEADER) String token) {
         Lobby lobby = lobbyService.getLobbyById(LobbyId);
         User user = userService.getUserByToken(token);
         userService.validateTokenMatch(user, token);
-        lobbyService.validateUserIsInLobby(user, lobby);
-        Player player = lobbyService.getPlayerByUser(user, lobby);
-        return lobbyService.getOwnRoleInformation(player, lobby);
+        return lobbyService.getOwnRolesInformation(user, lobby);
     }
 
+    //TODO: this probably should go into the the game controller, and the role assignement could be triggered in the constructor of the game
     @PutMapping("/lobbies/{lobbyId}/roles")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
-    public void assignRoles(@PathVariable("lobbyId") Long LobbyId, @RequestHeader("token") String token) {
+    public void assignRoles(@PathVariable(LOBBYID_PATHVARIABLE) Long LobbyId, @RequestHeader(USERAUTH_HEADER) String token) {
         Lobby lobby = lobbyService.getLobbyById(LobbyId);
         User user = userService.getUserByToken(token);
         lobbyService.assignRoles(user, lobby);

@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
@@ -174,28 +175,6 @@ public class LobbyServiceTest {
     }
 
     @Test
-    void testGetPlayerByUser_Valid() {
-        User admin = createTestAdmin();
-        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
-        User joiningUser = new User();
-        joiningUser.setId(3L);
-        joiningUser.setUsername("TestUser");
-        lobbyService.joinUserToLobby(joiningUser, lobby);
-        assertEquals(lobbyService.getPlayerByUser(joiningUser, lobby).getId(), joiningUser.getId());
-    }
-
-    @Test
-    void testGetPlayerByUser_NotInLobby() {
-        User admin = createTestAdmin();
-        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
-        User notJoiningUser = new User();
-        notJoiningUser.setId(3L);
-        notJoiningUser.setUsername("TestUser");
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.getPlayerByUser(notJoiningUser, lobby));
-        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
-    }
-
-    @Test
     void testAssignRole_notAdmin() {
         User admin = createTestAdmin();
         User notAdmin = createTestUser(15L, "notAdmin");
@@ -237,11 +216,13 @@ public class LobbyServiceTest {
 
     @Test
     void testGetOwnRolesInformation() {
-        Collection<Role> rolesReturn= new ArrayList<>();
+        Collection<Role> rolesReturn = new ArrayList<>();
         Lobby mock = mock(Lobby.class);
         rolesReturn.add(new Werewolf(mock::getAlivePlayers));
+        User user = createTestUser(1L, "testUser");
+        Mockito.when(mock.getPlayerById(1L)).thenReturn(LogicEntityMapper.createPlayerFromUser(user));
         Mockito.when(mock.getRolesOfPlayer(Mockito.any())).thenReturn(rolesReturn);
-        ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>(lobbyService.getOwnRolesInformation(new Player(1L, "user"), mock));
+        ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>(lobbyService.getOwnRolesInformation(user, mock));
         assertEquals("Werewolf", roleGetDTOS.get(0).getRoleName());
         assertEquals(0, roleGetDTOS.get(0).getAmount());
     }

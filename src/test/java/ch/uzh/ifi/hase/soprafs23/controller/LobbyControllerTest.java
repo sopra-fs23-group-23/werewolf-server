@@ -13,6 +13,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
 
+import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 @WebMvcTest(LobbyController.class)
 public class LobbyControllerTest {
@@ -137,6 +142,41 @@ public class LobbyControllerTest {
 
         mockMvc.perform(getRequest)
             .andExpect(status().isOk());
-        
+    }
+
+    @Test
+    void testGetAllRoles() throws Exception {
+        User user = createTestUser("test", 1L);
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(user));
+        Collection<RoleGetDTO> mockReturn = new ArrayList<>();
+
+        Mockito.when(userService.getUserByToken(Mockito.anyString())).thenReturn(user);
+        Mockito.when(lobbyService.getLobbyById(1L)).thenReturn(lobby);
+        doNothing().when(lobbyService).validateUserIsInLobby(user, lobby);
+        Mockito.when(lobbyService.getAllRolesInformation(lobby)).thenReturn(mockReturn);
+
+        MockHttpServletRequestBuilder getRequest = get("/lobbies/1/roles").
+                header(LobbyController.USERAUTH_HEADER, "token");
+
+        mockMvc.perform(getRequest)
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testGetOwnRoles() throws Exception {
+        User user = createTestUser("test", 1L);
+        Player player = LogicEntityMapper.createPlayerFromUser(user);
+        Lobby lobby = new Lobby(1L, player);
+        Collection<RoleGetDTO> mockReturn = new ArrayList<>();
+
+        Mockito.when(lobbyService.getLobbyById(1L)).thenReturn(lobby);
+        Mockito.when(userService.getUserByToken(Mockito.anyString())).thenReturn(user);
+        doNothing().when(userService).validateTokenMatch(user, "token");
+
+        MockHttpServletRequestBuilder getRequest = get("/lobbies/1/roles/1").
+                header(LobbyController.USERAUTH_HEADER, "token");
+
+        mockMvc.perform(getRequest)
+                .andExpect(status().isOk());
     }
 }
