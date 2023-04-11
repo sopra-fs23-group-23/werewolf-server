@@ -7,10 +7,16 @@ import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
 
+import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
@@ -37,7 +43,7 @@ public class LobbyServiceTest {
         return user;
     }
 
-    private void joinN_Users(int n, Lobby lobby) {
+    private void join_N_Users(int n, Lobby lobby) {
         for (long i = 2L; i < n+2; i++) {
             lobbyService.joinUserToLobby(createTestUser(i, "user" + Long.toString(i)), lobby);
         }
@@ -190,21 +196,21 @@ public class LobbyServiceTest {
     }
 
     @Test
-    void assignRole_notAdmin() {
+    void testAssignRole_notAdmin() {
         User admin = createTestAdmin();
         User notAdmin = createTestUser(15L, "notAdmin");
-        Lobby lobby = lobbyService.createNewLobby(admin);
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
         lobbyService.joinUserToLobby(notAdmin, lobby);
-        joinN_Users(5, lobby);
+        join_N_Users(5, lobby);
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.assignRoles(notAdmin, lobby));
         assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
     }
 
     @Test
-    void assignRole_allowed() {
+    void testAssignRole_allowed() {
         User admin = createTestAdmin();
-        Lobby lobby = lobbyService.createNewLobby(admin);
-        joinN_Users(5, lobby);
+        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
+        join_N_Users(5, lobby);
         lobbyService.assignRoles(admin, lobby);
         ArrayList<Role> roles = new ArrayList<>(lobby.getRoles());
         boolean foundWerewolf = false;
@@ -216,5 +222,27 @@ public class LobbyServiceTest {
             }
         }
         assertTrue(foundWerewolf);
+    }
+
+    @Test
+    void testGetAllRolesInformation() {
+        Collection<Role> rolesReturn= new ArrayList<>();
+        Lobby mock = mock(Lobby.class);
+        rolesReturn.add(new Werewolf(mock::getAlivePlayers));
+        Mockito.when(mock.getRoles()).thenReturn(rolesReturn);
+        ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>(lobbyService.getAllRolesInformation(mock));
+        assertEquals("Werewolf", roleGetDTOS.get(0).getRoleName());
+        assertEquals(0, roleGetDTOS.get(0).getAmount());
+    }
+
+    @Test
+    void testGetOwnRolesInformation() {
+        Collection<Role> rolesReturn= new ArrayList<>();
+        Lobby mock = mock(Lobby.class);
+        rolesReturn.add(new Werewolf(mock::getAlivePlayers));
+        Mockito.when(mock.getRolesOfPlayer(Mockito.any())).thenReturn(rolesReturn);
+        ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>(lobbyService.getOwnRolesInformation(new Player(1L, "user"), mock));
+        assertEquals("Werewolf", roleGetDTOS.get(0).getRoleName());
+        assertEquals(0, roleGetDTOS.get(0).getAmount());
     }
 }
