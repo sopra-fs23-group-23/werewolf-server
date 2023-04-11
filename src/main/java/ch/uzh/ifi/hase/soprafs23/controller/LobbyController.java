@@ -1,7 +1,10 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
 import java.io.IOException;
+import java.util.Collection;
 
+import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -95,4 +98,35 @@ public class LobbyController {
         return lobbyService.getLobbyEmitter(lobby);
     }
 
+    @GetMapping("/lobbies/{lobbyId}/roles")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public Collection<RoleGetDTO> getAllRoles(@PathVariable("lobbyId") Long LobbyId, @RequestHeader("token") String token) {
+        User user = userService.getUserByToken(token);
+        Lobby lobby = lobbyService.getLobbyById(LobbyId);
+        lobbyService.validateUserIsInLobby(user, lobby);
+        return lobbyService.getAllRoleInformation(lobby);
+    }
+
+    @GetMapping("/lobbies/{lobbyId}/roles/{uid}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public Collection<RoleGetDTO> getOwnRole(@PathVariable("lobbyId") Long LobbyId, @PathVariable("uid") Long userId,
+                                             @RequestHeader("token") String token) {
+        Lobby lobby = lobbyService.getLobbyById(LobbyId);
+        User user = userService.getUserByToken(token);
+        userService.validateTokenMatch(user, token);
+        lobbyService.validateUserIsInLobby(user, lobby);
+        Player player = lobbyService.getPlayerByUser(user, lobby);
+        return lobbyService.getOwnRoleInformation(player, lobby);
+    }
+
+    @PutMapping("/lobbies/{lobbyId}/roles")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public void assignRoles(@PathVariable("lobbyId") Long LobbyId, @RequestHeader("token") String token) {
+        Lobby lobby = lobbyService.getLobbyById(LobbyId);
+        User user = userService.getUserByToken(token);
+        lobbyService.assignRoles(user, lobby);
+    }
 }

@@ -6,8 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.stream.StreamSupport;
 
+import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
@@ -32,6 +35,12 @@ public class LobbyServiceTest {
         user.setId(id);
         user.setUsername(username);
         return user;
+    }
+
+    private void joinN_Users(int n, Lobby lobby) {
+        for (long i = 2L; i < n+2; i++) {
+            lobbyService.joinUserToLobby(createTestUser(i, "user" + Long.toString(i)), lobby);
+        }
     }
 
     @Test
@@ -178,5 +187,34 @@ public class LobbyServiceTest {
         notJoiningUser.setUsername("TestUser");
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.getPlayerByUser(notJoiningUser, lobby));
         assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
+    }
+
+    @Test
+    void assignRole_notAdmin() {
+        User admin = createTestAdmin();
+        User notAdmin = createTestUser(15L, "notAdmin");
+        Lobby lobby = lobbyService.createNewLobby(admin);
+        lobbyService.joinUserToLobby(notAdmin, lobby);
+        joinN_Users(5, lobby);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.assignRoles(notAdmin, lobby));
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
+    }
+
+    @Test
+    void assignRole_allowed() {
+        User admin = createTestAdmin();
+        Lobby lobby = lobbyService.createNewLobby(admin);
+        joinN_Users(5, lobby);
+        lobbyService.assignRoles(admin, lobby);
+        ArrayList<Role> roles = new ArrayList<>(lobby.getRoles());
+        boolean foundWerewolf = false;
+        for (Role role: roles) {
+            if (role.getClass() == Werewolf.class) {
+                foundWerewolf = true;
+                assertEquals("Werewolf", role.getName());
+                break;
+            }
+        }
+        assertTrue(foundWerewolf);
     }
 }
