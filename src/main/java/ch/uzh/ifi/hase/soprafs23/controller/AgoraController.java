@@ -45,7 +45,7 @@ public class AgoraController {
     }
 
     @PostMapping("/agora/{lobbyId}/rules/audio/{userId}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void forceMutePlayerFromChannel(@PathVariable("lobbyId") Long lobbyId, @PathVariable("userId") Long userId, @RequestHeader(USERAUTH_HEADER) String userToken) throws IOException, InterruptedException {
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
         User user = userService.getUserByToken(userToken);
