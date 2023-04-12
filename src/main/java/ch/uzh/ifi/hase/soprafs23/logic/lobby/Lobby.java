@@ -106,8 +106,8 @@ public class Lobby {
 
         Map<Class<? extends Role>, List<Player>> mapOfPlayersPerRole = new HashMap<>();
 
-        mapOfPlayersPerRole.put(Werewolf.class, playerList.subList(0, (this.getLobbySize() / 3) - 1));
-        mapOfPlayersPerRole.put(Villager.class, playerList.subList(this.getLobbySize() / 3, this.getLobbySize() - 1));
+        mapOfPlayersPerRole.put(Werewolf.class, playerList.subList(0, this.getLobbySize() / 3));
+        mapOfPlayersPerRole.put(Villager.class, playerList.subList(this.getLobbySize() / 3, this.getLobbySize()));
 
         for (Map.Entry<Class<? extends Role>, List<Player>> entry : mapOfPlayersPerRole.entrySet()){
             for (Player player : entry.getValue()){
