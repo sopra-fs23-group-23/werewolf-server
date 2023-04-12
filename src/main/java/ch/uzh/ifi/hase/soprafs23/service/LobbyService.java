@@ -149,16 +149,16 @@ public class LobbyService {
     }
 
     public void assignRoles(User user, Lobby lobby) {
+        //should also validate that the roles are not assigned yet, but since this code moves to the game service and may
+        //happen in the game constructor I think it is easier if we do this then instead of doing it twice
         validateUserIsAdmin(user, lobby);
         lobby.instantiateRoles();
     }
 
     private RoleGetDTO roleToRolesGetDTO(Lobby lobby, Role role) {
-        System.out.println(role.getName());
         Iterable<Player> playersOfThatRole = lobby.getPlayersByRole(role.getClass());
         int amount = 0;
         for(Player player: playersOfThatRole) {
-            System.out.println(player.getId());
             amount++;
         }
         return convertRoleToRoleGetDTO(role, amount);
