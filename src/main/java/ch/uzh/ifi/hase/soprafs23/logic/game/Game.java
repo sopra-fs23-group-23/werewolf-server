@@ -12,7 +12,12 @@ public class Game implements StageObserver{
     private Lobby lobby;
     private Stage currentStage;
 
+    /**
+     * @pre lobby.getLobbySize() <= Lobby.MAX_SIZE && lobby.getLobbySize() >= Lobby.MIN_SIZE
+     * @param lobby
+     */
     public Game(Lobby lobby) {
+        assert lobby.getLobbySize() <= Lobby.MAX_SIZE && lobby.getLobbySize() >= Lobby.MIN_SIZE;
         this.lobby = lobby;
     }
 
