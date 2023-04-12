@@ -15,7 +15,7 @@ import ch.uzh.ifi.hase.soprafs23.database.DBConnector;
 @SpringBootApplication
 public class Application {
 
-  public static void main(String[] args) {
+    public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
 
     // TODO delete next line... was for connection testing only

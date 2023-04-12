@@ -11,6 +11,11 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
 
 public class Werewolf extends Role implements NightVoter, Fraction{
     private Supplier<List<Player>> alivePlayersGetter;
+    private final static String name = "Werewolf";
+    private final static String description = "The werewolves take on the role of the antagonists in this game. " +
+            "They win as soon as no villagers are left alive. Every night the werewolves wake up and vote on " +
+            "their next victim. The person with the most votes dies. However, the werewolves have to be careful," +
+            " as no one dies if they can’t agree.";
 
     public Werewolf(Supplier<List<Player>> alivePlayersGetter) {
         this.alivePlayersGetter = alivePlayersGetter;
@@ -36,14 +41,12 @@ public class Werewolf extends Role implements NightVoter, Fraction{
 
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getName'");
+        return name;
     }
 
     @Override
     public String getDescription() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getDescription'");
+        return description;
     }
     
 }
