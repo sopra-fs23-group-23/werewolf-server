@@ -124,7 +124,6 @@ public class UserServiceTest {
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
         Mockito.when(userRepository.findByUsername(updatedUser.getUsername())).thenReturn(null);
 
-        // Call function
         userService.updateUser(updatedUser, userId);
 
         // Verify that user was updated
