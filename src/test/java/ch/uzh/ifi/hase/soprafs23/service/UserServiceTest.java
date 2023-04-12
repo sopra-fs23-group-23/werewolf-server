@@ -119,7 +119,6 @@ public class UserServiceTest {
 
     @Test
     public void updateUser_ValidUpdate_Success() throws ParseException {
-        // Set up
         Long userId = 1L;
         User existingUser = new User();
         existingUser.setId(userId);
