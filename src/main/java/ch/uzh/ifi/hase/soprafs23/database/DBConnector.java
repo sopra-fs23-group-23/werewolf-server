@@ -1,5 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.database;
-
+/*
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -32,3 +32,5 @@ public class DBConnector {
         }
     }
 }
+
+ */
