@@ -130,11 +130,9 @@ public class LobbyController {
         User user = userService.getUserByToken(token);
         //TODO: Delete this part but makes it much easier to test things around the role assignement, infoscreen etc.
         if (lobby.getLobbySize() < 5) {
-            for (long i = 20; i < 30; i++) {
-                User dummyUser = new User();
-                dummyUser.setUsername(Long.toString(i));
-                dummyUser.setPassword("1234");
-                lobbyService.joinUserToLobby(userService.createUser(dummyUser), lobby);
+            for (long i = 5; i <= 14; i++) {
+                User dummyUser = userService.getUser(i);
+                lobbyService.joinUserToLobby(dummyUser, lobby);
             }
         }
         lobbyService.assignRoles(user, lobby);
