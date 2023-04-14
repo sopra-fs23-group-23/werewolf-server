@@ -27,6 +27,7 @@ public final class LogicDTOMapper {
         playerGetDTO.setId(player.getId());
         playerGetDTO.setName(player.getName());
         playerGetDTO.setAlive(player.isAlive());
+        playerGetDTO.setAvatarUrl(player.getAvatarUrl());
         return playerGetDTO;
     }
 

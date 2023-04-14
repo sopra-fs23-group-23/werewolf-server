@@ -4,6 +4,7 @@ public class PlayerGetDTO {
     private Long id;
     private String name;
     private boolean isAlive;
+    private String avatarUrl;
 
     public Long getId() {
         return id;
@@ -14,6 +15,9 @@ public class PlayerGetDTO {
     public String getName() {
         return name;
     }
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
     public void setName(String name) {
         this.name = name;
     }
@@ -22,5 +26,8 @@ public class PlayerGetDTO {
     }
     public void setAlive(boolean isAlive) {
         this.isAlive = isAlive;
+    }
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }
