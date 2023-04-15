@@ -158,6 +158,32 @@ public class LobbyServiceTest {
     }
 
     @Test
+    void testValidateLobbySize() {
+        Lobby lobby = mock(Lobby.class);
+        Mockito.when(lobby.getLobbySize()).thenReturn(Lobby.MIN_SIZE);
+        lobbyService.validateLobbySize(lobby);
+        // should not throw error
+    }
+
+    @Test
+    void testValidateLobbySize_tooSmall() {
+        Lobby lobby = mock(Lobby.class);
+        Mockito.when(lobby.getLobbySize()).thenReturn(Lobby.MIN_SIZE-1);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.validateLobbySize(lobby));
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+    }
+
+    @Test
+    void testValidateLobbySize_tooLarge() {
+        Lobby lobby = mock(Lobby.class);
+        Mockito.when(lobby.getLobbySize()).thenReturn(Lobby.MAX_SIZE+1);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.validateLobbySize(lobby));
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+    }
+
+
+
+    @Test
     void testCreateAndGetLobbyEmitter() {
         User admin = createTestAdmin();
         Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
@@ -172,35 +198,6 @@ public class LobbyServiceTest {
         SseEmitter mockEmitter = mock(SseEmitter.class);
         lobbyService.sendEmitterUpdate(mockEmitter, "test", LobbySseEvent.update);
         Mockito.verify(mockEmitter).send(Mockito.any(SseEventBuilder.class));
-    }
-
-    @Test
-    void testAssignRole_notAdmin() {
-        User admin = createTestAdmin();
-        User notAdmin = createTestUser(15L, "notAdmin");
-        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
-        lobbyService.joinUserToLobby(notAdmin, lobby);
-        join_N_Users(5, lobby);
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.assignRoles(notAdmin, lobby));
-        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
-    }
-
-    @Test
-    void testAssignRole_allowed() {
-        User admin = createTestAdmin();
-        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
-        join_N_Users(5, lobby);
-        lobbyService.assignRoles(admin, lobby);
-        ArrayList<Role> roles = new ArrayList<>(lobby.getRoles());
-        boolean foundWerewolf = false;
-        for (Role role: roles) {
-            if (role.getClass() == Werewolf.class) {
-                foundWerewolf = true;
-                assertEquals("Werewolf", role.getName());
-                break;
-            }
-        }
-        assertTrue(foundWerewolf);
     }
 
     @Test

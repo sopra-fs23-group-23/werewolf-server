@@ -120,23 +120,4 @@ public class LobbyController {
         lobbyService.validateUserIsInLobby(user, lobby);
         return lobbyService.getOwnRolesInformation(user, lobby);
     }
-
-    //TODO: this probably should go into the the game controller, and the role assignement could be triggered in the constructor of the game
-    @PutMapping("/lobbies/{lobbyId}/roles")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ResponseBody
-    public void assignRoles(@PathVariable(LOBBYID_PATHVARIABLE) Long LobbyId, @RequestHeader(USERAUTH_HEADER) String token) {
-        Lobby lobby = lobbyService.getLobbyById(LobbyId);
-        User user = userService.getUserByToken(token);
-        //TODO: Delete this part but makes it much easier to test things around the role assignement, infoscreen etc.
-        if (lobby.getLobbySize() < 5) {
-            for (long i = 20; i < 30; i++) {
-                User dummyUser = new User();
-                dummyUser.setUsername(Long.toString(i));
-                dummyUser.setPassword("1234");
-                lobbyService.joinUserToLobby(userService.createUser(dummyUser), lobby);
-            }
-        }
-        lobbyService.assignRoles(user, lobby);
-    }
 }

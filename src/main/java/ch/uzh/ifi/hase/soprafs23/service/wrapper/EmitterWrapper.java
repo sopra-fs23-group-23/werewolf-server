@@ -2,11 +2,11 @@ package ch.uzh.ifi.hase.soprafs23.service.wrapper;
 
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-public class LobbyEmitterWrapper {
+public class EmitterWrapper {
     private SseEmitter emitter;
     private String token;
 
-    public LobbyEmitterWrapper(SseEmitter emitter, String token) {
+    public EmitterWrapper(SseEmitter emitter, String token) {
         this.emitter = emitter;
         this.token = token;
     }

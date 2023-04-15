@@ -22,7 +22,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
-import ch.uzh.ifi.hase.soprafs23.service.wrapper.LobbyEmitterWrapper;
+import ch.uzh.ifi.hase.soprafs23.service.wrapper.EmitterWrapper;
 
 import static ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper.convertRoleToRoleGetDTO;
 
@@ -31,7 +31,7 @@ import static ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper.convertR
 public class LobbyService {
 
     private Map<Long, Lobby> lobbies = new HashMap<>();
-    private Map<Long, LobbyEmitterWrapper> lobbyEmitterMap = new HashMap<>();
+    private Map<Long, EmitterWrapper> lobbyEmitterMap = new HashMap<>();
 
     private Long createLobbyId() {
         Long newId = ThreadLocalRandom.current().nextLong(100000, 999999);
@@ -96,7 +96,7 @@ public class LobbyService {
 
     public SseEmitter createLobbyEmitter(Lobby lobby) {
         SseEmitter emitter = new SseEmitter(-1l);
-        lobbyEmitterMap.put(lobby.getId(), new LobbyEmitterWrapper(emitter, UUID.randomUUID().toString()));
+        lobbyEmitterMap.put(lobby.getId(), new EmitterWrapper(emitter, UUID.randomUUID().toString()));
         return emitter;
     }
 
@@ -129,6 +129,15 @@ public class LobbyService {
         }
     }
 
+    public void validateLobbySize(Lobby lobby) {
+        if (lobby.getLobbySize() > Lobby.MAX_SIZE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby has too many players.");
+        }
+        if (lobby.getLobbySize() < Lobby.MIN_SIZE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby has not enough players.");
+        }
+    }
+
     public Collection<RoleGetDTO> getAllRolesInformation(Lobby lobby) {
         ArrayList<Role> roles = new ArrayList<>(lobby.getRoles());
         ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>();
@@ -148,10 +157,11 @@ public class LobbyService {
         return roleGetDTOS;
     }
 
-    public void assignRoles(User user, Lobby lobby) {
-        //should also validate that the roles are not assigned yet, but since this code moves to the game service and may
-        //happen in the game constructor I think it is easier if we do this then instead of doing it twice
-        validateUserIsAdmin(user, lobby);
+    /**
+     * @pre executing user is admin
+     * @param lobby
+     */
+    public void assignRoles(Lobby lobby) {
         lobby.instantiateRoles();
     }
 
