@@ -13,7 +13,7 @@ public class Stage implements PollObserver{
     private StageType type;
     private List<StageObserver> observers = new ArrayList<>();
     private Queue<Supplier<Poll>> pollSupplierQueue;
-    private List<PollCommand> pollCommands;
+    private List<PollCommand> pollCommands = new ArrayList<>();
     private Poll currentPoll;
 
     public Stage(StageType type, Queue<Supplier<Poll>> pollSupplierQueue) {

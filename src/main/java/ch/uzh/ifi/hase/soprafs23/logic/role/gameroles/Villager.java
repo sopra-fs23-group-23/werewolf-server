@@ -5,6 +5,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.NullPoll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
@@ -45,7 +46,7 @@ public class Villager extends Role implements DayVoter, Fraction{
     @Override
     public Poll createDayPoll() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createDayPoll'");
+        return new NullPoll();
     }
 
     @Override

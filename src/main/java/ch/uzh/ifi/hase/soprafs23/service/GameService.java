@@ -21,7 +21,8 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.game.GameObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.StageGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.helper.EmitterHelper;
 import ch.uzh.ifi.hase.soprafs23.service.wrapper.GameEmitter;
 
@@ -99,7 +100,7 @@ public class GameService implements GameObserver{
         executorService.schedule(command, delaySeconds, TimeUnit.SECONDS);
     }
 
-    private String stageGetDTOToJson(StageGetDTO dto) throws JsonProcessingException {
+    private String stageGetDTOToJson(GameGetDTO dto) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(dto);
     }
@@ -107,11 +108,9 @@ public class GameService implements GameObserver{
     @Override
     public void onNewStage(Game game) {
         GameEmitter emitter = getGameEmitter(game);
-        StageGetDTO stageGetDTO = new StageGetDTO();
-        stageGetDTO.setActions(game.getLastStagePollCommands());
-        stageGetDTO.setType(game.getCurrentStage().getType());
+        GameGetDTO dto = LogicDTOMapper.convertGameToGameGetDTO(game);
         try {
-            sendGameEmitterUpdate(emitter, stageGetDTOToJson(stageGetDTO), GameSseEvent.stage);
+            sendGameEmitterUpdate(emitter, stageGetDTOToJson(dto), GameSseEvent.stage);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
