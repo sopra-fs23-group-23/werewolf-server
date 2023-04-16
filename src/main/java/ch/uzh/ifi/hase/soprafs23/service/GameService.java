@@ -13,16 +13,21 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ch.uzh.ifi.hase.soprafs23.constant.sse.GameSseEvent;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
+import ch.uzh.ifi.hase.soprafs23.logic.game.GameObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.StageGetDTO;
 import ch.uzh.ifi.hase.soprafs23.service.helper.EmitterHelper;
 import ch.uzh.ifi.hase.soprafs23.service.wrapper.GameEmitter;
 
 @Service
 @Transactional
-public class GameService {
+public class GameService implements GameObserver{
     private Map<Long, Game> games = new HashMap<>();
     private Map<Long, GameEmitter> gameEmitterMap = new HashMap<>();
 
@@ -85,11 +90,31 @@ public class GameService {
     }
 
     public void startGame(Game game) {
+        game.addObserver(this);
         game.startGame();
     }
 
     public void schedule(Runnable command, int delaySeconds) {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.schedule(command, delaySeconds, TimeUnit.SECONDS);
+    }
+
+    private String stageGetDTOToJson(StageGetDTO dto) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(dto);
+    }
+
+    @Override
+    public void onNewStage(Game game) {
+        GameEmitter emitter = getGameEmitter(game);
+        StageGetDTO stageGetDTO = new StageGetDTO();
+        stageGetDTO.setActions(game.getLastStagePollCommands());
+        stageGetDTO.setType(game.getCurrentStage().getType());
+        try {
+            sendGameEmitterUpdate(emitter, stageGetDTOToJson(stageGetDTO), GameSseEvent.stage);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
     }
 }

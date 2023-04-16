@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -49,5 +50,13 @@ public class GameServiceTest {
         Lobby lobby = createValidMockLobby();
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->gameService.getGame(lobby));
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+    }
+
+    @Test
+    void testStartGame() {
+        Game game = mock(Game.class);
+        gameService.startGame(game);
+        verify(game).startGame();
+        verify(game).addObserver(gameService);
     }
 }
