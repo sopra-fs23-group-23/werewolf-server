@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.StreamSupport;
@@ -12,16 +11,15 @@ import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
+import ch.uzh.ifi.hase.soprafs23.service.helper.EmitterHelper;
 import ch.uzh.ifi.hase.soprafs23.service.wrapper.EmitterWrapper;
 
 import static ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper.convertRoleToRoleGetDTO;
@@ -114,13 +112,8 @@ public class LobbyService {
         return lobbyEmitterMap.get(lobby.getId()).getEmitter();
     }
 
-    public void sendEmitterUpdate(SseEmitter emitter, String data, LobbySseEvent eventType) throws IOException {
-        // ordering matters!!! .name needs to be before .data
-        SseEventBuilder event = SseEmitter.event()
-            .name(eventType.toString())
-            .data( data + "\n", MediaType.APPLICATION_JSON)
-            .id(UUID.randomUUID().toString());
-        emitter.send(event);
+    public void sendEmitterUpdate(SseEmitter emitter, String data, LobbySseEvent eventType) {
+        EmitterHelper.sendEmitterUpdate(emitter, data, eventType.toString());
     }
 
     public void validateUserIsAdmin(User user, Lobby lobby) {

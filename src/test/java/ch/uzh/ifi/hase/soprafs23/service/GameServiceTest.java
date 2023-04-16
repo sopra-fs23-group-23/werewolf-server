@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
+import ch.uzh.ifi.hase.soprafs23.service.wrapper.GameEmitter;
 
 public class GameServiceTest {
     GameService gameService = new GameService();
@@ -33,7 +33,7 @@ public class GameServiceTest {
     @Test
     void testCreateGameEmitter() {
         Game game = createValidMockGame();
-        SseEmitter emitter = gameService.createGameEmitter(game);
+        GameEmitter emitter = gameService.createGameEmitter(game);
         assertEquals(emitter, gameService.getGameEmitter(game));
     }
 

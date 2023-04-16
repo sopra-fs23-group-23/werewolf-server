@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.controller;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
@@ -36,12 +37,13 @@ public class GameControllerTest {
 
     @MockBean
     private GameService gameService;
+
+    private User user = mock(User.class);
+    private Lobby lobby = mock(Lobby.class);
+    private Game game = mock(Game.class);
     
     @Test
     void testCreateNewGame() throws Exception {
-        User user = mock(User.class);
-        Lobby lobby = mock(Lobby.class);
-        Game game = mock(Game.class);
         SseEmitter emitter = mock(SseEmitter.class);
 
         Mockito.when(userService.getUserByToken("token")).thenReturn(user);
@@ -60,6 +62,20 @@ public class GameControllerTest {
         verify(lobbyService).assignRoles(lobby);
         verify(gameService).createGameEmitter(game);
         verify(lobbyService).sendEmitterUpdate(emitter, "", LobbySseEvent.game);
+    }
 
+    @Test
+    void testGetPlayerSseEmitter() throws Exception {
+        Mockito.when(userService.getUserByToken("token")).thenReturn(user);
+        Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
+        Mockito.when(gameService.getGame(lobby)).thenReturn(game);
+
+        MockHttpServletRequestBuilder getRequest = get("/games/1/sse/token");
+
+        mockMvc.perform(getRequest)
+            .andExpect(status().isOk());
+
+        verify(lobbyService).validateUserIsInLobby(user, lobby);
+        verify(gameService).getPlayerSseEmitter(game, user);
     }
 }
