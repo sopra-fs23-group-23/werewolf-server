@@ -12,7 +12,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.FirstDayVoter;
 
-public class Villager extends Role implements FirstDayVoter, DayVoter, Fraction{
+public class Villager extends Role implements DayVoter, Fraction{
     private BiConsumer<Player, Class<? extends Role>> addPlayerToRole;
     private Supplier<List<Player>> alivePlayersGetter;
     private TiedPollDecider tiedPollDecider;
@@ -46,12 +46,6 @@ public class Villager extends Role implements FirstDayVoter, DayVoter, Fraction{
     public Poll createDayPoll() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'createDayPoll'");
-    }
-
-    @Override
-    public Poll createFirstDayPoll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createFirstDayPoll'");
     }
 
     @Override

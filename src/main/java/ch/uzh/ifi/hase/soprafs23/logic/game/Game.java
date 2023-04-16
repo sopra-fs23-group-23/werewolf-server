@@ -1,7 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.logic.game;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -11,15 +10,12 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
-import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.FirstDayVoter;
-import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.FirstNightVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
 
 public class Game implements StageObserver{
     private Lobby lobby;
     private Stage currentStage;
     private int stageCount = 0;
-    private Queue<Stage> initialStages = new LinkedList<>();
     private List<PollCommand> lastStagePollCommands = new ArrayList<>();
     private List<GameObserver> observers = new ArrayList<>();
 
@@ -33,25 +29,15 @@ public class Game implements StageObserver{
     }
 
     private Stage calculateNextStage() {
-        if (!initialStages.isEmpty()) {
-            // special cases
-            return initialStages.poll();
+        // normal cases
+        if (stageCount % 2 == 0) {
+            return new Stage(StageType.Day, getDayVoters());
         } else {
-            // normal cases
-            if (stageCount % 2 == 0) {
-                return new Stage(StageType.Day, getDayVoters());
-            } else {
-                return new Stage(StageType.Night, getNightVoters());
-            }
-
+            return new Stage(StageType.Night, getNightVoters());
         }
     }
 
     public void startGame() {
-        initialStages.addAll(Arrays.asList(
-            new Stage(StageType.Day, getFirstDayVoters()),
-            new Stage(StageType.Night, getFirstNightVoters())
-        ));
         startNextStage(calculateNextStage());
     }
 
@@ -83,26 +69,6 @@ public class Game implements StageObserver{
         lastStagePollCommands = currentStage.getPollCommands();
         lastStagePollCommands.stream().forEach(p->p.execute());
         startNextStage(calculateNextStage());
-    } 
-
-    private Queue<Supplier<Poll>> getFirstDayVoters() {
-        Queue<Supplier<Poll>> pq = new LinkedList<>();
-        lobby.getRoles().stream()
-            .filter(FirstDayVoter.class::isInstance)
-            .sorted()
-            .map(FirstDayVoter.class::cast)
-            .forEach(voter -> pq.add(voter::createFirstDayPoll));
-        return pq;
-    }
-
-    private Queue<Supplier<Poll>> getFirstNightVoters() {
-        Queue<Supplier<Poll>> pq = new LinkedList<>();
-        lobby.getRoles().stream()
-            .filter(FirstNightVoter.class::isInstance)
-            .sorted()
-            .map(FirstNightVoter.class::cast)
-            .forEach(voter -> pq.add(voter::createFirstNightPoll));
-        return pq;
     }
 
     private Queue<Supplier<Poll>> getDayVoters() {
