@@ -92,4 +92,15 @@ if (secretPropsFile.exists()) {
     }
 }
 
+File dbPasswordPropsFile = file('./dbpassword.properties')
+if (dbPasswordPropsFile.exists()) {
+    Properties p = new Properties()
+    p.load(new FileInputStream(dbPasswordPropsFile))
+    p.each { name, value ->
+        ext[name] = value
+    }
+} else {
+    ext['dbPassword'] = 'defaultpassword'
+}
+
 defaultTasks 'bootJar', 'build'
