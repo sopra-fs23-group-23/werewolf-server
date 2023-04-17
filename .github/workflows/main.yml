@@ -23,8 +23,8 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
-      - name: Set database password1
-          run: echo "dbPassword=${{ secrets.DB_PASSWORD }}" > dbpassword.properties
+      - name: Set database password
+        run: echo "dbPassword=${{ secrets.DB_PASSWORD }}" > dbpassword.properties
 
       - name: Test and analyze
         run: ./gradlew test jacocoTestReport sonarqube
