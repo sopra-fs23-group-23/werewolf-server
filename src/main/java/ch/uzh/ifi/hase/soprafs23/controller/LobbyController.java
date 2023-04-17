@@ -66,6 +66,7 @@ public class LobbyController {
     public void joinLobby(@PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @RequestHeader(USERAUTH_HEADER) String userToken) throws JsonProcessingException, IOException {
         User user = userService.getUserByToken(userToken);
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
+        lobbyService.validateLobbyIsOpen(lobby);
         lobbyService.joinUserToLobby(user, lobby);
         lobbyService.sendEmitterUpdate(lobbyService.getLobbyEmitter(lobby), lobbyToJSON(lobby), LobbySseEvent.update);
     }

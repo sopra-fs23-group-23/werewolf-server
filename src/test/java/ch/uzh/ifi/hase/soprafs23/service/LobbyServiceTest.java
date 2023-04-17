@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -79,6 +81,21 @@ public class LobbyServiceTest {
     void testGetLobbyById_nonExistent() {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> lobbyService.getLobbyById(1l));
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+    }
+
+    @Test
+    void testValidateLobbyIsOpen() {
+        Lobby lobby = mock(Lobby.class);
+        when(lobby.isOpen()).thenReturn(true);
+        lobbyService.validateLobbyIsOpen(lobby);
+    }
+
+    @Test
+    void testValidateLobbyIsOpen_closedLobby() {
+        Lobby lobby = mock(Lobby.class);
+        when(lobby.isOpen()).thenReturn(false);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.validateLobbyIsOpen(lobby));
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
     }
 
     @Test
@@ -209,6 +226,13 @@ public class LobbyServiceTest {
         ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>(lobbyService.getAllRolesInformation(mock));
         assertEquals("Werewolf", roleGetDTOS.get(0).getRoleName());
         assertEquals(0, roleGetDTOS.get(0).getAmount());
+    }
+
+    @Test
+    void testCloseLobby() {
+        Lobby lobby = mock(Lobby.class);
+        lobbyService.closeLobby(lobby);
+        verify(lobby).setOpen(false);
     }
 
     @Test

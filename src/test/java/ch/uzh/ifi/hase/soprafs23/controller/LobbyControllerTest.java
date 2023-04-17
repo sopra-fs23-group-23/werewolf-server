@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.is;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -77,16 +78,17 @@ public class LobbyControllerTest {
 
         Mockito.when(userService.getUserByToken("token")).thenReturn(joiningUser);
         Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
-        doNothing().when(lobbyService).joinUserToLobby(joiningUser, lobby);
         SseEmitter mockSseEmitter = mock(SseEmitter.class);
         Mockito.when(lobbyService.getLobbyEmitter(lobby)).thenReturn(mockSseEmitter);
-        doNothing().when(lobbyService).sendEmitterUpdate(Mockito.any(SseEmitter.class), Mockito.anyString(), Mockito.any(LobbySseEvent.class));
 
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1")
             .header(LobbyController.USERAUTH_HEADER, "token");
 
         mockMvc.perform(putRequest)
             .andExpect(status().isNoContent());
+
+        verify(lobbyService).joinUserToLobby(joiningUser, lobby);
+        verify(lobbyService).sendEmitterUpdate(Mockito.any(SseEmitter.class), Mockito.anyString(), Mockito.any(LobbySseEvent.class));
     }
 
     @Test

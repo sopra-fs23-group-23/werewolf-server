@@ -46,8 +46,8 @@ public class GameController {
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
         lobbyService.validateUserIsAdmin(user, lobby);
         lobbyService.validateLobbySize(lobby);
+        lobbyService.closeLobby(lobby);
         lobbyService.assignRoles(lobby);
-        // TODO close lobby & test for closed lobby in LobbyController
         Game game = gameService.createNewGame(lobby);
         gameService.createGameEmitter(game);
         lobbyService.sendEmitterUpdate(lobbyService.getLobbyEmitter(lobby), "", LobbySseEvent.game);

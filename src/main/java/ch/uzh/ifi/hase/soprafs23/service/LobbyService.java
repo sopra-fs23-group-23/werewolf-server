@@ -76,6 +76,12 @@ public class LobbyService {
         }
     }
 
+    public void validateLobbyIsOpen(Lobby lobby) {
+        if (!lobby.isOpen()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby is closed.");
+        }
+    }
+
     public void joinUserToLobby(User user, Lobby lobby) {
         if (lobby.getLobbySize() >= Lobby.MAX_SIZE) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby is already full.");
@@ -156,6 +162,10 @@ public class LobbyService {
      */
     public void assignRoles(Lobby lobby) {
         lobby.instantiateRoles();
+    }
+
+    public void closeLobby(Lobby lobby) {
+        lobby.setOpen(false);
     }
 
     private RoleGetDTO roleToRolesGetDTO(Lobby lobby, Role role) {
