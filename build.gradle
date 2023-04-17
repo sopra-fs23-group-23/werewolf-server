@@ -16,6 +16,12 @@ java {
     }
 }
 
+processResources {
+    filesMatching('**/application-prod.properties') {
+        expand(project.properties)
+    }
+}
+
 configurations {
     developmentOnly
     runtimeClasspath {
