@@ -27,6 +27,7 @@ import static ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper.convertR
 @Service
 @Transactional
 public class LobbyService {
+    public static final String LOBBYID_PATHVARIABLE = "lobbyId";
 
     private Map<Long, Lobby> lobbies = new HashMap<>();
     private Map<Long, EmitterWrapper> lobbyEmitterMap = new HashMap<>();

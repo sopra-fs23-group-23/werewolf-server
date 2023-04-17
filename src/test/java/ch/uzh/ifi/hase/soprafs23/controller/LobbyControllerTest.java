@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
 
 import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
 
@@ -62,7 +63,7 @@ public class LobbyControllerTest {
         Mockito.when(lobbyService.createLobbyEmitter(lobby)).thenReturn(null);
 
         MockHttpServletRequestBuilder postRequest = post("/lobbies")
-            .header(LobbyController.USERAUTH_HEADER, "token");
+            .header(USERAUTH_HEADER, "token");
 
         mockMvc.perform(postRequest)
             .andExpect(status().isCreated())
@@ -82,7 +83,7 @@ public class LobbyControllerTest {
         Mockito.when(lobbyService.getLobbyEmitter(lobby)).thenReturn(mockSseEmitter);
 
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1")
-            .header(LobbyController.USERAUTH_HEADER, "token");
+            .header(USERAUTH_HEADER, "token");
 
         mockMvc.perform(putRequest)
             .andExpect(status().isNoContent());
@@ -103,7 +104,7 @@ public class LobbyControllerTest {
         doNothing().when(lobbyService).validateUserIsInLobby(usr, lobby);
 
         MockHttpServletRequestBuilder getRequest = get("/lobbies/1")
-            .header(LobbyController.USERAUTH_HEADER, "token");
+            .header(USERAUTH_HEADER, "token");
 
         mockMvc.perform(getRequest)
             .andExpect(status().isOk())
@@ -123,7 +124,7 @@ public class LobbyControllerTest {
         Mockito.when(lobbyService.getLobbyEmitterToken(lobby)).thenReturn("token123");
 
         MockHttpServletRequestBuilder getRequest = get("/lobbies/1/sse")
-            .header(LobbyController.USERAUTH_HEADER, "token");
+            .header(USERAUTH_HEADER, "token");
 
         mockMvc.perform(getRequest)
             .andExpect(status().isOk())
@@ -158,7 +159,7 @@ public class LobbyControllerTest {
         Mockito.when(lobbyService.getAllRolesInformation(lobby)).thenReturn(mockReturn);
 
         MockHttpServletRequestBuilder getRequest = get("/lobbies/1/roles").
-                header(LobbyController.USERAUTH_HEADER, "token");
+                header(USERAUTH_HEADER, "token");
 
         mockMvc.perform(getRequest)
                 .andExpect(status().isOk());
@@ -177,7 +178,7 @@ public class LobbyControllerTest {
         doNothing().when(lobbyService).validateUserIsInLobby(user, lobby);
 
         MockHttpServletRequestBuilder getRequest = get("/lobbies/1/roles/1").
-                header(LobbyController.USERAUTH_HEADER, "token");
+                header(USERAUTH_HEADER, "token");
 
         mockMvc.perform(getRequest)
                 .andExpect(status().isOk());

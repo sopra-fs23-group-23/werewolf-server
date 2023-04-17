@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
-import ch.uzh.ifi.hase.soprafs23.constant.Reason;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
@@ -11,15 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.Optional;
-import java.util.stream.StreamSupport;
 
-import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
-
-import static ch.uzh.ifi.hase.soprafs23.controller.LobbyController.LOBBYID_PATHVARIABLE;
-import static ch.uzh.ifi.hase.soprafs23.controller.LobbyController.USERAUTH_HEADER;
-import static java.lang.Long.parseLong;
-import static javax.xml.bind.DatatypeConverter.parseInt;
+import static ch.uzh.ifi.hase.soprafs23.service.LobbyService.LOBBYID_PATHVARIABLE;
+import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
 
 
 @RestController

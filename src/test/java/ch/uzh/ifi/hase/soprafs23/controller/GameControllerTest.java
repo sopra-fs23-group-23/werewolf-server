@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -52,7 +53,7 @@ public class GameControllerTest {
         Mockito.when(lobbyService.getLobbyEmitter(lobby)).thenReturn(emitter);
 
         MockHttpServletRequestBuilder postRequest = post("/games/1")
-            .header(LobbyController.USERAUTH_HEADER, "token");
+            .header(USERAUTH_HEADER, "token");
 
         mockMvc.perform(postRequest)
             .andExpect(status().isCreated());

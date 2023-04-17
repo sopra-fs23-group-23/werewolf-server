@@ -1,5 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
+import static ch.uzh.ifi.hase.soprafs23.service.LobbyService.LOBBYID_PATHVARIABLE;
+import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
+
 import java.io.IOException;
 
 import org.springframework.http.HttpStatus;
@@ -27,10 +30,6 @@ public class GameController {
     private final UserService userService;
     private final LobbyService lobbyService;
     private final GameService gameService;
-
-    // TODO move to respective services
-    public static final String USERAUTH_HEADER = "token";
-    public static final String LOBBYID_PATHVARIABLE = "lobbyId";
 
     public GameController(UserService userService, LobbyService lobbyService, GameService gameService) {
         this.userService = userService;

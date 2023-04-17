@@ -25,6 +25,7 @@ import java.util.*;
 @Service
 @Transactional
 public class UserService {
+    public static final String USERAUTH_HEADER = "token";
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 

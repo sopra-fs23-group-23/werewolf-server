@@ -1,10 +1,11 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
+import static ch.uzh.ifi.hase.soprafs23.service.LobbyService.LOBBYID_PATHVARIABLE;
+import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
+
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 
-import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,9 +35,6 @@ import ch.uzh.ifi.hase.soprafs23.service.UserService;
 
 @RestController
 public class LobbyController {
-    public static final String USERAUTH_HEADER = "token";
-    public static final String LOBBYID_PATHVARIABLE = "lobbyId";
-
     private final UserService userService;
     private final LobbyService lobbyService;
 
