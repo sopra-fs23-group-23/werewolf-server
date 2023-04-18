@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.StreamSupport;
@@ -12,26 +11,26 @@ import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
-import ch.uzh.ifi.hase.soprafs23.service.wrapper.LobbyEmitterWrapper;
+import ch.uzh.ifi.hase.soprafs23.service.helper.EmitterHelper;
+import ch.uzh.ifi.hase.soprafs23.service.wrapper.EmitterWrapper;
 
 import static ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper.convertRoleToRoleGetDTO;
 
 @Service
 @Transactional
 public class LobbyService {
+    public static final String LOBBYID_PATHVARIABLE = "lobbyId";
 
     private Map<Long, Lobby> lobbies = new HashMap<>();
-    private Map<Long, LobbyEmitterWrapper> lobbyEmitterMap = new HashMap<>();
+    private Map<Long, EmitterWrapper> lobbyEmitterMap = new HashMap<>();
 
     private Long createLobbyId() {
         Long newId = ThreadLocalRandom.current().nextLong(100000, 999999);
@@ -78,6 +77,12 @@ public class LobbyService {
         }
     }
 
+    public void validateLobbyIsOpen(Lobby lobby) {
+        if (!lobby.isOpen()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby is closed.");
+        }
+    }
+
     public void joinUserToLobby(User user, Lobby lobby) {
         if (lobby.getLobbySize() >= Lobby.MAX_SIZE) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby is already full.");
@@ -96,7 +101,7 @@ public class LobbyService {
 
     public SseEmitter createLobbyEmitter(Lobby lobby) {
         SseEmitter emitter = new SseEmitter(-1l);
-        lobbyEmitterMap.put(lobby.getId(), new LobbyEmitterWrapper(emitter, UUID.randomUUID().toString()));
+        lobbyEmitterMap.put(lobby.getId(), new EmitterWrapper(emitter, UUID.randomUUID().toString()));
         return emitter;
     }
 
@@ -114,18 +119,22 @@ public class LobbyService {
         return lobbyEmitterMap.get(lobby.getId()).getEmitter();
     }
 
-    public void sendEmitterUpdate(SseEmitter emitter, String data, LobbySseEvent eventType) throws IOException {
-        // ordering matters!!! .name needs to be before .data
-        SseEventBuilder event = SseEmitter.event()
-            .name(eventType.toString())
-            .data( data + "\n", MediaType.APPLICATION_JSON)
-            .id(UUID.randomUUID().toString());
-        emitter.send(event);
+    public void sendEmitterUpdate(SseEmitter emitter, String data, LobbySseEvent eventType) {
+        EmitterHelper.sendEmitterUpdate(emitter, data, eventType.toString());
     }
 
     public void validateUserIsAdmin(User user, Lobby lobby) {
         if (!user.getId().equals(lobby.getAdmin().getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the admin may perform this action.");
+        }
+    }
+
+    public void validateLobbySize(Lobby lobby) {
+        if (lobby.getLobbySize() > Lobby.MAX_SIZE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby has too many players.");
+        }
+        if (lobby.getLobbySize() < Lobby.MIN_SIZE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby has not enough players.");
         }
     }
 
@@ -148,11 +157,16 @@ public class LobbyService {
         return roleGetDTOS;
     }
 
-    public void assignRoles(User user, Lobby lobby) {
-        //should also validate that the roles are not assigned yet, but since this code moves to the game service and may
-        //happen in the game constructor I think it is easier if we do this then instead of doing it twice
-        validateUserIsAdmin(user, lobby);
+    /**
+     * @pre executing user is admin
+     * @param lobby
+     */
+    public void assignRoles(Lobby lobby) {
         lobby.instantiateRoles();
+    }
+
+    public void closeLobby(Lobby lobby) {
+        lobby.setOpen(false);
     }
 
     private RoleGetDTO roleToRolesGetDTO(Lobby lobby, Role role) {

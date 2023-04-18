@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.logic.game;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.Supplier;
@@ -9,26 +10,37 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.PollObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 
 public class Stage implements PollObserver{
-
-    // TODO replace name with enum (Night, Day)
-    private String name;
-    private List<StageObserver> observers;
+    private StageType type;
+    private List<StageObserver> observers = new ArrayList<>();
     private Queue<Supplier<Poll>> pollSupplierQueue;
-    private List<PollCommand> pollCommands;
+    private List<PollCommand> pollCommands = new ArrayList<>();
     private Poll currentPoll;
 
-    public Stage(String name, Queue<Supplier<Poll>> pollSupplierQueue) {
-        this.name = name;
+    public Stage(StageType type, Queue<Supplier<Poll>> pollSupplierQueue) {
+        this.type = type;
         this.pollSupplierQueue = pollSupplierQueue;
     }
 
-    public void startStage() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'startStage'");
+    private void startNextPoll() {
+        if(pollSupplierQueue.isEmpty()) {
+            finishStage();
+            return;
+        }
+        currentPoll = pollSupplierQueue.poll().get();
+        currentPoll.addObserver(this);
+        currentPoll.startPoll();
     }
 
-    public String getName() {
-        return name;
+    private void finishStage() {
+        observers.stream().forEach(s -> s.onStageFinished());
+    }
+
+    public void startStage() {
+        startNextPoll();
+    }
+
+    public StageType getType() {
+        return type;
     }
 
     public List<PollCommand> getPollCommands() {
@@ -41,14 +53,13 @@ public class Stage implements PollObserver{
     }
 
     public void addObserver(StageObserver observer) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addObserver'");
+        observers.add(observer);
     }
 
     @Override
     public void onPollFinished() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'onPollFinished'");
+        pollCommands.add(currentPoll.getResultCommand());
+        startNextPoll();
     }
     
 }

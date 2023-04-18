@@ -5,6 +5,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.NullPoll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
@@ -12,7 +13,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.FirstDayVoter;
 
-public class Villager extends Role implements FirstDayVoter, DayVoter, Fraction{
+public class Villager extends Role implements DayVoter, Fraction{
     private BiConsumer<Player, Class<? extends Role>> addPlayerToRole;
     private Supplier<List<Player>> alivePlayersGetter;
     private TiedPollDecider tiedPollDecider;
@@ -45,13 +46,7 @@ public class Villager extends Role implements FirstDayVoter, DayVoter, Fraction{
     @Override
     public Poll createDayPoll() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createDayPoll'");
-    }
-
-    @Override
-    public Poll createFirstDayPoll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createFirstDayPoll'");
+        return new NullPoll();
     }
 
     @Override

@@ -40,8 +40,6 @@ public class UserServiceTest {
     testUser.setPassword("password");
     testUser.setUsername("testUsername");
 
-    // when -> any object is being save in the userRepository -> return the dummy
-    // testUser
     Mockito.when(userRepository.save(Mockito.any())).thenReturn(testUser);
   }
 
@@ -110,7 +108,6 @@ public class UserServiceTest {
 
     @Test
     public void updateUser_ValidUpdate_Success() throws ParseException {
-        // Set up
         Long userId = 1L;
         User existingUser = new User();
         existingUser.setId(userId);
@@ -125,7 +122,6 @@ public class UserServiceTest {
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
         Mockito.when(userRepository.findByUsername(updatedUser.getUsername())).thenReturn(null);
 
-        // Call function
         userService.updateUser(updatedUser, userId);
 
         // Verify that user was updated
