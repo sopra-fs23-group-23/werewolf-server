@@ -1,14 +1,12 @@
 package ch.uzh.ifi.hase.soprafs23.logic.poll;
 
+import java.util.Collection;
+import java.util.List;
+
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.NullPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 
 public class NullPoll extends Poll {
-
-    @Override
-    public void startPoll() {
-        super.finish();
-    }
 
     @Override
     public PollCommand getResultCommand() {
@@ -18,6 +16,16 @@ public class NullPoll extends Poll {
     @Override
     public int getDurationSeconds() {
         return 0;
+    }
+
+    @Override
+    public Collection<PollParticipant> getPollParticipants() {
+        return List.of();
+    }
+
+    @Override
+    public Collection<PollOption> getPollOptions() {
+        return List.of();
     }
     
 }

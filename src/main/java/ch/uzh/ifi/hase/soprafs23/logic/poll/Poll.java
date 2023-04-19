@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.logic.poll;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
@@ -16,7 +17,8 @@ public abstract class Poll {
         observers.stream().forEach(o->o.onPollFinished());
     }
 
-    public abstract void startPoll();
     public abstract PollCommand getResultCommand();
     public abstract int getDurationSeconds();
+    public abstract Collection<PollParticipant> getPollParticipants();
+    public abstract Collection<PollOption> getPollOptions();
 }
