@@ -54,10 +54,10 @@ https://github.com/sopra-fs23-group-23/werewolf-server/issues/114
 https://github.com/sopra-fs23-group-23/werewolf-server/issues/193
 
 ### Jan Lüthi
-https://github.com/sopra-fs23-group-23/werewolf-client/issues/60
-https://github.com/sopra-fs23-group-23/werewolf-client/issues/78
-https://github.com/sopra-fs23-group-23/werewolf-server/issues/188
-https://github.com/sopra-fs23-group-23/werewolf-client/issues/79
+https://github.com/sopra-fs23-group-23/werewolf-client/issues/60  
+https://github.com/sopra-fs23-group-23/werewolf-client/issues/78  
+https://github.com/sopra-fs23-group-23/werewolf-server/issues/188  
+https://github.com/sopra-fs23-group-23/werewolf-client/issues/79  
 https://github.com/sopra-fs23-group-23/werewolf-server/issues/194
 
 ## Week 3 (12.04 - 18.04)
