@@ -90,5 +90,10 @@ public class Game implements StageObserver{
             .forEach(voter -> pq.add(voter::createNightPoll));
         return pq;
     }
+
+    @Override
+    public void onNewPoll(Poll poll) {
+        observers.stream().forEach(o -> o.onNewPoll(this, poll));
+    }
     
 }

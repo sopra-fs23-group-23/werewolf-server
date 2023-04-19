@@ -28,11 +28,15 @@ public class Stage implements PollObserver{
         }
         currentPoll = pollSupplierQueue.poll().get();
         currentPoll.addObserver(this);
-        currentPoll.startPoll();
+        notifyObserversAboutNewPoll();
     }
 
     private void finishStage() {
         observers.stream().forEach(s -> s.onStageFinished());
+    }
+
+    private void notifyObserversAboutNewPoll() {
+        observers.stream().forEach(s -> s.onNewPoll(currentPoll));
     }
 
     public void startStage() {

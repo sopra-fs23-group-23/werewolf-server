@@ -1,15 +1,21 @@
 package ch.uzh.ifi.hase.soprafs23.rest.logicmapper;
 
+import java.util.Calendar;
 import java.util.stream.StreamSupport;
 
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Stage;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.PlayerGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.PollGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.PollOptionGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.StageGetDTO;
 
@@ -55,5 +61,29 @@ public final class LogicDTOMapper {
         gameGetDTO.setLobby(convertLobbyToLobbyGetDTO(game.getLobby()));
         gameGetDTO.setStage(convertStageToStageGetDTO(game.getCurrentStage()));
         return gameGetDTO;
+    }
+
+    public static PollOptionGetDTO convertPollOptionToPollOptionGetDTO (PollOption pollOption) {
+        PollOptionGetDTO pollOptionGetDTO = new PollOptionGetDTO();
+        pollOptionGetDTO.setPlayer(convertPlayerToPlayerGetDTO(pollOption.getPlayer()));
+        pollOptionGetDTO.setSupporters(
+            StreamSupport.stream(pollOption.getSupporters().spliterator(), false).map(PollParticipant::getPlayer).map(LogicDTOMapper::convertPlayerToPlayerGetDTO).toList()
+        );
+        return pollOptionGetDTO;
+    }
+
+    public static PollGetDTO convertPollToPollGetDTO (Poll poll) {
+        PollGetDTO pollGetDTO = new PollGetDTO();
+        pollGetDTO.setQuestion(poll.getQuestion());
+        pollGetDTO.setParticipants(
+            StreamSupport.stream(poll.getPollParticipants().spliterator(), false).map(PollParticipant::getPlayer).map(LogicDTOMapper::convertPlayerToPlayerGetDTO).toList()
+        );
+        pollGetDTO.setPollOptions(
+            StreamSupport.stream(poll.getPollOptions().spliterator(), false).map(LogicDTOMapper::convertPollOptionToPollOptionGetDTO).toList()
+        );
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.SECOND, poll.getDurationSeconds());
+        pollGetDTO.setScheduledFinish(calendar.getTime());
+        return pollGetDTO;
     }
 }

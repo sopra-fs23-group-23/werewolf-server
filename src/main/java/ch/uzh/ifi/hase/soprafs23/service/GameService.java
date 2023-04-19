@@ -21,6 +21,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.game.GameObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.helper.EmitterHelper;
@@ -31,6 +32,7 @@ import ch.uzh.ifi.hase.soprafs23.service.wrapper.GameEmitter;
 public class GameService implements GameObserver{
     private Map<Long, Game> games = new HashMap<>();
     private Map<Long, GameEmitter> gameEmitterMap = new HashMap<>();
+    private Map<Long, Poll> gamePollMap = new HashMap<>();
 
     /**
      * @pre lobby.getLobbySize() <= Lobby.MAX_SIZE && lobby.getLobbySize() >= Lobby.MIN_SIZE && lobby roles assigned
@@ -100,7 +102,7 @@ public class GameService implements GameObserver{
         executorService.schedule(command, delaySeconds, TimeUnit.SECONDS);
     }
 
-    private String stageGetDTOToJson(GameGetDTO dto) throws JsonProcessingException {
+    private String mapDTOToJson(Object dto) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(dto);
     }
@@ -110,10 +112,44 @@ public class GameService implements GameObserver{
         GameEmitter emitter = getGameEmitter(game);
         GameGetDTO dto = LogicDTOMapper.convertGameToGameGetDTO(game);
         try {
-            sendGameEmitterUpdate(emitter, stageGetDTOToJson(dto), GameSseEvent.stage);
+            sendGameEmitterUpdate(emitter, mapDTOToJson(dto), GameSseEvent.stage);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
 
+    }
+
+    private void sendPollUpdateToAffectedUsers(GameEmitter gameEmitter, Poll poll) throws JsonProcessingException {
+        if (poll.getPollParticipants().isEmpty()) {
+            return;
+        }
+        String pollJson = mapDTOToJson(LogicDTOMapper.convertPollToPollGetDTO(poll));
+
+        poll.getPollParticipants().forEach(p -> {
+            SseEmitter playerEmitter = gameEmitter.getPlayerEmitter(p.getPlayer().getId());
+            try {
+                sendEmitterUpdate(playerEmitter, pollJson, GameSseEvent.poll);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("Failed to send poll update to player");
+            }
+        });
+    }
+
+    @Override
+    public void onNewPoll(Game game, Poll poll) {
+        Long gameId = game.getLobby().getId();
+        if (!gameEmitterMap.containsKey(gameId)) {
+            System.err.println("Failed to send poll to game " + gameId + " because no emitter was found");
+            return;
+        }
+        gamePollMap.put(gameId, poll);
+        GameEmitter emitter = getGameEmitter(game);
+        try {
+            sendPollUpdateToAffectedUsers(emitter, poll);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            System.err.println("Failed to send poll updates");
+        }
     }
 }
