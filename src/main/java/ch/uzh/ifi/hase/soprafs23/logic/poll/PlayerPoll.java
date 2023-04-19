@@ -10,14 +10,16 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 
 public class PlayerPoll extends Poll{
+    private String question;
     private List<PollOption> pollOptions;
     private List<PollParticipant> pollParticipants;
     private int durationSeconds;
     private TiedPollDecider tiedPollDecider;
     private Optional<PollCommand> resultCommand = Optional.empty();
 
-    public PlayerPoll(List<PollOption> pollOptions, List<PollParticipant> pollParticipants, int durationSeconds,
+    public PlayerPoll(String question, List<PollOption> pollOptions, List<PollParticipant> pollParticipants, int durationSeconds,
             TiedPollDecider tiedPollDecider) {
+        this.question = question;
         this.pollOptions = pollOptions;
         this.pollParticipants = pollParticipants;
         this.durationSeconds = durationSeconds;
@@ -77,6 +79,11 @@ public class PlayerPoll extends Poll{
     @Override
     public Collection<PollOption> getPollOptions() {
         return pollOptions;
+    }
+
+    @Override
+    public String getQuestion() {
+        return question;
     }
     
 }

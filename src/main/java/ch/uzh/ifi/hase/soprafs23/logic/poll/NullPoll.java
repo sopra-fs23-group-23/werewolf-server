@@ -27,5 +27,10 @@ public class NullPoll extends Poll {
     public Collection<PollOption> getPollOptions() {
         return List.of();
     }
+
+    @Override
+    public String getQuestion() {
+        return "";
+    }
     
 }

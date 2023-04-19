@@ -21,4 +21,5 @@ public abstract class Poll {
     public abstract int getDurationSeconds();
     public abstract Collection<PollParticipant> getPollParticipants();
     public abstract Collection<PollOption> getPollOptions();
+    public abstract String getQuestion();
 }

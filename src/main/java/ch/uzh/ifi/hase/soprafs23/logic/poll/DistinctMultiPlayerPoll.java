@@ -6,9 +6,9 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 
 public class DistinctMultiPlayerPoll extends PlayerPoll {
 
-    public DistinctMultiPlayerPoll(List<PollOption> pollOptions, List<PollParticipant> pollParticipants,
+    public DistinctMultiPlayerPoll(String question, List<PollOption> pollOptions, List<PollParticipant> pollParticipants,
             int durationSeconds, TiedPollDecider tiedPollDecider) {
-        super(pollOptions, pollParticipants, durationSeconds, tiedPollDecider);
+        super(question, pollOptions, pollParticipants, durationSeconds, tiedPollDecider);
         //TODO Auto-generated constructor stub
     }
 

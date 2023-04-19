@@ -28,7 +28,7 @@ public class PlayerPollTest {
             mock(PollParticipant.class)
         );
         TiedPollDecider mockTiedPollDecider = mock(TiedPollDecider.class);
-        return new PlayerPoll(mockOptions, mockParticipants, 0, mockTiedPollDecider);
+        return new PlayerPoll("", mockOptions, mockParticipants, 0, mockTiedPollDecider);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class PlayerPollTest {
             }
             
         };
-        Poll poll = new PlayerPoll(mockOptions, mockParticipants, 0, mockTiedPollDecider);
+        Poll poll = new PlayerPoll("", mockOptions, mockParticipants, 0, mockTiedPollDecider);
         poll.finish();
         assertEquals(expectedCommand, poll.getResultCommand());
     }
