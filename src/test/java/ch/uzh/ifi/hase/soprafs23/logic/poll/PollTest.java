@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 
-public class PlayerPollTest {
+public class PollTest {
     
     private Poll setupBasicPlayerPoll () {
         List<PollOption> mockOptions = List.of(
