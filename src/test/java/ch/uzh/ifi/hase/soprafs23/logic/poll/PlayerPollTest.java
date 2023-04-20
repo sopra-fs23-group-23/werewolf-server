@@ -52,6 +52,28 @@ public class PlayerPollTest {
     }
 
     @Test
+    void testRemoveVote() {
+        PlayerPoll poll = setupBasicPlayerPoll();
+        PollParticipant p1 = poll.getPollParticipants().iterator().next();
+        PollOption o1 = poll.getPollOptions().iterator().next();
+        when(p1.getRemainingVotes()).thenReturn(0);
+        when(o1.getSupporters()).thenReturn(List.of(p1));
+        poll.removeVote(p1, o1);
+        verify(p1).increaseRemainingVotes();
+        verify(o1).removeSupporter(p1);
+    }
+
+    @Test
+    void testRemoveVote_noSupporter() {
+        PlayerPoll poll = setupBasicPlayerPoll();
+        PollParticipant p1 = poll.getPollParticipants().iterator().next();
+        PollOption o1 = poll.getPollOptions().iterator().next();
+        when(p1.getRemainingVotes()).thenReturn(0);
+        when(o1.getSupporters()).thenReturn(List.of());
+        assertThrows(IllegalArgumentException.class, ()-> poll.removeVote(p1, o1));
+    }
+
+    @Test
     void testFinishPoll() {
         // Test that the poll finishes if there is only one option
         PlayerPoll poll = setupBasicPlayerPoll();

@@ -36,6 +36,14 @@ public class PlayerPoll extends Poll{
         }
     }
 
+    public void removeVote(PollParticipant voter, PollOption pollOption) throws IllegalArgumentException{
+        if (!pollOption.getSupporters().contains(voter)) {
+            throw new IllegalArgumentException("Voter has not voted for this poll option.");
+        }
+        pollOption.removeSupporter(voter);
+        voter.increaseRemainingVotes();
+    }
+
     public void setResultCommand(PollCommand resultCommand) {
         this.resultCommand = Optional.of(resultCommand);
     }

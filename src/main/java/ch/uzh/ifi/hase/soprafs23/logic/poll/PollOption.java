@@ -1,12 +1,13 @@
 package ch.uzh.ifi.hase.soprafs23.logic.poll;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 
 public class PollOption {
-    private List<PollParticipant> supporters;
+    private List<PollParticipant> supporters = new ArrayList<>();
     private Player player;
     private PollCommand pollCommand;
 
@@ -16,8 +17,11 @@ public class PollOption {
     }
 
     public void addSupporter(PollParticipant supporter) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addSupporter'");
+        supporters.add(supporter);
+    }
+
+    public void removeSupporter(PollParticipant supporter) {
+        supporters.remove(supporter);
     }
 
     public List<PollParticipant> getSupporters() {
@@ -33,8 +37,7 @@ public class PollOption {
     }
 
     public int getSupportersAmount() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getSupportersAmount'");
+        return supporters.size();
     }
 
     
