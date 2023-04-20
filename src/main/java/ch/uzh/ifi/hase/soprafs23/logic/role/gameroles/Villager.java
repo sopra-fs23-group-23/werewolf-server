@@ -5,13 +5,15 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.NullPoll;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.PlayerPoll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.KillPlayerPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
-import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.FirstDayVoter;
 
 public class Villager extends Role implements DayVoter, Fraction{
     private BiConsumer<Player, Class<? extends Role>> addPlayerToRole;
@@ -34,7 +36,7 @@ public class Villager extends Role implements DayVoter, Fraction{
     @Override
     public int compareTo(Role arg0) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'compareTo'");
+        return 0;
     }
 
     @Override
@@ -45,8 +47,14 @@ public class Villager extends Role implements DayVoter, Fraction{
 
     @Override
     public Poll createDayPoll() {
-        // TODO Auto-generated method stub
-        return new NullPoll();
+        List<Player> alivePlayers = alivePlayersGetter.get();
+        return new PlayerPoll(
+            "Who do you suspect to be a werewolf?",
+            alivePlayers.stream().map(p->new PollOption(p, new KillPlayerPollCommand(p))).toList(), 
+            alivePlayers.stream().map(p->new PollParticipant(p)).toList(),
+            30,
+            tiedPollDecider
+        );
     }
 
     @Override
