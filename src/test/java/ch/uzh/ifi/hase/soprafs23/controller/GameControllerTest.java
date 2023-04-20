@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
 
@@ -110,6 +111,34 @@ public class GameControllerTest {
 
         verify(gameService).validateParticipant(poll, user);
         verify(gameService).castVote(poll, participant, option);
+        verify(gameService).sendPollUpdateToAffectedUsers(emitter, poll);
+    }
+
+    @Test
+    void testRemoveVote() throws Exception {
+        // Test GameController removeVote
+        Mockito.when(userService.getUserByToken("token")).thenReturn(user);
+        Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
+        Mockito.when(gameService.getGame(lobby)).thenReturn(game);
+
+        Poll poll = mock(Poll.class);
+        PollParticipant participant = mock(PollParticipant.class);
+        PollOption option = mock(PollOption.class);
+        GameEmitter emitter = mock(GameEmitter.class);
+
+        Mockito.when(gameService.getCurrentPoll(game)).thenReturn(poll);
+        Mockito.when(gameService.getParticipant(poll, user)).thenReturn(participant);
+        Mockito.when(gameService.getPollOption(poll, 1l)).thenReturn(option);
+        Mockito.when(gameService.getGameEmitter(game)).thenReturn(emitter);
+
+        MockHttpServletRequestBuilder deleteRequest = delete("/games/1/votes/1")
+            .header(USERAUTH_HEADER, "token");
+
+        mockMvc.perform(deleteRequest)
+            .andExpect(status().isNoContent());
+
+        verify(gameService).validateParticipant(poll, user);
+        verify(gameService).removeVote(poll, participant, option);
         verify(gameService).sendPollUpdateToAffectedUsers(emitter, poll);
     }
 }

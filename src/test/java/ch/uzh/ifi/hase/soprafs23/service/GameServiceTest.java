@@ -193,4 +193,26 @@ public class GameServiceTest {
         verify(emitter1).send(Mockito.any(SseEventBuilder.class));
         verify(emitter2).send(Mockito.any(SseEventBuilder.class));
     }
+
+    @Test
+    void testRemoveVote() {
+        Poll poll = mock(Poll.class);
+        PollParticipant participant = mock(PollParticipant.class);
+        PollOption option = mock(PollOption.class);
+
+        gameService.removeVote(poll, participant, option);
+        verify(poll).removeVote(participant, option);
+    }
+
+    @Test
+    void testRemoveVote_illegalRemove() {
+        Poll poll = mock(Poll.class);
+        PollParticipant participant = mock(PollParticipant.class);
+        PollOption option = mock(PollOption.class);
+
+        doThrow(new IllegalArgumentException("test")).when(poll).removeVote(participant, option);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->gameService.removeVote(poll, participant, option));
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
+        assertEquals("test", exception.getReason());   
+    }
 }

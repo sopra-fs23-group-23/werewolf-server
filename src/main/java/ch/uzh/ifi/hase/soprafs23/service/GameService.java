@@ -200,7 +200,7 @@ public class GameService implements GameObserver{
 
     public void removeVote(Poll poll, PollParticipant participant, PollOption option) {
         try {
-            //poll.removeVote(participant);
+            poll.removeVote(participant, option);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
         }
