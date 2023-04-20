@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.logic.role.gameroles;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -45,15 +46,15 @@ public class Villager extends Role implements DayVoter, Fraction{
     }
 
     @Override
-    public Poll createDayPoll() {
+    public Optional<Poll> createDayPoll() {
         List<Player> alivePlayers = alivePlayersGetter.get();
-        return new Poll(
+        return Optional.of(new Poll(
             "Who do you suspect to be a werewolf?",
             alivePlayers.stream().map(p->new PollOption(p, new KillPlayerPollCommand(p))).toList(), 
             alivePlayers.stream().map(p->new PollParticipant(p)).toList(),
             30,
             tiedPollDecider
-        );
+        ));
     }
 
     @Override

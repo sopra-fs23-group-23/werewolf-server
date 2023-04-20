@@ -38,7 +38,7 @@ public class VillagerTest {
         );
         TiedPollDecider tiedPollDecider = mock(TiedPollDecider.class);
         Villager villager = new Villager(null, createMockAlivePlayersGetter(expected), tiedPollDecider);
-        Poll poll = villager.createDayPoll();
+        Poll poll = villager.createDayPoll().get();
         assertThat(
             "Contains all alive players in any order as participants",
             poll.getPollParticipants().stream().map(PollParticipant::getPlayer).toList(),

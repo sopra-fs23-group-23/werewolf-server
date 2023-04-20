@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.logic.game;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Supplier;
 
@@ -71,8 +72,8 @@ public class Game implements StageObserver{
         startNextStage(calculateNextStage());
     }
 
-    private Queue<Supplier<Poll>> getDayVoters() {
-        Queue<Supplier<Poll>> pq = new LinkedList<>();
+    private Queue<Supplier<Optional<Poll>>> getDayVoters() {
+        Queue<Supplier<Optional<Poll>>> pq = new LinkedList<>();
         lobby.getRoles().stream()
             .filter(DayVoter.class::isInstance)
             .sorted()
@@ -81,8 +82,8 @@ public class Game implements StageObserver{
         return pq;
     }
 
-    private Queue<Supplier<Poll>> getNightVoters() {
-        Queue<Supplier<Poll>> pq = new LinkedList<>();
+    private Queue<Supplier<Optional<Poll>>> getNightVoters() {
+        Queue<Supplier<Optional<Poll>>> pq = new LinkedList<>();
         lobby.getRoles().stream()
             .filter(NightVoter.class::isInstance)
             .sorted()

@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.logic.game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Supplier;
 
@@ -12,11 +13,11 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 public class Stage implements PollObserver{
     private StageType type;
     private List<StageObserver> observers = new ArrayList<>();
-    private Queue<Supplier<Poll>> pollSupplierQueue;
+    private Queue<Supplier<Optional<Poll>>> pollSupplierQueue;
     private List<PollCommand> pollCommands = new ArrayList<>();
     private Poll currentPoll;
 
-    public Stage(StageType type, Queue<Supplier<Poll>> pollSupplierQueue) {
+    public Stage(StageType type, Queue<Supplier<Optional<Poll>>> pollSupplierQueue) {
         this.type = type;
         this.pollSupplierQueue = pollSupplierQueue;
     }
@@ -26,9 +27,14 @@ public class Stage implements PollObserver{
             finishStage();
             return;
         }
-        currentPoll = pollSupplierQueue.poll().get();
-        currentPoll.addObserver(this);
-        notifyObserversAboutNewPoll();
+        Optional<Poll> nextPoll = pollSupplierQueue.poll().get();
+        if(nextPoll.isEmpty()) {
+            startNextPoll();
+        } else {
+            currentPoll = nextPoll.get();
+            currentPoll.addObserver(this);
+            notifyObserversAboutNewPoll();
+        }
     }
 
     private void finishStage() {

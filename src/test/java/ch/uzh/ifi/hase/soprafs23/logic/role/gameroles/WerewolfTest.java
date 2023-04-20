@@ -42,7 +42,7 @@ public class WerewolfTest {
         Werewolf werewolf = new Werewolf(createMockAlivePlayersGetter(expected));
         expectedWerewolves.stream().forEach(werewolf::addPlayer);
 
-        Poll poll = werewolf.createNightPoll();
+        Poll poll = werewolf.createNightPoll().get();
 
         assertThat(
             "Contains all alive players in any order as participants",
