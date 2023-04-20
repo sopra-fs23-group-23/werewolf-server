@@ -93,7 +93,7 @@ public class Game implements StageObserver{
 
     @Override
     public void onNewPoll(Poll poll) {
-        observers.stream().forEach(o -> o.onNewPoll(this, poll));
+        observers.stream().forEach(o -> o.onNewPoll(this, poll));   
     }
     
 }

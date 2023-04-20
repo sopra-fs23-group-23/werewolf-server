@@ -6,6 +6,7 @@ import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
 import java.io.IOException;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -91,6 +92,21 @@ public class GameController {
         gameService.sendPollUpdateToAffectedUsers(emitter, poll);
     }
 
+    @DeleteMapping("/games/{lobbyId}/votes/{optionId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public void removeVote(@RequestHeader(USERAUTH_HEADER) String token, @PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @PathVariable("optionId") Long optionId) {
+        User user = userService.getUserByToken(token);
+        Lobby lobby = lobbyService.getLobbyById(lobbyId);
+        Game game = gameService.getGame(lobby);
+        Poll poll = gameService.getCurrentPoll(game);
+        gameService.validateParticipant(poll, user);
+        PollParticipant participant = gameService.getParticipant(poll, user);
+        PollOption option = gameService.getPollOption(poll, optionId);
+        gameService.removeVote(poll, participant, option);
+        GameEmitter emitter = gameService.getGameEmitter(game);
+        gameService.sendPollUpdateToAffectedUsers(emitter, poll);
+    }
 
     
 }

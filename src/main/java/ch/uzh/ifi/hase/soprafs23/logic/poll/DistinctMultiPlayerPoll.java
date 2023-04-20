@@ -4,7 +4,7 @@ import java.util.List;
 
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 
-public class DistinctMultiPlayerPoll extends PlayerPoll {
+public class DistinctMultiPlayerPoll extends Poll {
 
     public DistinctMultiPlayerPoll(String question, List<PollOption> pollOptions, List<PollParticipant> pollParticipants,
             int durationSeconds, TiedPollDecider tiedPollDecider) {

@@ -5,7 +5,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.PlayerPoll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
@@ -48,7 +47,7 @@ public class Villager extends Role implements DayVoter, Fraction{
     @Override
     public Poll createDayPoll() {
         List<Player> alivePlayers = alivePlayersGetter.get();
-        return new PlayerPoll(
+        return new Poll(
             "Who do you suspect to be a werewolf?",
             alivePlayers.stream().map(p->new PollOption(p, new KillPlayerPollCommand(p))).toList(), 
             alivePlayers.stream().map(p->new PollParticipant(p)).toList(),

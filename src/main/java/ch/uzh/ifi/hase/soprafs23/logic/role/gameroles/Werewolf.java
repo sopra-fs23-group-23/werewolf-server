@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.PlayerPoll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
@@ -41,7 +40,7 @@ public class Werewolf extends Role implements NightVoter, Fraction{
     @Override
     public Poll createNightPoll() {
         List<Player> alivePlayers = alivePlayersGetter.get();
-        return new PlayerPoll(
+        return new Poll(
             "Who do you want to kill tonight?",
             alivePlayers.stream().map(p->new PollOption(p, new KillPlayerPollCommand(p))).toList(),
             getPlayers().stream().map(p->new PollParticipant(p)).toList(),

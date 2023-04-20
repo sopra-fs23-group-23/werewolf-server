@@ -17,7 +17,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 
 public class PlayerPollTest {
     
-    private PlayerPoll setupBasicPlayerPoll () {
+    private Poll setupBasicPlayerPoll () {
         List<PollOption> mockOptions = List.of(
             mock(PollOption.class),
             mock(PollOption.class),
@@ -28,12 +28,12 @@ public class PlayerPollTest {
             mock(PollParticipant.class)
         );
         TiedPollDecider mockTiedPollDecider = mock(TiedPollDecider.class);
-        return new PlayerPoll("", mockOptions, mockParticipants, 0, mockTiedPollDecider);
+        return new Poll("", mockOptions, mockParticipants, 0, mockTiedPollDecider);
     }
 
     @Test
     void testCastVote() {
-        PlayerPoll poll = setupBasicPlayerPoll();
+        Poll poll = setupBasicPlayerPoll();
         PollParticipant p1 = poll.getPollParticipants().iterator().next();
         when(p1.getRemainingVotes()).thenReturn(1);
         PollOption o1 = poll.getPollOptions().iterator().next();
@@ -44,7 +44,7 @@ public class PlayerPollTest {
 
     @Test
     void testCastVote_noVotes() {
-        PlayerPoll poll = setupBasicPlayerPoll();
+        Poll poll = setupBasicPlayerPoll();
         PollParticipant p1 = poll.getPollParticipants().iterator().next();
         when(p1.getRemainingVotes()).thenReturn(0);
         PollOption o1 = poll.getPollOptions().iterator().next();
@@ -53,7 +53,7 @@ public class PlayerPollTest {
 
     @Test
     void testRemoveVote() {
-        PlayerPoll poll = setupBasicPlayerPoll();
+        Poll poll = setupBasicPlayerPoll();
         PollParticipant p1 = poll.getPollParticipants().iterator().next();
         PollOption o1 = poll.getPollOptions().iterator().next();
         when(p1.getRemainingVotes()).thenReturn(0);
@@ -65,7 +65,7 @@ public class PlayerPollTest {
 
     @Test
     void testRemoveVote_noSupporter() {
-        PlayerPoll poll = setupBasicPlayerPoll();
+        Poll poll = setupBasicPlayerPoll();
         PollParticipant p1 = poll.getPollParticipants().iterator().next();
         PollOption o1 = poll.getPollOptions().iterator().next();
         when(p1.getRemainingVotes()).thenReturn(0);
@@ -76,7 +76,7 @@ public class PlayerPollTest {
     @Test
     void testFinishPoll() {
         // Test that the poll finishes if there is only one option
-        PlayerPoll poll = setupBasicPlayerPoll();
+        Poll poll = setupBasicPlayerPoll();
         PollOption o1 = poll.getPollOptions().iterator().next();
         PollOption o2 = poll.getPollOptions().stream().skip(1).findFirst().get();
         PollOption o3 = poll.getPollOptions().stream().skip(2).findFirst().get();
@@ -119,14 +119,14 @@ public class PlayerPollTest {
         TiedPollDecider mockTiedPollDecider = new TiedPollDecider() {
 
             @Override
-            public void executeTiePoll(PlayerPoll poll, List<PollOption> pollOptions, Runnable onTiePollFinished) {
+            public void executeTiePoll(Poll poll, List<PollOption> pollOptions, Runnable onTiePollFinished) {
                 assertThat("PollOptions equality without order", pollOptions, containsInAnyOrder(List.of(o2,o3).toArray()));
                 poll.setResultCommand(expectedCommand);
                 onTiePollFinished.run();
             }
             
         };
-        Poll poll = new PlayerPoll("", mockOptions, mockParticipants, 0, mockTiedPollDecider);
+        Poll poll = new Poll("", mockOptions, mockParticipants, 0, mockTiedPollDecider);
         poll.finish();
         assertEquals(expectedCommand, poll.getResultCommand());
     }

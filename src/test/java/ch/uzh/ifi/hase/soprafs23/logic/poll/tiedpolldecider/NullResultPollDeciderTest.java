@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import ch.uzh.ifi.hase.soprafs23.logic.poll.PlayerPoll;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.NullPollCommand;
 
 public class NullResultPollDeciderTest {
@@ -16,7 +16,7 @@ public class NullResultPollDeciderTest {
 
     @Test
     void testExecuteTiePoll() {
-        PlayerPoll poll = mock(PlayerPoll.class);
+        Poll poll = mock(Poll.class);
 
         decider.executeTiePoll(poll, List.of(), poll::finish);
         verify(poll).finish();
