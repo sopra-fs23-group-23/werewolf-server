@@ -32,5 +32,10 @@ public class NullPoll extends Poll {
     public String getQuestion() {
         return "";
     }
+
+    @Override
+    public void castVote(PollParticipant voter, PollOption pollOption) throws IllegalArgumentException{
+        throw new IllegalArgumentException("Unable to vote in NullPoll.");
+    }
     
 }

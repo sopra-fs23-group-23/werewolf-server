@@ -26,7 +26,8 @@ public class PlayerPoll extends Poll{
         this.tiedPollDecider = tiedPollDecider;
     }
 
-    public void castVote(PollParticipant voter, PollOption pollOption) {
+    @Override
+    public void castVote(PollParticipant voter, PollOption pollOption) throws IllegalArgumentException{
         if (voter.getRemainingVotes() > 0) {
             pollOption.addSupporter(voter);
             voter.decreaseRemainingVotes();

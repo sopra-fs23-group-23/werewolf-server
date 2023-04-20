@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.controller;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
@@ -20,9 +21,13 @@ import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
+import ch.uzh.ifi.hase.soprafs23.service.wrapper.GameEmitter;
 
 @WebMvcTest(GameController.class)
 public class GameControllerTest {
@@ -78,5 +83,33 @@ public class GameControllerTest {
 
         verify(lobbyService).validateUserIsInLobby(user, lobby);
         verify(gameService).getPlayerSseEmitter(game, user);
+    }
+
+    @Test
+    void testVote() throws Exception {
+        // Test GameController vote
+        Mockito.when(userService.getUserByToken("token")).thenReturn(user);
+        Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
+        Mockito.when(gameService.getGame(lobby)).thenReturn(game);
+
+        Poll poll = mock(Poll.class);
+        PollParticipant participant = mock(PollParticipant.class);
+        PollOption option = mock(PollOption.class);
+        GameEmitter emitter = mock(GameEmitter.class);
+
+        Mockito.when(gameService.getCurrentPoll(game)).thenReturn(poll);
+        Mockito.when(gameService.getParticipant(poll, user)).thenReturn(participant);
+        Mockito.when(gameService.getPollOption(poll, 1l)).thenReturn(option);
+        Mockito.when(gameService.getGameEmitter(game)).thenReturn(emitter);
+
+        MockHttpServletRequestBuilder postRequest = put("/games/1/votes/1")
+            .header(USERAUTH_HEADER, "token");
+
+        mockMvc.perform(postRequest)
+            .andExpect(status().isNoContent());
+
+        verify(gameService).validateParticipant(poll, user);
+        verify(gameService).castVote(poll, participant, option);
+        verify(gameService).sendPollUpdateToAffectedUsers(emitter, poll);
     }
 }

@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,8 @@ import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.game.GameObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.helper.EmitterHelper;
@@ -119,11 +122,15 @@ public class GameService implements GameObserver{
 
     }
 
-    private void sendPollUpdateToAffectedUsers(GameEmitter gameEmitter, Poll poll) throws JsonProcessingException {
-        if (poll.getPollParticipants().isEmpty()) {
+    public void sendPollUpdateToAffectedUsers(GameEmitter gameEmitter, Poll poll) {
+        String pollJson;
+        try {
+            pollJson = mapDTOToJson(LogicDTOMapper.convertPollToPollGetDTO(poll));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            System.err.println("Failed to send poll updates");
             return;
         }
-        String pollJson = mapDTOToJson(LogicDTOMapper.convertPollToPollGetDTO(poll));
 
         poll.getPollParticipants().forEach(p -> {
             SseEmitter playerEmitter = gameEmitter.getPlayerEmitter(p.getPlayer().getId());
@@ -143,13 +150,51 @@ public class GameService implements GameObserver{
             System.err.println("Failed to send poll to game " + gameId + " because no emitter was found");
             return;
         }
+        if (poll.getPollParticipants().isEmpty()) {
+            return;
+        }
         gamePollMap.put(gameId, poll);
         GameEmitter emitter = getGameEmitter(game);
+        sendPollUpdateToAffectedUsers(emitter, poll);
+    }
+
+    public Poll getCurrentPoll(Game game) {
+        Long lobbyId = game.getLobby().getId();
+        if (!gamePollMap.containsKey(lobbyId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Currently there is no poll active for this game.");
+        }
+        return gamePollMap.get(lobbyId);
+    }
+
+    public void validateParticipant(Poll poll, User user) {
+        if (!poll.getPollParticipants().stream().anyMatch(p->p.getPlayer().getId() == user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not participant in this poll.");
+        }
+    }
+
+    /**
+     * @pre validateParticipant
+     * @param poll
+     * @param user
+     * @return
+     */
+    public PollParticipant getParticipant (Poll poll, User user) {
+        return poll.getPollParticipants().stream().filter(p->p.getPlayer().getId() == user.getId()).findFirst().get();
+    }
+
+    public PollOption getPollOption(Poll poll, Long pollOptionId) {
+        Predicate<? super PollOption> optionFilter = (p->p.getPlayer().getId() == pollOptionId);
+        if (!poll.getPollOptions().stream().anyMatch(optionFilter)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Selected option is not a valid option for this poll.");
+        }
+        return poll.getPollOptions().stream().filter(optionFilter).findFirst().get();
+    }
+
+    public void castVote(Poll poll, PollParticipant participant, PollOption option) {
         try {
-            sendPollUpdateToAffectedUsers(emitter, poll);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            System.err.println("Failed to send poll updates");
+            poll.castVote(participant, option);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
         }
     }
 }

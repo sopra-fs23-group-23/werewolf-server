@@ -22,4 +22,5 @@ public abstract class Poll {
     public abstract Collection<PollParticipant> getPollParticipants();
     public abstract Collection<PollOption> getPollOptions();
     public abstract String getQuestion();
+    public abstract void castVote(PollParticipant voter, PollOption pollOption) throws IllegalArgumentException;
 }
