@@ -10,10 +10,12 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.PlayerGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.PollCommandGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.PollGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.PollOptionGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
@@ -55,9 +57,16 @@ public final class LogicDTOMapper {
         return stageGetDTO;
     }
 
+    public static PollCommandGetDTO convertPollCommandToPollCommandGetDTO (PollCommand pollCommand) {
+        PollCommandGetDTO pollCommandGetDTO = new PollCommandGetDTO();
+        pollCommandGetDTO.setType(pollCommand.getClass().getSimpleName());
+        pollCommandGetDTO.setMessage(pollCommand.toString());
+        return pollCommandGetDTO;
+    }
+
     public static GameGetDTO convertGameToGameGetDTO(Game game) {
         GameGetDTO gameGetDTO = new GameGetDTO();
-        gameGetDTO.setActions(game.getLastStagePollCommands());
+        gameGetDTO.setActions(game.getLastStagePollCommands().stream().map(LogicDTOMapper::convertPollCommandToPollCommandGetDTO).toList());
         gameGetDTO.setLobby(convertLobbyToLobbyGetDTO(game.getLobby()));
         gameGetDTO.setStage(convertStageToStageGetDTO(game.getCurrentStage()));
         return gameGetDTO;

@@ -45,6 +45,7 @@ public class Game implements StageObserver{
     private void startNextStage(Stage nextStage) {
         stageCount++;
         currentStage = nextStage;
+        currentStage.addObserver(this);
         currentStage.startStage();
         observers.stream().forEach(o -> o.onNewStage(this));
     }

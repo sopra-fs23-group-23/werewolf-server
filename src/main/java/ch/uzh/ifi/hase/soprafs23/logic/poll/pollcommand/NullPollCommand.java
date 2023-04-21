@@ -4,5 +4,10 @@ public class NullPollCommand implements PollCommand{
 
     @Override
     public void execute() {}
+
+    @Override
+    public String toString() {
+        return "";
+    }
     
 }

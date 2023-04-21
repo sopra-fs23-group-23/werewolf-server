@@ -150,12 +150,10 @@ public class GameService implements GameObserver{
             System.err.println("Failed to send poll to game " + gameId + " because no emitter was found");
             return;
         }
-        if (poll.getPollParticipants().isEmpty()) {
-            return;
-        }
         gamePollMap.put(gameId, poll);
         GameEmitter emitter = getGameEmitter(game);
         sendPollUpdateToAffectedUsers(emitter, poll);
+        schedule(poll::finish, poll.getDurationSeconds());
     }
 
     public Poll getCurrentPoll(Game game) {

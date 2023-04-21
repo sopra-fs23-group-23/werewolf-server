@@ -18,5 +18,10 @@ public class KillPlayerPollCommand implements PollCommand{
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'execute'");
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s was killed.", player.getName());
+    }
     
 }
