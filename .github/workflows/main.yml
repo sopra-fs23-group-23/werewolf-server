@@ -23,11 +23,16 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
+      - name: Set database password1
+        run: echo "dbPassword=${{ secrets.DB_PASSWORD }}" > dbpassword.properties
+
       - name: Test and analyze
         run: ./gradlew test jacocoTestReport sonarqube
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SPRING_PROFILES_ACTIVE: devH2
+          GRADLE_OPTS: '-DdbPassword=${{ secrets.DB_PASSWORD }}'
 
   deploy:
     name: Deploying to Google Cloud
@@ -38,6 +43,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Set database password
+        run: echo "dbPassword=${{ secrets.DB_PASSWORD }}" > dbpassword.properties
+
       - name: Deploy to App Engine
         id: deploy
         uses: google-github-actions/deploy-appengine@v0.2.0
@@ -45,6 +53,9 @@ jobs:
           deliverables: app.yaml
           version: v1
           credentials: ${{ secrets.GCP_SERVICE_CREDENTIALS }}
+        env:
+          SPRING_PROFILES_ACTIVE: prod
+          GRADLE_OPTS: '-DdbPassword=${{ secrets.DB_PASSWORD }}'
 
       - name: Test
         run: curl "${{ steps.deploy.outputs.url }}"

@@ -41,4 +41,6 @@ local.properties
 
 .vscode
 
+.env
+
 /bin
