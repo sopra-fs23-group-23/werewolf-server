@@ -49,6 +49,7 @@ public class Villager extends Role implements DayVoter, Fraction{
     public Optional<Poll> createDayPoll() {
         List<Player> alivePlayers = alivePlayersGetter.get();
         return Optional.of(new Poll(
+            this.getClass(),
             "Who do you suspect to be a werewolf?",
             alivePlayers.stream().map(p->new PollOption(p, new KillPlayerPollCommand(p))).toList(), 
             alivePlayers.stream().map(p->new PollParticipant(p)).toList(),

@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Test;
 
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
 
 public class PollTest {
     
@@ -28,7 +30,7 @@ public class PollTest {
             mock(PollParticipant.class)
         );
         TiedPollDecider mockTiedPollDecider = mock(TiedPollDecider.class);
-        return new Poll("", mockOptions, mockParticipants, 0, mockTiedPollDecider);
+        return new Poll(Villager.class, "", mockOptions, mockParticipants, 0, mockTiedPollDecider);
     }
 
     @Test
@@ -126,7 +128,7 @@ public class PollTest {
             }
             
         };
-        Poll poll = new Poll("", mockOptions, mockParticipants, 0, mockTiedPollDecider);
+        Poll poll = new Poll(Werewolf.class, "", mockOptions, mockParticipants, 0, mockTiedPollDecider);
         poll.finish();
         assertEquals(expectedCommand, poll.getResultCommand());
     }

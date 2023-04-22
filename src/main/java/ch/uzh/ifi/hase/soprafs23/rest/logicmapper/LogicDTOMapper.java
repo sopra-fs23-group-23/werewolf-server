@@ -83,6 +83,7 @@ public final class LogicDTOMapper {
 
     public static PollGetDTO convertPollToPollGetDTO (Poll poll) {
         PollGetDTO pollGetDTO = new PollGetDTO();
+        pollGetDTO.setRole(poll.getRole().getSimpleName());
         pollGetDTO.setQuestion(poll.getQuestion());
         pollGetDTO.setParticipants(
             StreamSupport.stream(poll.getPollParticipants().spliterator(), false).map(PollParticipant::getPlayer).map(LogicDTOMapper::convertPlayerToPlayerGetDTO).toList()

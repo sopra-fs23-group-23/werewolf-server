@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 public class PollGetDTO {
+    private String role;
     private String question;
     private List<PlayerGetDTO> participants;
     private List<PollOptionGetDTO> pollOptions;
@@ -32,6 +33,14 @@ public class PollGetDTO {
     }
     public void setScheduledFinish(Date scheduledFinish) {
         this.scheduledFinish = scheduledFinish;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     

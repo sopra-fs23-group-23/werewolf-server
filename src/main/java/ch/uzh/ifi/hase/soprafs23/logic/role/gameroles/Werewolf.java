@@ -42,6 +42,7 @@ public class Werewolf extends Role implements NightVoter, Fraction{
     public Optional<Poll> createNightPoll() {
         List<Player> alivePlayers = alivePlayersGetter.get();
         return Optional.of(new Poll(
+            this.getClass(),
             "Who do you want to kill tonight?",
             alivePlayers.stream().map(p->new PollOption(p, new KillPlayerPollCommand(p))).toList(),
             getPlayers().stream().map(p->new PollParticipant(p)).toList(),

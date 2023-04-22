@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -24,6 +25,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
 import ch.uzh.ifi.hase.soprafs23.service.wrapper.GameEmitter;
 
 public class GameServiceTest {
@@ -186,6 +188,7 @@ public class GameServiceTest {
         when(player1.getId()).thenReturn(1l);
         when(player2.getId()).thenReturn(2l);
         when(poll.getPollParticipants()).thenReturn(List.of(p1,p2));
+        doReturn(Villager.class).when(poll).getRole();
         when(gameEmitter.getPlayerEmitter(1l)).thenReturn(emitter1);
         when(gameEmitter.getPlayerEmitter(2l)).thenReturn(emitter2);
 

@@ -9,8 +9,10 @@ import java.util.Optional;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.NullPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
+import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 
 public class Poll{
+    private Class<? extends Role> role;
     private String question;
     private List<PollOption> pollOptions;
     private List<PollParticipant> pollParticipants;
@@ -27,8 +29,9 @@ public class Poll{
         observers.stream().forEach(o->o.onPollFinished());
     }
 
-    public Poll(String question, List<PollOption> pollOptions, List<PollParticipant> pollParticipants, int durationSeconds,
+    public Poll(Class<? extends Role> role, String question, List<PollOption> pollOptions, List<PollParticipant> pollParticipants, int durationSeconds,
             TiedPollDecider tiedPollDecider) {
+        this.role = role;
         this.question = question;
         this.pollOptions = pollOptions;
         this.pollParticipants = pollParticipants;
@@ -96,6 +99,10 @@ public class Poll{
 
     public String getQuestion() {
         return question;
+    }
+
+    public Class<? extends Role> getRole() {
+        return role;
     }
     
 }
