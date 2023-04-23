@@ -39,10 +39,15 @@ public class Villager extends Role implements DayVoter, Fraction{
         return 0;
     }
 
+    // TODO: testing
     @Override
     public boolean hasWon() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'hasWon'");
+        for(Player player : alivePlayersGetter.get()) {
+            if(!getPlayers().contains(player)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
