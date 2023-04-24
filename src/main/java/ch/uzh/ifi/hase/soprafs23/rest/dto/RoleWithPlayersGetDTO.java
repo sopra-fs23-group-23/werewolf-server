@@ -7,13 +7,13 @@ import java.util.List;
 
 public class RoleWithPlayersGetDTO extends RoleGetDTO{
 
-    private List<Player> players;
+    private List<PlayerGetDTO> players;
 
-    public void setPlayers(Role role){
-        this.players = role.getPlayers();
+    public void setPlayers(List<PlayerGetDTO> players){
+        this.players = players;
     }
 
-    public List<Player> getPlayers() {
+    public List<PlayerGetDTO> getPlayers() {
         return players;
     }
 }

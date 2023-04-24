@@ -45,6 +45,14 @@ public final class LogicDTOMapper {
         return roleGetDTO;
     }
 
+    public static RoleWithPlayersGetDTO convertRoleToRoleWithPlayersGetDTO(Role role, int amount) {
+        RoleWithPlayersGetDTO roleWithPlayersGetDTO = (RoleWithPlayersGetDTO) convertRoleToRoleGetDTO(role, amount);
+        roleWithPlayersGetDTO.setPlayers(
+            role.getPlayers().stream().map(LogicDTOMapper::convertPlayerToPlayerGetDTO).toList()
+        );
+        return roleWithPlayersGetDTO;
+    }
+
     public static StageGetDTO convertStageToStageGetDTO(Stage stage) {
         StageGetDTO stageGetDTO = new StageGetDTO();
         stageGetDTO.setType(stage.getType());

@@ -206,25 +206,22 @@ public class GameService implements GameObserver{
         }
     }
 
+    // TODO testing
     @Override
     public void onGameEnd(Game game, Fraction fraction) {
         Long gameId = game.getLobby().getId();
         if (!gameEmitterMap.containsKey(gameId)) {
-            System.err.println("Failed to send poll to game " + gameId + " because no emitter was found");
+            System.err.println("Failed to send fraction to game " + gameId + " because no emitter was found");
             return;
         }
         GameEmitter emitter = getGameEmitter(game);
         FractionGetDTO dto = LogicDTOMapper.convertFractionToFractionGetDTO(fraction);
-        Consumer<SseEmitter> action = new Consumer<SseEmitter>() {
-            @Override
-            public void accept(SseEmitter t) {
-                try {
-                    sendEmitterUpdate(t, mapDTOToJson(dto), GameSseEvent.finish);
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
+        emitter.forAllPlayerEmitters(t -> {
+            try {
+                sendEmitterUpdate(t, mapDTOToJson(dto), GameSseEvent.finish);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
             }
-        };
-        emitter.forAllPlayerEmitters(action);
+        });
     }
 }
