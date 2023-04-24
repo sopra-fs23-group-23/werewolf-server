@@ -8,6 +8,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.FractionGetDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -202,5 +204,27 @@ public class GameService implements GameObserver{
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
         }
+    }
+
+    @Override
+    public void onGameEnd(Game game, Fraction fraction) {
+        Long gameId = game.getLobby().getId();
+        if (!gameEmitterMap.containsKey(gameId)) {
+            System.err.println("Failed to send poll to game " + gameId + " because no emitter was found");
+            return;
+        }
+        GameEmitter emitter = getGameEmitter(game);
+        FractionGetDTO dto = LogicDTOMapper.convertFractionToFractionGetDTO(fraction);
+        Consumer<SseEmitter> action = new Consumer<SseEmitter>() {
+            @Override
+            public void accept(SseEmitter t) {
+                try {
+                    sendEmitterUpdate(t, mapDTOToJson(dto), GameSseEvent.finish);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        emitter.forAllPlayerEmitters(action);
     }
 }

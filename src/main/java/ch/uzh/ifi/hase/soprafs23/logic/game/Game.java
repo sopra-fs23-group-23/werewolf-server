@@ -18,6 +18,7 @@ public class Game implements StageObserver{
     private Lobby lobby;
     private Stage currentStage;
     private int stageCount = 0;
+    private boolean finished = false;
     private List<PollCommand> lastStagePollCommands = new ArrayList<>();
     private List<GameObserver> observers = new ArrayList<>();
 
@@ -71,12 +72,22 @@ public class Game implements StageObserver{
     public void onStageFinished() {
         for (Fraction fraction : lobby.getFractions()) {
             if(fraction.hasWon()) {
+                finishGame(fraction);
                 return;
             }
         }
         lastStagePollCommands = currentStage.getPollCommands();
         lastStagePollCommands.stream().forEach(p->p.execute());
         startNextStage(calculateNextStage());
+    }
+
+    private void finishGame(Fraction winningFraction) {
+        observers.stream().forEach(o -> o.onGameEnd(this, winningFraction));
+        finished = true;
+    }
+
+    public boolean isFinished() {
+        return finished;
     }
 
     private Queue<Supplier<Optional<Poll>>> getDayVoters() {

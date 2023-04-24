@@ -11,15 +11,9 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbyGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.PlayerGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.PollCommandGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.PollGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.PollOptionGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.StageGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.*;
 
 public final class LogicDTOMapper {
     private LogicDTOMapper(){}
@@ -94,5 +88,10 @@ public final class LogicDTOMapper {
         calendar.add(Calendar.SECOND, poll.getDurationSeconds());
         pollGetDTO.setScheduledFinish(calendar.getTime());
         return pollGetDTO;
+    }
+
+    public static FractionGetDTO convertFractionToFractionGetDTO (Fraction fraction) {
+        FractionGetDTO fractionGetDTO = new FractionGetDTO();
+        return fractionGetDTO;
     }
 }
