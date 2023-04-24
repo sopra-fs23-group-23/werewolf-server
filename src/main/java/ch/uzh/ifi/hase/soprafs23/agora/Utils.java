@@ -5,17 +5,11 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.math.BigInteger;
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.zip.CRC32;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
 public class Utils {
     public static final long HMAC_SHA256_LENGTH = 32;
     public static final int VERSION_LENGTH = 3;

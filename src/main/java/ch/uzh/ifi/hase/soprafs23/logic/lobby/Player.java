@@ -1,7 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.logic.lobby;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Player {
