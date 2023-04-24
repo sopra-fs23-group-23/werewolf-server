@@ -18,6 +18,7 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.PlayerGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.PollCommandGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.PollGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.PollOptionGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.PollParticipantGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.StageGetDTO;
 
@@ -81,12 +82,19 @@ public final class LogicDTOMapper {
         return pollOptionGetDTO;
     }
 
+    public static PollParticipantGetDTO convertPollParticipantToPollParticipantGetDTO(PollParticipant pollParticipant) {
+        PollParticipantGetDTO pollParticipantGetDTO = new PollParticipantGetDTO();
+        pollParticipantGetDTO.setPlayer(convertPlayerToPlayerGetDTO(pollParticipant.getPlayer()));
+        pollParticipantGetDTO.setRemainingVotes(pollParticipant.getRemainingVotes());
+        return pollParticipantGetDTO;
+    }
+
     public static PollGetDTO convertPollToPollGetDTO (Poll poll) {
         PollGetDTO pollGetDTO = new PollGetDTO();
         pollGetDTO.setRole(poll.getRole().getSimpleName());
         pollGetDTO.setQuestion(poll.getQuestion());
         pollGetDTO.setParticipants(
-            StreamSupport.stream(poll.getPollParticipants().spliterator(), false).map(PollParticipant::getPlayer).map(LogicDTOMapper::convertPlayerToPlayerGetDTO).toList()
+            StreamSupport.stream(poll.getPollParticipants().spliterator(), false).map(LogicDTOMapper::convertPollParticipantToPollParticipantGetDTO).toList()
         );
         pollGetDTO.setPollOptions(
             StreamSupport.stream(poll.getPollOptions().spliterator(), false).map(LogicDTOMapper::convertPollOptionToPollOptionGetDTO).toList()

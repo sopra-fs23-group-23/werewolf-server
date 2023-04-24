@@ -6,7 +6,7 @@ import java.util.List;
 public class PollGetDTO {
     private String role;
     private String question;
-    private List<PlayerGetDTO> participants;
+    private List<PollParticipantGetDTO> participants;
     private List<PollOptionGetDTO> pollOptions;
     private Date scheduledFinish;
     
@@ -16,10 +16,10 @@ public class PollGetDTO {
     public void setQuestion(String question) {
         this.question = question;
     }
-    public List<PlayerGetDTO> getParticipants() {
+    public List<PollParticipantGetDTO> getParticipants() {
         return participants;
     }
-    public void setParticipants(List<PlayerGetDTO> participants) {
+    public void setParticipants(List<PollParticipantGetDTO> participants) {
         this.participants = participants;
     }
     public List<PollOptionGetDTO> getPollOptions() {
