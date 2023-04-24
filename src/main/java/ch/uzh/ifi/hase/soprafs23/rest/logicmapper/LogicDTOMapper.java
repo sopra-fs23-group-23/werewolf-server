@@ -77,7 +77,7 @@ public final class LogicDTOMapper {
         PollOptionGetDTO pollOptionGetDTO = new PollOptionGetDTO();
         pollOptionGetDTO.setPlayer(convertPlayerToPlayerGetDTO(pollOption.getPlayer()));
         pollOptionGetDTO.setSupporters(
-            StreamSupport.stream(pollOption.getSupporters().spliterator(), false).map(PollParticipant::getPlayer).map(LogicDTOMapper::convertPlayerToPlayerGetDTO).toList()
+            pollOption.getSupporters().stream().map(PollParticipant::getPlayer).map(LogicDTOMapper::convertPlayerToPlayerGetDTO).toList()
         );
         return pollOptionGetDTO;
     }
@@ -94,10 +94,10 @@ public final class LogicDTOMapper {
         pollGetDTO.setRole(poll.getRole().getSimpleName());
         pollGetDTO.setQuestion(poll.getQuestion());
         pollGetDTO.setParticipants(
-            StreamSupport.stream(poll.getPollParticipants().spliterator(), false).map(LogicDTOMapper::convertPollParticipantToPollParticipantGetDTO).toList()
+            poll.getPollParticipants().stream().map(LogicDTOMapper::convertPollParticipantToPollParticipantGetDTO).toList()
         );
         pollGetDTO.setPollOptions(
-            StreamSupport.stream(poll.getPollOptions().spliterator(), false).map(LogicDTOMapper::convertPollOptionToPollOptionGetDTO).toList()
+            poll.getPollOptions().stream().map(LogicDTOMapper::convertPollOptionToPollOptionGetDTO).toList()
         );
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.SECOND, poll.getDurationSeconds());
