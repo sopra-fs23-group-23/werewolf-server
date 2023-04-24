@@ -63,12 +63,12 @@ public class LobbyService {
 
     private boolean userInALobby(User user) {
         return lobbies.values().stream().anyMatch(
-            l -> StreamSupport.stream(l.getPlayers().spliterator(), false).anyMatch(p->p.getId()==user.getId())
+            l -> StreamSupport.stream(l.getPlayers().spliterator(), false).anyMatch(p->p.getId().equals(user.getId()))
         );
     }
 
     private boolean userIsInLobby(User user, Lobby lobby) {
-        return StreamSupport.stream(lobby.getPlayers().spliterator(), false).anyMatch(p->p.getId()==user.getId());
+        return StreamSupport.stream(lobby.getPlayers().spliterator(), false).anyMatch(p->p.getId().equals(user.getId()));
     }
 
     public void validateUserIsInLobby(User user, Lobby lobby) {
@@ -90,7 +90,7 @@ public class LobbyService {
         if (!lobby.isOpen()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby is closed.");
         }
-        if (StreamSupport.stream(lobby.getPlayers().spliterator(), false).anyMatch(p->p.getId()==user.getId())) {
+        if (userIsInLobby(user, lobby)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in this lobby.");
         }
         if (userInALobby(user)) {
