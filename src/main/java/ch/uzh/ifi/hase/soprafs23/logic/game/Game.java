@@ -68,6 +68,7 @@ public class Game implements StageObserver{
 
     @Override
     public void onStageFinished() {
+        // TODO did any fraction win?
         lastStagePollCommands = currentStage.getPollCommands();
         lastStagePollCommands.stream().forEach(p->p.execute());
         startNextStage(calculateNextStage());
