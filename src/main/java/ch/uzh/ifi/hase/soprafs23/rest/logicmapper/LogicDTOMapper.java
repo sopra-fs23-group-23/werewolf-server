@@ -44,11 +44,11 @@ public final class LogicDTOMapper {
         return playerGetDTO;
     }
 
-    public static RoleGetDTO convertRoleToRoleGetDTO(Role role, int amount) {
+    public static RoleGetDTO convertRoleToRoleGetDTO(Role role) {
         RoleGetDTO roleGetDTO = new RoleGetDTO();
         roleGetDTO.setRoleName(role.getName());
         roleGetDTO.setDescription(role.getDescription());
-        roleGetDTO.setAmount(amount);
+        roleGetDTO.setAmount(role.getPlayers().size());
         return roleGetDTO;
     }
 

@@ -8,7 +8,6 @@ import javax.transaction.Transactional;
 
 import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
 
-import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,11 +17,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
 import ch.uzh.ifi.hase.soprafs23.service.helper.EmitterHelper;
 import ch.uzh.ifi.hase.soprafs23.service.wrapper.EmitterWrapper;
-
-import static ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper.convertRoleToRoleGetDTO;
 
 @Service
 @Transactional
@@ -139,22 +137,18 @@ public class LobbyService {
     }
 
     public Collection<RoleGetDTO> getAllRolesInformation(Lobby lobby) {
-        ArrayList<Role> roles = new ArrayList<>(lobby.getRoles());
-        ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>();
-        for (Role role : roles) {
-            roleGetDTOS.add(roleToRolesGetDTO(lobby, role));
-        }
-        return roleGetDTOS;
+        return lobby.getRoles().stream().map(role -> LogicDTOMapper.convertRoleToRoleGetDTO(role)).toList();
     }
 
+    /**
+     * @pre user is in lobby
+     * @param user
+     * @param lobby
+     * @return
+     */
     public Collection<RoleGetDTO> getOwnRolesInformation(User user, Lobby lobby) {
         Player player = lobby.getPlayerById(user.getId());
-        ArrayList<Role> roles = new ArrayList<>(lobby.getRolesOfPlayer(player));
-        ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>();
-        for (Role role : roles) {
-            roleGetDTOS.add(roleToRolesGetDTO(lobby, role));
-        }
-        return roleGetDTOS;
+        return lobby.getRolesOfPlayer(player).stream().map(role -> LogicDTOMapper.convertRoleToRoleGetDTO(role)).toList();
     }
 
     /**
@@ -167,14 +161,5 @@ public class LobbyService {
 
     public void closeLobby(Lobby lobby) {
         lobby.setOpen(false);
-    }
-
-    private RoleGetDTO roleToRolesGetDTO(Lobby lobby, Role role) {
-        Iterable<Player> playersOfThatRole = lobby.getPlayersByRole(role.getClass());
-        int amount = 0;
-        for(Player player: playersOfThatRole) {
-            amount++;
-        }
-        return convertRoleToRoleGetDTO(role, amount);
     }
 }
