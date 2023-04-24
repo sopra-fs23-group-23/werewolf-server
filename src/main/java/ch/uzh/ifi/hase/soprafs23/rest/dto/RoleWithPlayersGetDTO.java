@@ -1,13 +1,19 @@
 package ch.uzh.ifi.hase.soprafs23.rest.dto;
 
-import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
-import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
-
 import java.util.List;
 
-public class RoleWithPlayersGetDTO extends RoleGetDTO{
+public class RoleWithPlayersGetDTO {
+    private RoleGetDTO role;
 
     private List<PlayerGetDTO> players;
+
+    public void setRole(RoleGetDTO role) {
+        this.role = role;
+    }
+
+    public RoleGetDTO getRole() {
+        return role;
+    }
 
     public void setPlayers(List<PlayerGetDTO> players){
         this.players = players;

@@ -45,8 +45,9 @@ public final class LogicDTOMapper {
         return roleGetDTO;
     }
 
-    public static RoleWithPlayersGetDTO convertRoleToRoleWithPlayersGetDTO(Role role, int amount) {
-        RoleWithPlayersGetDTO roleWithPlayersGetDTO = (RoleWithPlayersGetDTO) convertRoleToRoleGetDTO(role, amount);
+    public static RoleWithPlayersGetDTO convertRoleToRoleWithPlayersGetDTO(Role role) {
+        RoleWithPlayersGetDTO roleWithPlayersGetDTO = new RoleWithPlayersGetDTO();
+        roleWithPlayersGetDTO.setRole(convertRoleToRoleGetDTO(role, role.getPlayers().size()));
         roleWithPlayersGetDTO.setPlayers(
             role.getPlayers().stream().map(LogicDTOMapper::convertPlayerToPlayerGetDTO).toList()
         );
@@ -100,6 +101,10 @@ public final class LogicDTOMapper {
 
     public static FractionGetDTO convertFractionToFractionGetDTO (Fraction fraction) {
         FractionGetDTO fractionGetDTO = new FractionGetDTO();
+        fractionGetDTO.setWinner(fraction.getName());
+        fractionGetDTO.setPlayers(
+            fraction.getPlayers().stream().map(LogicDTOMapper::convertPlayerToPlayerGetDTO).toList()
+        );
         return fractionGetDTO;
     }
 }

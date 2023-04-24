@@ -4,7 +4,7 @@ import java.util.List;
 
 public class FractionGetDTO {
     private String winner;
-    private List<RoleWithPlayersGetDTO> roles;
+    private List<PlayerGetDTO> players;
 
     public String getWinner() {
         return winner;
@@ -14,12 +14,12 @@ public class FractionGetDTO {
         this.winner = winner;
     }
 
-    public List<RoleWithPlayersGetDTO> getPlayers() {
-        return roles;
+    public List<PlayerGetDTO> getPlayers() {
+        return players;
     }
 
-    public void setPlayers(List<RoleWithPlayersGetDTO> roles) {
-        this.roles = roles;
+    public void setPlayers(List<PlayerGetDTO> players) {
+        this.players = players;
     }
 }
 
