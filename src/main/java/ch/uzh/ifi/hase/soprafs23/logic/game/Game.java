@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
 
@@ -68,7 +69,11 @@ public class Game implements StageObserver{
 
     @Override
     public void onStageFinished() {
-        // TODO did any fraction win?
+        for (Fraction fraction : lobby.getFractions()) {
+            if(fraction.hasWon()) {
+                return;
+            }
+        }
         lastStagePollCommands = currentStage.getPollCommands();
         lastStagePollCommands.stream().forEach(p->p.execute());
         startNextStage(calculateNextStage());
