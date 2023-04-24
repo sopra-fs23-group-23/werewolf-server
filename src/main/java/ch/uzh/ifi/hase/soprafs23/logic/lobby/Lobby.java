@@ -58,9 +58,15 @@ public class Lobby {
         return players;
     }
 
-    public Player getPlayerById(Long id){
-        //I would move this to the service, otherways we have to check somehow the precondition that player is in this lobby
-        return players.stream().filter(p -> p.getId() == id).findFirst().get();
+    /**
+     * @pre player is in lobby
+     * @param id
+     * @return
+     */
+    public Player getPlayerById(Long id) {
+        Optional<Player> player = players.stream().filter(p -> p.getId().equals(id)).findFirst();
+        assert player.isPresent();
+        return player.get();
     }
 
     public Player getAdmin() {
