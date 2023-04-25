@@ -56,7 +56,7 @@ public class LobbyControllerTest {
 
     @Test
     void createNewLobbyTest() throws Exception {
-        User tUser = createTestUser("test", 1l);
+        User tUser = createTestUser("test", 1L);
         Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(tUser));
         Mockito.when(userService.getUserByToken("token")).thenReturn(tUser);
         Mockito.when(lobbyService.createNewLobby(tUser)).thenReturn(lobby);
