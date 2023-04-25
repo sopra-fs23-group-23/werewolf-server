@@ -63,3 +63,15 @@ https://github.com/sopra-fs23-group-23/werewolf-server/issues/194
 ## Week 3 (12.04 - 18.04)
 
 ## Week 4 (19.04 - 25.04)
+### Michel Sabbatini
+https://github.com/sopra-fs23-group-23/werewolf-server/issues/180  
+https://github.com/sopra-fs23-group-23/werewolf-server/issues/181  
+https://github.com/sopra-fs23-group-23/werewolf-server/issues/195
+
+### Miro Vannini
+
+### Marvin Wiedenkeller
+
+### David Scherrer
+
+### Jan Lüthi
