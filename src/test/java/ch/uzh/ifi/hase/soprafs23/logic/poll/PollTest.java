@@ -95,7 +95,7 @@ public class PollTest {
     }
 
     @Test
-    void testStartPoll_tiedPoll() {
+    void testFinishPoll_tiedPoll() {
         // Test that the poll finishes if there is a tie
         List<PollOption> mockOptions = List.of(
             mock(PollOption.class),
