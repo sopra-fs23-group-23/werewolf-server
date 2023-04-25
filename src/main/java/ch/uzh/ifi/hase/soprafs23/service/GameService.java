@@ -206,7 +206,6 @@ public class GameService implements GameObserver{
         }
     }
 
-    // TODO testing
     @Override
     public void onGameEnd(Game game, Fraction fraction) {
         Long gameId = game.getLobby().getId();
