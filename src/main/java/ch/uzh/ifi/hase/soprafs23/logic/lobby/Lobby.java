@@ -1,7 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.logic.lobby;
 
 import java.util.*;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.NullResultPollDecider;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.RandomTiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
@@ -104,7 +104,7 @@ public class Lobby {
 
     public void instantiateRoles() {
         roles.put(Werewolf.class, new Werewolf(this::getAlivePlayers));
-        roles.put(Villager.class, new Villager(this::addPlayerToRole, this::getAlivePlayers, new NullResultPollDecider()));
+        roles.put(Villager.class, new Villager(this::addPlayerToRole, this::getAlivePlayers, new RandomTiedPollDecider()));
 
         ArrayList<Player> playerList = shufflePlayers();
 
