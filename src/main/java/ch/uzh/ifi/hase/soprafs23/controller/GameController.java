@@ -62,7 +62,7 @@ public class GameController {
                 PlayerEmitter gameEmitter = gameService.getGameEmitter(game);
                 gameService.sendGameEmitterUpdate(gameEmitter, "", GameSseEvent.start);
             }
-        }, 30);
+        }, 3);
     }
 
     @GetMapping("/games/{lobbyId}/sse/{token}")
