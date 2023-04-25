@@ -9,12 +9,12 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 
-public class GameEmitter {
+public class PlayerEmitter {
     private Map<Long, SseEmitter> playerEmitter = new HashMap<>();
 
-    
+    public PlayerEmitter() {}
 
-    public GameEmitter(Game game) {
+    public PlayerEmitter(Game game) {
         for (Player player : game.getLobby().getPlayers()) {
             addPlayerEmitter(player.getId(), new SseEmitter(-1l));
         }
@@ -25,9 +25,13 @@ public class GameEmitter {
      * @param uid
      * @param emitter
      */
-    private void addPlayerEmitter(Long uid, SseEmitter emitter) {
+    public void addPlayerEmitter(Long uid, SseEmitter emitter) {
         assert !playerEmitter.containsKey(uid);
         playerEmitter.put(uid, emitter);
+    }
+
+    public boolean containsKey(Long uid) {
+        return playerEmitter.containsKey(uid);
     }
 
     /**

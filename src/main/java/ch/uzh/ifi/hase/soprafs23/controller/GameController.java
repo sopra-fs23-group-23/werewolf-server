@@ -28,7 +28,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
-import ch.uzh.ifi.hase.soprafs23.service.wrapper.GameEmitter;
+import ch.uzh.ifi.hase.soprafs23.service.wrapper.PlayerEmitter;
 
 @RestController
 public class GameController {
@@ -54,12 +54,12 @@ public class GameController {
         lobbyService.assignRoles(lobby);
         Game game = gameService.createNewGame(lobby);
         gameService.createGameEmitter(game);
-        lobbyService.sendEmitterUpdate(lobbyService.getLobbyEmitter(lobby), "", LobbySseEvent.game);
+        lobbyService.sendEmitterUpdate(lobbyService.getLobbyPlayerEmitter(lobby), "", LobbySseEvent.game);
         gameService.schedule(new Runnable() {
             @Override
             public void run() {
                 gameService.startGame(game);
-                GameEmitter gameEmitter = gameService.getGameEmitter(game);
+                PlayerEmitter gameEmitter = gameService.getGameEmitter(game);
                 gameService.sendGameEmitterUpdate(gameEmitter, "", GameSseEvent.start);
             }
         }, 30);
@@ -88,7 +88,7 @@ public class GameController {
         PollParticipant participant = gameService.getParticipant(poll, user);
         PollOption option = gameService.getPollOption(poll, optionId);
         gameService.castVote(poll, participant, option);
-        GameEmitter emitter = gameService.getGameEmitter(game);
+        PlayerEmitter emitter = gameService.getGameEmitter(game);
         gameService.sendPollUpdateToAffectedUsers(emitter, poll);
     }
 
@@ -104,7 +104,7 @@ public class GameController {
         PollParticipant participant = gameService.getParticipant(poll, user);
         PollOption option = gameService.getPollOption(poll, optionId);
         gameService.removeVote(poll, participant, option);
-        GameEmitter emitter = gameService.getGameEmitter(game);
+        PlayerEmitter emitter = gameService.getGameEmitter(game);
         gameService.sendPollUpdateToAffectedUsers(emitter, poll);
     }
 

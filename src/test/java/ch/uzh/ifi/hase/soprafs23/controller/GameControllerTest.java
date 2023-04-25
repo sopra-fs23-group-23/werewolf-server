@@ -16,7 +16,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
@@ -28,7 +27,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
-import ch.uzh.ifi.hase.soprafs23.service.wrapper.GameEmitter;
+import ch.uzh.ifi.hase.soprafs23.service.wrapper.PlayerEmitter;
 
 @WebMvcTest(GameController.class)
 public class GameControllerTest {
@@ -51,12 +50,12 @@ public class GameControllerTest {
     
     @Test
     void testCreateNewGame() throws Exception {
-        SseEmitter emitter = mock(SseEmitter.class);
+        PlayerEmitter emitter = mock(PlayerEmitter.class);
 
         Mockito.when(userService.getUserByToken("token")).thenReturn(user);
         Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
         Mockito.when(gameService.createNewGame(lobby)).thenReturn(game);
-        Mockito.when(lobbyService.getLobbyEmitter(lobby)).thenReturn(emitter);
+        Mockito.when(lobbyService.getLobbyPlayerEmitter(lobby)).thenReturn(emitter);
 
         MockHttpServletRequestBuilder postRequest = post("/games/1")
             .header(USERAUTH_HEADER, "token");
@@ -96,7 +95,7 @@ public class GameControllerTest {
         Poll poll = mock(Poll.class);
         PollParticipant participant = mock(PollParticipant.class);
         PollOption option = mock(PollOption.class);
-        GameEmitter emitter = mock(GameEmitter.class);
+        PlayerEmitter emitter = mock(PlayerEmitter.class);
 
         Mockito.when(gameService.getCurrentPoll(game)).thenReturn(poll);
         Mockito.when(gameService.getParticipant(poll, user)).thenReturn(participant);
@@ -124,7 +123,7 @@ public class GameControllerTest {
         Poll poll = mock(Poll.class);
         PollParticipant participant = mock(PollParticipant.class);
         PollOption option = mock(PollOption.class);
-        GameEmitter emitter = mock(GameEmitter.class);
+        PlayerEmitter emitter = mock(PlayerEmitter.class);
 
         Mockito.when(gameService.getCurrentPoll(game)).thenReturn(poll);
         Mockito.when(gameService.getParticipant(poll, user)).thenReturn(participant);

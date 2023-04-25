@@ -7,7 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.StreamSupport;
@@ -19,13 +18,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 
-import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
+import ch.uzh.ifi.hase.soprafs23.service.wrapper.PlayerEmitter;
 
 public class LobbyServiceTest {
     LobbyService lobbyService = new LobbyService();
@@ -187,23 +184,12 @@ public class LobbyServiceTest {
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
     }
 
-
-
+    // test createLobbyPlayerEmitter and getLobbyPlayerEmitter
     @Test
-    void testCreateAndGetLobbyEmitter() {
-        User admin = createTestAdmin();
-        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
-        SseEmitter emitter = lobbyService.createLobbyEmitter(lobby);
-        assertEquals(emitter, lobbyService.getLobbyEmitter(lobby));
-
-
-    }
-
-    @Test
-    void testSendEmitterUpdate() throws IOException {
-        SseEmitter mockEmitter = mock(SseEmitter.class);
-        lobbyService.sendEmitterUpdate(mockEmitter, "test", LobbySseEvent.update);
-        Mockito.verify(mockEmitter).send(Mockito.any(SseEventBuilder.class));
+    void testCreateAndGetLobbyPlayerEmitter() {
+        Lobby lobby = mock(Lobby.class);
+        PlayerEmitter expected = lobbyService.createLobbyPlayerEmitter(lobby);
+        assertEquals(expected, lobbyService.getLobbyPlayerEmitter(lobby));
     }
 
     @Test
