@@ -28,6 +28,7 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
+import ch.uzh.ifi.hase.soprafs23.service.wrapper.PlayerEmitter;
 
 /**
  * This class handles all requests related to lobby
@@ -49,7 +50,8 @@ public class LobbyController {
     public LobbyGetDTO createNewLobby(@RequestHeader(USERAUTH_HEADER) String userToken) {
         User user = userService.getUserByToken(userToken);
         Lobby l = lobbyService.createNewLobby(user);
-        lobbyService.createLobbyEmitter(l);
+        PlayerEmitter emitter = lobbyService.createLobbyPlayerEmitter(l);
+        lobbyService.joinUserToLobbyPlayerEmitter(emitter, user);
         return LogicDTOMapper.convertLobbyToLobbyGetDTO(l);
     }
 
@@ -66,7 +68,9 @@ public class LobbyController {
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
         lobbyService.validateLobbyIsOpen(lobby);
         lobbyService.joinUserToLobby(user, lobby);
-        lobbyService.sendEmitterUpdate(lobbyService.getLobbyEmitter(lobby), lobbyToJSON(lobby), LobbySseEvent.update);
+        PlayerEmitter emitter = lobbyService.getLobbyPlayerEmitter(lobby);
+        lobbyService.sendEmitterUpdate(emitter, lobbyToJSON(lobby), LobbySseEvent.update);
+        lobbyService.joinUserToLobbyPlayerEmitter(emitter, user);
     }
 
     @GetMapping("/lobbies/{lobbyId}")
@@ -79,23 +83,14 @@ public class LobbyController {
         return LogicDTOMapper.convertLobbyToLobbyGetDTO(lobby);
     }
 
-    @GetMapping("/lobbies/{lobbyId}/sse")
+    @GetMapping("/lobbies/{lobbyId}/sse/{token}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public String getLobbySseEmitterToken(@PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @RequestHeader(USERAUTH_HEADER) String userToken) {
-        User user = userService.getUserByToken(userToken);
+    public SseEmitter getLobbySseEmitter(@PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @PathVariable("token") String token) {
+        User user = userService.getUserByToken(token);
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
-        lobbyService.validateUserIsInLobby(user, lobby);
-        return lobbyService.getLobbyEmitterToken(lobby);
-    }
-
-    @GetMapping("/lobbies/{lobbyId}/sse/{sseToken}")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public SseEmitter getLobbySseEmitter(@PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @PathVariable("sseToken") String sseToken) {
-        Lobby lobby = lobbyService.getLobbyById(lobbyId);
-        lobbyService.validateLobbyEmitterToken(lobby, sseToken);
-        return lobbyService.getLobbyEmitter(lobby);
+        PlayerEmitter emitter = lobbyService.getLobbyPlayerEmitter(lobby);
+        return lobbyService.getUserSseEmitter(emitter, user);
     }
 
     @GetMapping("/lobbies/{lobbyId}/roles")

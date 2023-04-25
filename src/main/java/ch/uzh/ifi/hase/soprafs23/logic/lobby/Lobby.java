@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.logic.lobby;
 import java.util.*;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.RandomTiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
+import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
 
@@ -124,5 +125,12 @@ public class Lobby {
         ArrayList<Player> playerList = new ArrayList<>(this.players);
         Collections.shuffle(playerList);
         return playerList;
+    }
+
+    public List<Fraction> getFractions() {
+        return roles.values().stream()
+                .filter(Fraction.class::isInstance)
+                .map(Fraction.class::cast)
+                .toList();
     }
 }

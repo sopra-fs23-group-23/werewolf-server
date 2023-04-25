@@ -8,6 +8,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.FractionGetDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,13 +30,13 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.helper.EmitterHelper;
-import ch.uzh.ifi.hase.soprafs23.service.wrapper.GameEmitter;
+import ch.uzh.ifi.hase.soprafs23.service.wrapper.PlayerEmitter;
 
 @Service
 @Transactional
 public class GameService implements GameObserver{
     private Map<Long, Game> games = new HashMap<>();
-    private Map<Long, GameEmitter> gameEmitterMap = new HashMap<>();
+    private Map<Long, PlayerEmitter> gameEmitterMap = new HashMap<>();
     private Map<Long, Poll> gamePollMap = new HashMap<>();
 
     /**
@@ -55,8 +57,8 @@ public class GameService implements GameObserver{
         return games.get(lobby.getId());
     }
 
-    public GameEmitter createGameEmitter(Game game) {
-        GameEmitter gameEmitter = new GameEmitter(game);
+    public PlayerEmitter createGameEmitter(Game game) {
+        PlayerEmitter gameEmitter = new PlayerEmitter(game);
         gameEmitterMap.put(game.getLobby().getId(), gameEmitter);
         return gameEmitter;
     }
@@ -66,7 +68,7 @@ public class GameService implements GameObserver{
      * @param game
      * @return
      */
-    public GameEmitter getGameEmitter(Game game) {
+    public PlayerEmitter getGameEmitter(Game game) {
         assert gameEmitterMap.containsKey(game.getLobby().getId());
         return gameEmitterMap.get(game.getLobby().getId());
     }
@@ -85,7 +87,7 @@ public class GameService implements GameObserver{
         EmitterHelper.sendEmitterUpdate(emitter, data, gameSseEvent.toString());
     }
 
-    public void sendGameEmitterUpdate(GameEmitter gameEmitterWrapper, String data, GameSseEvent event) {
+    public void sendGameEmitterUpdate(PlayerEmitter gameEmitterWrapper, String data, GameSseEvent event) {
         Consumer<SseEmitter> action = new Consumer<SseEmitter>() {
             @Override
             public void accept(SseEmitter t) {
@@ -112,7 +114,7 @@ public class GameService implements GameObserver{
 
     @Override
     public void onNewStage(Game game) {
-        GameEmitter emitter = getGameEmitter(game);
+        PlayerEmitter emitter = getGameEmitter(game);
         GameGetDTO dto = LogicDTOMapper.convertGameToGameGetDTO(game);
         try {
             sendGameEmitterUpdate(emitter, mapDTOToJson(dto), GameSseEvent.stage);
@@ -122,7 +124,7 @@ public class GameService implements GameObserver{
 
     }
 
-    public void sendPollUpdateToAffectedUsers(GameEmitter gameEmitter, Poll poll) {
+    public void sendPollUpdateToAffectedUsers(PlayerEmitter gameEmitter, Poll poll) {
         String pollJson;
         try {
             pollJson = mapDTOToJson(LogicDTOMapper.convertPollToPollGetDTO(poll));
@@ -151,7 +153,7 @@ public class GameService implements GameObserver{
             return;
         }
         gamePollMap.put(gameId, poll);
-        GameEmitter emitter = getGameEmitter(game);
+        PlayerEmitter emitter = getGameEmitter(game);
         sendPollUpdateToAffectedUsers(emitter, poll);
         schedule(poll::finish, poll.getDurationSeconds());
     }
@@ -202,5 +204,23 @@ public class GameService implements GameObserver{
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
         }
+    }
+
+    @Override
+    public void onGameEnd(Game game, Fraction fraction) {
+        Long gameId = game.getLobby().getId();
+        if (!gameEmitterMap.containsKey(gameId)) {
+            System.err.println("Failed to send fraction to game " + gameId + " because no emitter was found");
+            return;
+        }
+        PlayerEmitter emitter = getGameEmitter(game);
+        FractionGetDTO dto = LogicDTOMapper.convertFractionToFractionGetDTO(fraction);
+        emitter.forAllPlayerEmitters(t -> {
+            try {
+                sendEmitterUpdate(t, mapDTOToJson(dto), GameSseEvent.finish);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }
