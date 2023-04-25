@@ -28,7 +28,9 @@ public class GameServiceIntegrationTest {
 
         Game game = new Game(lobby);
 
-        assertEquals(game.getLobby().getAdmin().getId(), player1.getId());
+        gameService.createNewGame(lobby);
+
+        assertEquals(gameService.getGame(lobby).getLobby().getAdmin().getId(), player1.getId());
         assertFalse(game.isFinished());
     }
 }
