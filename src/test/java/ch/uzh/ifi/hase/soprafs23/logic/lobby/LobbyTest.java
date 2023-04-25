@@ -1,15 +1,19 @@
 package ch.uzh.ifi.hase.soprafs23.logic.lobby;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.IsIterableContaining.hasItem;
 import static org.hamcrest.CoreMatchers.not;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
+import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
 import org.junit.jupiter.api.Test;
 
 public class LobbyTest {
@@ -64,13 +68,22 @@ public class LobbyTest {
     }
 
     @Test
-    void testAddPlayerToRole(){
-        // TODO implement
-    }
-
-    @Test
     void testInstantiateRoles(){
-        // TODO implement
+        Player admin = new Player(12l, "admin");
+        Player p1 = new Player(13l, "player1");
+        Player p2 = new Player(14l, "player2");
+        Lobby l = new Lobby(1l, admin);
+        l.addPlayer(p1);
+        l.addPlayer(p2);
+        l.instantiateRoles();
+        Collection<Role> roles = l.getRoles();
+
+        for (Player player : l.getPlayers()) {
+            assertThat("Player is assigned a role", !l.getRolesOfPlayer(player).isEmpty());
+            for (Role role : l.getRolesOfPlayer(player)) {
+                assertTrue(roles.contains(role));
+            }
+        }
     }
 
     @Test
