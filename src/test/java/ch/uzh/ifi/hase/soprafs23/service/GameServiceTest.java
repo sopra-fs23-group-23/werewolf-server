@@ -26,7 +26,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
-import ch.uzh.ifi.hase.soprafs23.service.wrapper.GameEmitter;
+import ch.uzh.ifi.hase.soprafs23.service.wrapper.PlayerEmitter;
 
 public class GameServiceTest {
     GameService gameService = new GameService();
@@ -48,7 +48,7 @@ public class GameServiceTest {
     @Test
     void testCreateGameEmitter() {
         Game game = createValidMockGame();
-        GameEmitter emitter = gameService.createGameEmitter(game);
+        PlayerEmitter emitter = gameService.createGameEmitter(game);
         assertEquals(emitter, gameService.getGameEmitter(game));
     }
 
@@ -174,7 +174,7 @@ public class GameServiceTest {
 
     @Test
     void testSendPollUpdateToAffectedUsers() throws IOException {
-        GameEmitter gameEmitter = mock(GameEmitter.class);
+        PlayerEmitter gameEmitter = mock(PlayerEmitter.class);
         Poll poll = mock(Poll.class);
         PollParticipant p1 = mock(PollParticipant.class);
         PollParticipant p2 = mock(PollParticipant.class);

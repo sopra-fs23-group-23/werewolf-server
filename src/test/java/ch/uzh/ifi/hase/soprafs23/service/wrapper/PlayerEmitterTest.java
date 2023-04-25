@@ -17,7 +17,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 
-public class GameEmitterTest {
+public class PlayerEmitterTest {
     private Game createMockGame() {
         Lobby lobby = mock(Lobby.class);
         Game game = mock(Game.class);
@@ -40,7 +40,7 @@ public class GameEmitterTest {
             }
         };
 
-        GameEmitter emitter = new GameEmitter(game);
+        PlayerEmitter emitter = new PlayerEmitter(game);
         emitter.forAllPlayerEmitters(mockConsumer);
         SseEmitter[] expected = {emitter.getPlayerEmitter(1l), emitter.getPlayerEmitter(2l)};
         assertThat("List equality without order", emitters, containsInAnyOrder(expected));
@@ -50,7 +50,7 @@ public class GameEmitterTest {
     void testGetPlayerEmitter() {
         Game game = createMockGame();
 
-        GameEmitter emitter = new GameEmitter(game);
+        PlayerEmitter emitter = new PlayerEmitter(game);
         assertTrue(emitter.getPlayerEmitter(1l) instanceof SseEmitter, "Playeremitter of p1 is not instance of SseEmitter");
         assertTrue(emitter.getPlayerEmitter(2l) instanceof SseEmitter, "Playeremitter of p2 is not instance of SseEmitter");
     }
