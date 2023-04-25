@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
 
@@ -17,6 +18,7 @@ public class Game implements StageObserver{
     private Lobby lobby;
     private Stage currentStage;
     private int stageCount = 0;
+    private boolean finished = false;
     private List<PollCommand> lastStagePollCommands = new ArrayList<>();
     private List<GameObserver> observers = new ArrayList<>();
 
@@ -68,9 +70,24 @@ public class Game implements StageObserver{
 
     @Override
     public void onStageFinished() {
+        for (Fraction fraction : lobby.getFractions()) {
+            if(fraction.hasWon()) {
+                finishGame(fraction);
+                return;
+            }
+        }
         lastStagePollCommands = currentStage.getPollCommands();
         lastStagePollCommands.stream().forEach(p->p.execute());
         startNextStage(calculateNextStage());
+    }
+
+    private void finishGame(Fraction winningFraction) {
+        observers.stream().forEach(o -> o.onGameEnd(this, winningFraction));
+        finished = true;
+    }
+
+    public boolean isFinished() {
+        return finished;
     }
 
     private Queue<Supplier<Optional<Poll>>> getDayVoters() {

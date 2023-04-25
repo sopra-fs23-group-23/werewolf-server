@@ -218,4 +218,9 @@ public class GameServiceTest {
         assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
         assertEquals("test", exception.getReason());   
     }
+
+    @Test
+    void testOnGameEnd() {
+
+    }
 }
