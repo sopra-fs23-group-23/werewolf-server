@@ -161,9 +161,10 @@ public class UserServiceTest {
     @Test
     public void
     validateToken_UserNotFound_throwsException() {
-        Mockito.when(userRepository.findByToken(Mockito.any())).thenReturn(null);
+        Mockito.when(userRepository.findByUsername(Mockito.anyString())).thenReturn(null);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userService.loginUser(testUser));
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
     }
 
     @Test
@@ -176,6 +177,7 @@ public class UserServiceTest {
     public void validateTokenMatch_NoMatch_throwsException() {
         testUser.setToken("12345");
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userService.validateTokenMatch(testUser, "1234"));
+        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
     }
 
     @Test

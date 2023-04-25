@@ -41,12 +41,6 @@ public class LobbyServiceTest {
         return user;
     }
 
-    private void join_N_Users(int n, Lobby lobby) {
-        for (long i = 2L; i < n+2; i++) {
-            lobbyService.joinUserToLobby(createTestUser(i, "user" + Long.toString(i)), lobby);
-        }
-    }
-
     @Test
     void testCreateNewLobby() {
         User admin = createTestAdmin();

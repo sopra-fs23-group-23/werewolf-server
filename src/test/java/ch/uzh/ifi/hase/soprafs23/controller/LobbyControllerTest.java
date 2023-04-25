@@ -170,7 +170,6 @@ public class LobbyControllerTest {
         User user = createTestUser("test", 1L);
         Player player = LogicEntityMapper.createPlayerFromUser(user);
         Lobby lobby = new Lobby(1L, player);
-        Collection<RoleGetDTO> mockReturn = new ArrayList<>();
 
         Mockito.when(lobbyService.getLobbyById(1L)).thenReturn(lobby);
         Mockito.when(userService.getUser(1L)).thenReturn(user);
