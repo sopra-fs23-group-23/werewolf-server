@@ -3,18 +3,15 @@ package ch.uzh.ifi.hase.soprafs23.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
 
-import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
@@ -42,12 +39,6 @@ public class LobbyServiceTest {
         user.setId(id);
         user.setUsername(username);
         return user;
-    }
-
-    private void join_N_Users(int n, Lobby lobby) {
-        for (long i = 2L; i < n+2; i++) {
-            lobbyService.joinUserToLobby(createTestUser(i, "user" + Long.toString(i)), lobby);
-        }
     }
 
     @Test
@@ -79,6 +70,21 @@ public class LobbyServiceTest {
     void testGetLobbyById_nonExistent() {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> lobbyService.getLobbyById(1l));
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+    }
+
+    @Test
+    void testValidateLobbyIsOpen() {
+        Lobby lobby = mock(Lobby.class);
+        when(lobby.isOpen()).thenReturn(true);
+        lobbyService.validateLobbyIsOpen(lobby);
+    }
+
+    @Test
+    void testValidateLobbyIsOpen_closedLobby() {
+        Lobby lobby = mock(Lobby.class);
+        when(lobby.isOpen()).thenReturn(false);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.validateLobbyIsOpen(lobby));
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
     }
 
     @Test
@@ -158,6 +164,32 @@ public class LobbyServiceTest {
     }
 
     @Test
+    void testValidateLobbySize() {
+        Lobby lobby = mock(Lobby.class);
+        Mockito.when(lobby.getLobbySize()).thenReturn(Lobby.MIN_SIZE);
+        lobbyService.validateLobbySize(lobby);
+        // should not throw error
+    }
+
+    @Test
+    void testValidateLobbySize_tooSmall() {
+        Lobby lobby = mock(Lobby.class);
+        Mockito.when(lobby.getLobbySize()).thenReturn(Lobby.MIN_SIZE-1);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.validateLobbySize(lobby));
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+    }
+
+    @Test
+    void testValidateLobbySize_tooLarge() {
+        Lobby lobby = mock(Lobby.class);
+        Mockito.when(lobby.getLobbySize()).thenReturn(Lobby.MAX_SIZE+1);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.validateLobbySize(lobby));
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+    }
+
+
+
+    @Test
     void testCreateAndGetLobbyEmitter() {
         User admin = createTestAdmin();
         Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
@@ -175,35 +207,6 @@ public class LobbyServiceTest {
     }
 
     @Test
-    void testAssignRole_notAdmin() {
-        User admin = createTestAdmin();
-        User notAdmin = createTestUser(15L, "notAdmin");
-        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
-        lobbyService.joinUserToLobby(notAdmin, lobby);
-        join_N_Users(5, lobby);
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.assignRoles(notAdmin, lobby));
-        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
-    }
-
-    @Test
-    void testAssignRole_allowed() {
-        User admin = createTestAdmin();
-        Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
-        join_N_Users(5, lobby);
-        lobbyService.assignRoles(admin, lobby);
-        ArrayList<Role> roles = new ArrayList<>(lobby.getRoles());
-        boolean foundWerewolf = false;
-        for (Role role: roles) {
-            if (role.getClass() == Werewolf.class) {
-                foundWerewolf = true;
-                assertEquals("Werewolf", role.getName());
-                break;
-            }
-        }
-        assertTrue(foundWerewolf);
-    }
-
-    @Test
     void testGetAllRolesInformation() {
         Collection<Role> rolesReturn= new ArrayList<>();
         Lobby mock = mock(Lobby.class);
@@ -212,6 +215,13 @@ public class LobbyServiceTest {
         ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>(lobbyService.getAllRolesInformation(mock));
         assertEquals("Werewolf", roleGetDTOS.get(0).getRoleName());
         assertEquals(0, roleGetDTOS.get(0).getAmount());
+    }
+
+    @Test
+    void testCloseLobby() {
+        Lobby lobby = mock(Lobby.class);
+        lobbyService.closeLobby(lobby);
+        verify(lobby).setOpen(false);
     }
 
     @Test

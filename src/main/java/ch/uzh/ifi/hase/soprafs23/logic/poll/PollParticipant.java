@@ -16,14 +16,16 @@ public class PollParticipant {
         this.player = player;
     }
 
-    public boolean hasVoted() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'hasVoted'");
+    public int getRemainingVotes() {
+        return remainingVotes;
     }
 
-    public void castVote() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'castVote'");
+    public void increaseRemainingVotes() {
+        this.remainingVotes++;
+    }
+
+    public void decreaseRemainingVotes() {
+        this.remainingVotes--;
     }
 
     public Player getPlayer() {

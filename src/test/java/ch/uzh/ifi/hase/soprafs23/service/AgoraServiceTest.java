@@ -25,10 +25,6 @@ public class AgoraServiceTest {
 
     AgoraService agoraService = new AgoraService();
 
-    private User createTestAdmin() {
-        return createTestUser(1l, "admin");
-    }
-
     private User createTestUser(Long id, String username) {
         User user = new User();
         user.setId(id);
@@ -73,7 +69,7 @@ public class AgoraServiceTest {
         when(agoraServiceMock.createHttpRequest(eq(HttpMethod.GET), eq("")))
                 .thenReturn(createJsonNode(sampleRules));
 
-        AgoraService agoraService = new AgoraService();
+        // AgoraService agoraService = new AgoraService();
 
         Player player = new Player((long) 1717, "Willy");
         agoraServiceMock.deleteRules(Reason.MUTE_DEAD, Optional.of(player));

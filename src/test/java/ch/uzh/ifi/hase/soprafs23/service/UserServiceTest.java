@@ -1,7 +1,6 @@
 
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +12,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.Optional;
@@ -40,8 +38,6 @@ public class UserServiceTest {
     testUser.setPassword("password");
     testUser.setUsername("testUsername");
 
-    // when -> any object is being save in the userRepository -> return the dummy
-    // testUser
     Mockito.when(userRepository.save(Mockito.any())).thenReturn(testUser);
   }
 
@@ -110,7 +106,6 @@ public class UserServiceTest {
 
     @Test
     public void updateUser_ValidUpdate_Success() throws ParseException {
-        // Set up
         Long userId = 1L;
         User existingUser = new User();
         existingUser.setId(userId);
@@ -125,7 +120,6 @@ public class UserServiceTest {
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
         Mockito.when(userRepository.findByUsername(updatedUser.getUsername())).thenReturn(null);
 
-        // Call function
         userService.updateUser(updatedUser, userId);
 
         // Verify that user was updated
@@ -167,9 +161,10 @@ public class UserServiceTest {
     @Test
     public void
     validateToken_UserNotFound_throwsException() {
-        Mockito.when(userRepository.findByToken(Mockito.any())).thenReturn(null);
+        Mockito.when(userRepository.findByUsername(Mockito.anyString())).thenReturn(null);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userService.loginUser(testUser));
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
     }
 
     @Test
@@ -182,6 +177,7 @@ public class UserServiceTest {
     public void validateTokenMatch_NoMatch_throwsException() {
         testUser.setToken("12345");
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userService.validateTokenMatch(testUser, "1234"));
+        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
     }
 
     @Test

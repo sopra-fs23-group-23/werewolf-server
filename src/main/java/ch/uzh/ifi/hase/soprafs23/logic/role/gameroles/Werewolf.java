@@ -1,10 +1,15 @@
 package ch.uzh.ifi.hase.soprafs23.logic.role.gameroles;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.KillPlayerPollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.NullResultPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
@@ -24,7 +29,7 @@ public class Werewolf extends Role implements NightVoter, Fraction{
     @Override
     public int compareTo(Role arg0) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'compareTo'");
+        return 0;
     }
 
     @Override
@@ -34,9 +39,15 @@ public class Werewolf extends Role implements NightVoter, Fraction{
     }
 
     @Override
-    public Poll createNightPoll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createNightPoll'");
+    public Optional<Poll> createNightPoll() {
+        List<Player> alivePlayers = alivePlayersGetter.get();
+        return Optional.of(new Poll(
+            this.getClass(),
+            "Who do you want to kill tonight?",
+            alivePlayers.stream().map(p->new PollOption(p, new KillPlayerPollCommand(p))).toList(),
+            getPlayers().stream().map(p->new PollParticipant(p)).toList(),
+            30,
+            new NullResultPollDecider()));
     }
 
     @Override

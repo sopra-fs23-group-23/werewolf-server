@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.StreamSupport;
@@ -9,29 +8,27 @@ import javax.transaction.Transactional;
 
 import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
 
-import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
-import ch.uzh.ifi.hase.soprafs23.service.wrapper.LobbyEmitterWrapper;
-
-import static ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper.convertRoleToRoleGetDTO;
+import ch.uzh.ifi.hase.soprafs23.service.helper.EmitterHelper;
+import ch.uzh.ifi.hase.soprafs23.service.wrapper.EmitterWrapper;
 
 @Service
 @Transactional
 public class LobbyService {
+    public static final String LOBBYID_PATHVARIABLE = "lobbyId";
 
     private Map<Long, Lobby> lobbies = new HashMap<>();
-    private Map<Long, LobbyEmitterWrapper> lobbyEmitterMap = new HashMap<>();
+    private Map<Long, EmitterWrapper> lobbyEmitterMap = new HashMap<>();
 
     private Long createLobbyId() {
         Long newId = ThreadLocalRandom.current().nextLong(100000, 999999);
@@ -64,17 +61,23 @@ public class LobbyService {
 
     private boolean userInALobby(User user) {
         return lobbies.values().stream().anyMatch(
-            l -> StreamSupport.stream(l.getPlayers().spliterator(), false).anyMatch(p->p.getId()==user.getId())
+            l -> StreamSupport.stream(l.getPlayers().spliterator(), false).anyMatch(p->p.getId().equals(user.getId()))
         );
     }
 
     private boolean userIsInLobby(User user, Lobby lobby) {
-        return StreamSupport.stream(lobby.getPlayers().spliterator(), false).anyMatch(p->p.getId()==user.getId());
+        return StreamSupport.stream(lobby.getPlayers().spliterator(), false).anyMatch(p->p.getId().equals(user.getId()));
     }
 
     public void validateUserIsInLobby(User user, Lobby lobby) {
         if (!userIsInLobby(user, lobby)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not part of this lobby");
+        }
+    }
+
+    public void validateLobbyIsOpen(Lobby lobby) {
+        if (!lobby.isOpen()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby is closed.");
         }
     }
 
@@ -85,7 +88,7 @@ public class LobbyService {
         if (!lobby.isOpen()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby is closed.");
         }
-        if (StreamSupport.stream(lobby.getPlayers().spliterator(), false).anyMatch(p->p.getId()==user.getId())) {
+        if (userIsInLobby(user, lobby)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in this lobby.");
         }
         if (userInALobby(user)) {
@@ -96,7 +99,7 @@ public class LobbyService {
 
     public SseEmitter createLobbyEmitter(Lobby lobby) {
         SseEmitter emitter = new SseEmitter(-1l);
-        lobbyEmitterMap.put(lobby.getId(), new LobbyEmitterWrapper(emitter, UUID.randomUUID().toString()));
+        lobbyEmitterMap.put(lobby.getId(), new EmitterWrapper(emitter, UUID.randomUUID().toString()));
         return emitter;
     }
 
@@ -114,13 +117,8 @@ public class LobbyService {
         return lobbyEmitterMap.get(lobby.getId()).getEmitter();
     }
 
-    public void sendEmitterUpdate(SseEmitter emitter, String data, LobbySseEvent eventType) throws IOException {
-        // ordering matters!!! .name needs to be before .data
-        SseEventBuilder event = SseEmitter.event()
-            .name(eventType.toString())
-            .data( data + "\n", MediaType.APPLICATION_JSON)
-            .id(UUID.randomUUID().toString());
-        emitter.send(event);
+    public void sendEmitterUpdate(SseEmitter emitter, String data, LobbySseEvent eventType) {
+        EmitterHelper.sendEmitterUpdate(emitter, data, eventType.toString());
     }
 
     public void validateUserIsAdmin(User user, Lobby lobby) {
@@ -129,38 +127,39 @@ public class LobbyService {
         }
     }
 
-    public Collection<RoleGetDTO> getAllRolesInformation(Lobby lobby) {
-        ArrayList<Role> roles = new ArrayList<>(lobby.getRoles());
-        ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>();
-        for (Role role : roles) {
-            roleGetDTOS.add(roleToRolesGetDTO(lobby, role));
+    public void validateLobbySize(Lobby lobby) {
+        if (lobby.getLobbySize() > Lobby.MAX_SIZE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby has too many players.");
         }
-        return roleGetDTOS;
+        if (lobby.getLobbySize() < Lobby.MIN_SIZE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby has not enough players.");
+        }
     }
 
+    public Collection<RoleGetDTO> getAllRolesInformation(Lobby lobby) {
+        return lobby.getRoles().stream().map(role -> LogicDTOMapper.convertRoleToRoleGetDTO(role)).toList();
+    }
+
+    /**
+     * @pre user is in lobby
+     * @param user
+     * @param lobby
+     * @return
+     */
     public Collection<RoleGetDTO> getOwnRolesInformation(User user, Lobby lobby) {
         Player player = lobby.getPlayerById(user.getId());
-        ArrayList<Role> roles = new ArrayList<>(lobby.getRolesOfPlayer(player));
-        ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>();
-        for (Role role : roles) {
-            roleGetDTOS.add(roleToRolesGetDTO(lobby, role));
-        }
-        return roleGetDTOS;
+        return lobby.getRolesOfPlayer(player).stream().map(role -> LogicDTOMapper.convertRoleToRoleGetDTO(role)).toList();
     }
 
-    public void assignRoles(User user, Lobby lobby) {
-        //should also validate that the roles are not assigned yet, but since this code moves to the game service and may
-        //happen in the game constructor I think it is easier if we do this then instead of doing it twice
-        validateUserIsAdmin(user, lobby);
+    /**
+     * @pre executing user is admin
+     * @param lobby
+     */
+    public void assignRoles(Lobby lobby) {
         lobby.instantiateRoles();
     }
 
-    private RoleGetDTO roleToRolesGetDTO(Lobby lobby, Role role) {
-        Iterable<Player> playersOfThatRole = lobby.getPlayersByRole(role.getClass());
-        int amount = 0;
-        for(Player player: playersOfThatRole) {
-            amount++;
-        }
-        return convertRoleToRoleGetDTO(role, amount);
+    public void closeLobby(Lobby lobby) {
+        lobby.setOpen(false);
     }
 }

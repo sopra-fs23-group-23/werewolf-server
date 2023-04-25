@@ -1,7 +1,6 @@
 
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,7 +62,7 @@ public class UserServiceIntegrationTest {
     User testUser = new User();
     testUser.setPassword("password1");
     testUser.setUsername("testUsername");
-    User createdUser = userService.createUser(testUser);
+    userService.createUser(testUser);
 
     // attempt to create second user with same username
     User testUser2 = new User();

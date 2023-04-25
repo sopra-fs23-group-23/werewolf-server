@@ -5,7 +5,6 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,12 +24,12 @@ import java.util.*;
 @Service
 @Transactional
 public class UserService {
+    public static final String USERAUTH_HEADER = "token";
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
 
-    @Autowired
     public UserService(@Qualifier("userRepository") UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -40,6 +39,7 @@ public class UserService {
     }
 
     public User createUser(User newUser) {
+        checkUsernameAndPWLength(newUser);
         checkIfUserExists(newUser);
         newUser.setToken(UUID.randomUUID().toString());
 
@@ -81,6 +81,7 @@ public class UserService {
     }
 
     public void updateUser(User updatedUser, Long id) throws ParseException {
+        checkUsernameAndPWLength(updatedUser);
         User userById = getUser(id);
 
         if (!userById.getUsername().equals(updatedUser.getUsername())){
@@ -122,5 +123,14 @@ public class UserService {
             return true;
         }
         throw new ResponseStatusException(HttpStatus.CONFLICT, "User does not match to the player.");
+    }
+
+    private void checkUsernameAndPWLength(User user) {
+        if (user.getUsername().length() > 16) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please choose a username that has 16 or less symbols.");
+        }
+        if (user.getPassword().length() > 36) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please choose a password that has 36 or less symbols.");
+        }
     }
 }

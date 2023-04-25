@@ -1,7 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.logic.lobby;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Player {
@@ -9,10 +8,13 @@ public class Player {
     private String name;
     private boolean alive = true;
     private List<PlayerObserver> observers = new ArrayList<>();
+    private final String avatarUrl;
 
     public Player(Long id, String name) {
         this.id = id;
         this.name = name;
+        // alternatives to miniavas: https://www.dicebear.com/guides/how-many-unique-avatars
+        this.avatarUrl = "https://api.dicebear.com/6.x/miniavs/svg?seed=" + id;
     }
 
     public Long getId() {
@@ -25,6 +27,10 @@ public class Player {
 
     public boolean isAlive() {
         return alive;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
     }
 
     public void addObserver(PlayerObserver observer) {

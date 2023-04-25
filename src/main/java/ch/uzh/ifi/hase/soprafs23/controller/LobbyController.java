@@ -1,10 +1,11 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
+import static ch.uzh.ifi.hase.soprafs23.service.LobbyService.LOBBYID_PATHVARIABLE;
+import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
+
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 
-import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,9 +35,6 @@ import ch.uzh.ifi.hase.soprafs23.service.UserService;
 
 @RestController
 public class LobbyController {
-    public static final String USERAUTH_HEADER = "token";
-    public static final String LOBBYID_PATHVARIABLE = "lobbyId";
-
     private final UserService userService;
     private final LobbyService lobbyService;
 
@@ -66,6 +64,7 @@ public class LobbyController {
     public void joinLobby(@PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @RequestHeader(USERAUTH_HEADER) String userToken) throws JsonProcessingException, IOException {
         User user = userService.getUserByToken(userToken);
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
+        lobbyService.validateLobbyIsOpen(lobby);
         lobbyService.joinUserToLobby(user, lobby);
         lobbyService.sendEmitterUpdate(lobbyService.getLobbyEmitter(lobby), lobbyToJSON(lobby), LobbySseEvent.update);
     }
@@ -119,22 +118,5 @@ public class LobbyController {
         userService.validateTokenMatch(user, token);
         lobbyService.validateUserIsInLobby(user, lobby);
         return lobbyService.getOwnRolesInformation(user, lobby);
-    }
-
-    //TODO: this probably should go into the the game controller, and the role assignement could be triggered in the constructor of the game
-    @PutMapping("/lobbies/{lobbyId}/roles")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ResponseBody
-    public void assignRoles(@PathVariable(LOBBYID_PATHVARIABLE) Long LobbyId, @RequestHeader(USERAUTH_HEADER) String token) {
-        Lobby lobby = lobbyService.getLobbyById(LobbyId);
-        User user = userService.getUserByToken(token);
-        //TODO: Delete this part but makes it much easier to test things around the role assignement, infoscreen etc.
-        if (lobby.getLobbySize() < 5) {
-            for (long i = 5; i <= 14; i++) {
-                User dummyUser = userService.getUser(i);
-                lobbyService.joinUserToLobby(dummyUser, lobby);
-            }
-        }
-        lobbyService.assignRoles(user, lobby);
     }
 }
