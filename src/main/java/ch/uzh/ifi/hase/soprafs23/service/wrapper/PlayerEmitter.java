@@ -20,6 +20,10 @@ public class PlayerEmitter {
         }
     }
 
+    public static SseEmitter createDefaulEmitter() {
+        return new SseEmitter(-1l);
+    }
+
     /**
      * @pre !playerEmitter.containsKey(uid)
      * @param uid

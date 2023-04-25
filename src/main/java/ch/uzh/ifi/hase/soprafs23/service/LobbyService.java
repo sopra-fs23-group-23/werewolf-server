@@ -110,7 +110,7 @@ public class LobbyService {
         if (emitter.containsKey(user.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User already has a sse emitter.");
         }
-        emitter.addPlayerEmitter(user.getId(), new SseEmitter());
+        emitter.addPlayerEmitter(user.getId(), PlayerEmitter.createDefaulEmitter());
     }
 
     public PlayerEmitter getLobbyPlayerEmitter (Lobby lobby) {
