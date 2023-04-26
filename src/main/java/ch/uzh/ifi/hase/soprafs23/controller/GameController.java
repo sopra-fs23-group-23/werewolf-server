@@ -5,6 +5,7 @@ import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
 
 import java.io.IOException;
 
+import ch.uzh.ifi.hase.soprafs23.rest.dto.FractionGetDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,7 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.PollGetDTO;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class GameController {
@@ -78,6 +80,18 @@ public class GameController {
         } else {
             return gameService.censorPollGetDTO(pollGetDTO);
         }
+    }
+
+    @GetMapping("/games/{lobbyId}/winner")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public FractionGetDTO getWinner(@RequestHeader(USERAUTH_HEADER) String token, @PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId) {
+        Lobby lobby = lobbyService.getLobbyById(lobbyId);
+        Game game = gameService.getGame(lobby);
+        if(!game.isFinished()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Game is not finished yet.");
+        }
+        return gameService.getFractionGetDTO(game);
     }
 
     @PutMapping("/games/{lobbyId}/votes/{optionId}")

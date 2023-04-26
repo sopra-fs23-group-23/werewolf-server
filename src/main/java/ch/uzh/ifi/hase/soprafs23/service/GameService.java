@@ -8,6 +8,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
+import ch.uzh.ifi.hase.soprafs23.rest.dto.FractionGetDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -118,5 +119,14 @@ public class GameService{
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
         }
+    }
+
+    /**
+     * @pre game is finished
+     * @param game
+     */
+    public FractionGetDTO getFractionGetDTO(Game game) {
+        assert game.isFinished();
+        return LogicDTOMapper.convertFractionToFractionGetDTO(game.getWinner());
     }
 }
