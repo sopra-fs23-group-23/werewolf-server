@@ -37,6 +37,7 @@ public class GameService implements GameObserver{
     public Game createNewGame(Lobby lobby) {
         assert lobby.getLobbySize() <= Lobby.MAX_SIZE && lobby.getLobbySize() >= Lobby.MIN_SIZE;
         Game game = new Game(lobby);
+        game.addObserver(this);
         games.put(lobby.getId(), game);
         return game;
     }
