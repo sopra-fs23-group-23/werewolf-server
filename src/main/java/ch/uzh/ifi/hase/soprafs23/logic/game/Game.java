@@ -17,6 +17,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
 public class Game implements StageObserver{
     private Lobby lobby;
     private Stage currentStage;
+    private boolean started = false;
     private Optional<Poll> currentPoll = Optional.empty();
     private Optional<Fraction> winner = Optional.empty();
     private int stageCount = 0;
@@ -43,6 +44,11 @@ public class Game implements StageObserver{
 
     public void startGame() {
         startNextStage(calculateNextStage());
+        started = true;
+    }
+
+    public boolean isStarted() {
+        return started;
     }
 
     private void startNextStage(Stage nextStage) {

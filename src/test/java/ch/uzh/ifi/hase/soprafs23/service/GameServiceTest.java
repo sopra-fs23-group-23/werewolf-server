@@ -57,6 +57,14 @@ public class GameServiceTest {
     }
 
     @Test
+    void testValidateGameStarted() {
+        Game game = mock(Game.class);
+        when(game.isStarted()).thenReturn(false);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.validateGameStarted(game));
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
+    }
+
+    @Test
     void testValidateParticipant() {
         Poll poll = mock(Poll.class);
         User user = mock(User.class);

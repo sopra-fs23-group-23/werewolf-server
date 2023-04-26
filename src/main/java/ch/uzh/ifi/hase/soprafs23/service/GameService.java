@@ -54,6 +54,12 @@ public class GameService{
         game.startGame();
     }
 
+    public void validateGameStarted(Game game) {
+        if (!game.isStarted()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Game has not started yet.");
+        }
+    }
+
     public void schedule(Runnable command, int delaySeconds) {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.schedule(command, delaySeconds, TimeUnit.SECONDS);

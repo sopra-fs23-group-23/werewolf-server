@@ -77,6 +77,7 @@ public class GameControllerTest {
         mockMvc.perform(getRequest)
             .andExpect(status().isOk());
 
+        verify(gameService).validateGameStarted(game);
         verify(lobbyService).validateUserIsInLobby(user, lobby);
         verify(gameService).toGameGetDTO(game);
     }
@@ -97,6 +98,7 @@ public class GameControllerTest {
         mockMvc.perform(getRequest)
             .andExpect(status().isOk());
 
+        verify(gameService).validateGameStarted(game);
         verify(gameService).toPollGetDTO(poll);
         verify(gameService, never()).censorPollGetDTO(Mockito.any(PollGetDTO.class));
     }
@@ -117,6 +119,7 @@ public class GameControllerTest {
         mockMvc.perform(getRequest)
             .andExpect(status().isOk());
 
+        verify(gameService).validateGameStarted(game);
         verify(gameService).toPollGetDTO(poll);
         verify(gameService).censorPollGetDTO(Mockito.any());
     }
@@ -142,6 +145,7 @@ public class GameControllerTest {
         mockMvc.perform(postRequest)
             .andExpect(status().isNoContent());
 
+        verify(gameService).validateGameStarted(game);
         verify(gameService).validateParticipant(poll, user);
         verify(gameService).castVote(poll, participant, option);
     }
@@ -167,6 +171,7 @@ public class GameControllerTest {
         mockMvc.perform(deleteRequest)
             .andExpect(status().isNoContent());
 
+        verify(gameService).validateGameStarted(game);
         verify(gameService).validateParticipant(poll, user);
         verify(gameService).removeVote(poll, participant, option);
     }
