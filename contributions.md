@@ -88,6 +88,7 @@ https://github.com/sopra-fs23-group-23/werewolf-client/issues/83
 https://github.com/sopra-fs23-group-23/werewolf-client/issues/85
 
 ### Jan Lüthi
+https://github.com/sopra-fs23-group-23/werewolf-server/issues/145
 https://github.com/sopra-fs23-group-23/werewolf-server/issues/151
 https://github.com/sopra-fs23-group-23/werewolf-server/issues/152
 https://github.com/sopra-fs23-group-23/werewolf-server/issues/153
