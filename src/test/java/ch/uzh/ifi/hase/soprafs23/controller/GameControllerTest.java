@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.controller;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -60,6 +61,22 @@ public class GameControllerTest {
         verify(lobbyService).validateUserIsAdmin(user, lobby);
         verify(lobbyService).validateLobbySize(lobby);
         verify(lobbyService).assignRoles(lobby);
+    }
+
+    @Test
+    void testGetGame() throws Exception {
+        Mockito.when(userService.getUserByToken("token")).thenReturn(user);
+        Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
+        Mockito.when(gameService.getGame(lobby)).thenReturn(game);
+
+        MockHttpServletRequestBuilder getRequest = get("/games/1")
+            .header(USERAUTH_HEADER, "token");
+
+        mockMvc.perform(getRequest)
+            .andExpect(status().isOk());
+
+        verify(lobbyService).validateUserIsInLobby(user, lobby);
+        verify(gameService).toGameGetDTO(game);
     }
 
     @Test

@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,6 +21,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
@@ -48,6 +50,17 @@ public class GameController {
         lobbyService.assignRoles(lobby);
         Game game = gameService.createNewGame(lobby);
         gameService.schedule(() -> gameService.startGame(game), 30);
+    }
+
+    @GetMapping("/games/{lobbyId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GameGetDTO getGame(@RequestHeader(USERAUTH_HEADER) String token, @PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId) {
+        User user = userService.getUserByToken(token);
+        Lobby lobby = lobbyService.getLobbyById(lobbyId);
+        lobbyService.validateUserIsInLobby(user, lobby);
+        Game game = gameService.getGame(lobby);
+        return gameService.toGameGetDTO(game);
     }
 
     @PutMapping("/games/{lobbyId}/votes/{optionId}")

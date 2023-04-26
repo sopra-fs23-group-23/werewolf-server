@@ -17,6 +17,8 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 
 @Service
 @Transactional
@@ -39,6 +41,10 @@ public class GameService{
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("No game found for lobby with id %d", lobby.getId()));
         }
         return games.get(lobby.getId());
+    }
+
+    public GameGetDTO toGameGetDTO(Game game) {
+        return LogicDTOMapper.convertGameToGameGetDTO(game);
     }
 
     public void startGame(Game game) {

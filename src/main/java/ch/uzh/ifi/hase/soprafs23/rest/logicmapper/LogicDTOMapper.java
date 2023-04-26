@@ -72,6 +72,7 @@ public final class LogicDTOMapper {
         gameGetDTO.setActions(game.getLastStagePollCommands().stream().map(LogicDTOMapper::convertPollCommandToPollCommandGetDTO).toList());
         gameGetDTO.setLobby(convertLobbyToLobbyGetDTO(game.getLobby()));
         gameGetDTO.setStage(convertStageToStageGetDTO(game.getCurrentStage()));
+        gameGetDTO.setFinished(game.isFinished());
         return gameGetDTO;
     }
 
