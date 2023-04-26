@@ -71,6 +71,7 @@ public class GameController {
     public PollGetDTO getPoll(@RequestHeader(USERAUTH_HEADER) String token, @PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId) {
         User user = userService.getUserByToken(token);
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
+        lobbyService.validateUserIsInLobby(user, lobby);
         Game game = gameService.getGame(lobby);
         gameService.validateGameStarted(game);
         Poll poll = gameService.getCurrentPoll(game);
@@ -88,6 +89,7 @@ public class GameController {
     public void vote(@RequestHeader(USERAUTH_HEADER) String token, @PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @PathVariable("optionId") Long optionId) {
         User user = userService.getUserByToken(token);
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
+        lobbyService.validateUserIsInLobby(user, lobby);
         Game game = gameService.getGame(lobby);
         gameService.validateGameStarted(game);
         Poll poll = gameService.getCurrentPoll(game);
@@ -103,6 +105,7 @@ public class GameController {
     public void removeVote(@RequestHeader(USERAUTH_HEADER) String token, @PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @PathVariable("optionId") Long optionId) {
         User user = userService.getUserByToken(token);
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
+        lobbyService.validateUserIsInLobby(user, lobby);
         Game game = gameService.getGame(lobby);
         gameService.validateGameStarted(game);
         Poll poll = gameService.getCurrentPoll(game);
