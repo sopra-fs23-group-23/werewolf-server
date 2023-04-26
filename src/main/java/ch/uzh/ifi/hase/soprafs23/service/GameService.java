@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
+import ch.uzh.ifi.hase.soprafs23.logic.game.GameObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
@@ -25,7 +27,7 @@ import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 
 @Service
 @Transactional
-public class GameService{
+public class GameService implements GameObserver{
     private Map<Long, Game> games = new HashMap<>();
 
     /**
@@ -134,5 +136,14 @@ public class GameService{
     public FractionGetDTO getFractionGetDTO(Game game) {
         assert game.isFinished();
         return LogicDTOMapper.convertFractionToFractionGetDTO(game.getWinner());
+    }
+
+    @Override
+    public void onNewPoll(Game game) {
+        Poll poll = game.getCurrentPoll();
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.SECOND, poll.getDurationSeconds());
+        poll.setScheduledFinish(calendar.getTime());
+        schedule(poll::finish, poll.getDurationSeconds());
     }
 }

@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.rest.logicmapper;
 
-import java.util.Calendar;
 import java.util.stream.StreamSupport;
 
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
@@ -103,9 +102,7 @@ public final class LogicDTOMapper {
         pollGetDTO.setPollOptions(
             poll.getPollOptions().stream().map(LogicDTOMapper::convertPollOptionToPollOptionGetDTO).toList()
         );
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.SECOND, poll.getDurationSeconds());
-        pollGetDTO.setScheduledFinish(calendar.getTime());
+        pollGetDTO.setScheduledFinish(poll.getScheduledFinish());
         return pollGetDTO;
     }
 
