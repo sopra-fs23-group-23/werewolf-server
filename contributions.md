@@ -66,33 +66,33 @@ https://github.com/sopra-fs23-group-23/werewolf-server/issues/194
 
 ## Week 4 (19.04 - 25.04)
 ### Michel Sabbatini
-https://github.com/sopra-fs23-group-23/werewolf-server/issues/180
-https://github.com/sopra-fs23-group-23/werewolf-server/issues/181
-https://github.com/sopra-fs23-group-23/werewolf-server/issues/195
+https://github.com/sopra-fs23-group-23/werewolf-server/issues/180  
+https://github.com/sopra-fs23-group-23/werewolf-server/issues/181  
+https://github.com/sopra-fs23-group-23/werewolf-server/issues/195  
 
 ### Miro Vannini
-https://github.com/sopra-fs23-group-23/werewolf-client/issues/71
-https://github.com/sopra-fs23-group-23/werewolf-client/issues/70
+https://github.com/sopra-fs23-group-23/werewolf-client/issues/71  
+https://github.com/sopra-fs23-group-23/werewolf-client/issues/70  
 
 ### Marvin Wiedenkeller
-https://github.com/sopra-fs23-group-23/werewolf-client/issues/84
-https://github.com/sopra-fs23-group-23/werewolf-client/issues/24
-https://github.com/sopra-fs23-group-23/werewolf-client/issues/82
+https://github.com/sopra-fs23-group-23/werewolf-client/issues/84  
+https://github.com/sopra-fs23-group-23/werewolf-client/issues/24  
+https://github.com/sopra-fs23-group-23/werewolf-client/issues/82  
 
 ### David Scherrer
-https://github.com/sopra-fs23-group-23/werewolf-client/issues/25
-https://github.com/sopra-fs23-group-23/werewolf-client/issues/26
-https://github.com/sopra-fs23-group-23/werewolf-client/issues/80
-https://github.com/sopra-fs23-group-23/werewolf-client/issues/81
-https://github.com/sopra-fs23-group-23/werewolf-client/issues/83
-https://github.com/sopra-fs23-group-23/werewolf-client/issues/85
+https://github.com/sopra-fs23-group-23/werewolf-client/issues/25  
+https://github.com/sopra-fs23-group-23/werewolf-client/issues/26  
+https://github.com/sopra-fs23-group-23/werewolf-client/issues/80  
+https://github.com/sopra-fs23-group-23/werewolf-client/issues/81  
+https://github.com/sopra-fs23-group-23/werewolf-client/issues/83  
+https://github.com/sopra-fs23-group-23/werewolf-client/issues/85  
 
 ### Jan Lüthi
-https://github.com/sopra-fs23-group-23/werewolf-server/issues/145
-https://github.com/sopra-fs23-group-23/werewolf-server/issues/151
-https://github.com/sopra-fs23-group-23/werewolf-server/issues/152
-https://github.com/sopra-fs23-group-23/werewolf-server/issues/153
-https://github.com/sopra-fs23-group-23/werewolf-server/issues/154
-https://github.com/sopra-fs23-group-23/werewolf-server/issues/174
-https://github.com/sopra-fs23-group-23/werewolf-server/issues/175
-https://github.com/sopra-fs23-group-23/werewolf-server/issues/196
+https://github.com/sopra-fs23-group-23/werewolf-server/issues/145  
+https://github.com/sopra-fs23-group-23/werewolf-server/issues/151  
+https://github.com/sopra-fs23-group-23/werewolf-server/issues/152  
+https://github.com/sopra-fs23-group-23/werewolf-server/issues/153  
+https://github.com/sopra-fs23-group-23/werewolf-server/issues/154  
+https://github.com/sopra-fs23-group-23/werewolf-server/issues/174  
+https://github.com/sopra-fs23-group-23/werewolf-server/issues/175  
+https://github.com/sopra-fs23-group-23/werewolf-server/issues/196  
