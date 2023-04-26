@@ -86,8 +86,10 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public FractionGetDTO getWinner(@RequestHeader(USERAUTH_HEADER) String token, @PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId) {
+        User user = userService.getUserByToken(token);
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
         Game game = gameService.getGame(lobby);
+        lobbyService.validateUserIsInLobby(user, lobby);
         if(!game.isFinished()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Game is not finished yet.");
         }
