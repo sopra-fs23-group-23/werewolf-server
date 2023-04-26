@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,9 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.PollGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.PollOptionGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.PollParticipantGetDTO;
 
 public class GameServiceTest {
     GameService gameService = new GameService();
@@ -79,6 +83,19 @@ public class GameServiceTest {
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->gameService.validateParticipant(poll, user));
         assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
+    }
+
+    @Test
+    void testCensorPollGetDTO() {
+        PollGetDTO pollGetDTO = new PollGetDTO();
+
+        pollGetDTO.setParticipants(List.of(mock(PollParticipantGetDTO.class)));
+        pollGetDTO.setPollOptions(List.of(mock(PollOptionGetDTO.class)));
+
+        gameService.censorPollGetDTO(pollGetDTO);
+
+        assertEquals(Collections.emptyList(), pollGetDTO.getParticipants());
+        assertEquals(Collections.emptyList(), pollGetDTO.getPollOptions());
     }
 
     @Test

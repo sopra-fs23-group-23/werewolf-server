@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -23,6 +24,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.PollGetDTO;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
@@ -77,6 +79,46 @@ public class GameControllerTest {
 
         verify(lobbyService).validateUserIsInLobby(user, lobby);
         verify(gameService).toGameGetDTO(game);
+    }
+
+    @Test
+    void testGetPoll() throws Exception {
+        // Test GameController getPoll
+        Poll poll = mock(Poll.class);
+        Mockito.when(userService.getUserByToken("token")).thenReturn(user);
+        Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
+        Mockito.when(gameService.getGame(lobby)).thenReturn(game);
+        Mockito.when(gameService.getCurrentPoll(game)).thenReturn(poll);
+        Mockito.when(gameService.isPollParticipant(poll, user)).thenReturn(true);
+
+        MockHttpServletRequestBuilder getRequest = get("/games/1/polls")
+            .header(USERAUTH_HEADER, "token");
+
+        mockMvc.perform(getRequest)
+            .andExpect(status().isOk());
+
+        verify(gameService).toPollGetDTO(poll);
+        verify(gameService, never()).censorPollGetDTO(Mockito.any(PollGetDTO.class));
+    }
+
+    @Test
+    void testGetPoll_nonParticipant() throws Exception {
+        // Test GameController getPoll
+        Poll poll = mock(Poll.class);
+        Mockito.when(userService.getUserByToken("token")).thenReturn(user);
+        Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
+        Mockito.when(gameService.getGame(lobby)).thenReturn(game);
+        Mockito.when(gameService.getCurrentPoll(game)).thenReturn(poll);
+        Mockito.when(gameService.isPollParticipant(poll, user)).thenReturn(false);
+
+        MockHttpServletRequestBuilder getRequest = get("/games/1/polls")
+            .header(USERAUTH_HEADER, "token");
+
+        mockMvc.perform(getRequest)
+            .andExpect(status().isOk());
+
+        verify(gameService).toPollGetDTO(poll);
+        verify(gameService).censorPollGetDTO(Mockito.any());
     }
 
     @Test

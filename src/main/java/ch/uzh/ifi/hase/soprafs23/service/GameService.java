@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -18,6 +19,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.PollGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 
 @Service
@@ -64,10 +66,24 @@ public class GameService{
         }
     }
 
+    public boolean isPollParticipant(Poll poll, User user) {
+        return poll.getPollParticipants().stream().anyMatch(p->p.getPlayer().getId() == user.getId());
+    }
+
     public void validateParticipant(Poll poll, User user) {
-        if (!poll.getPollParticipants().stream().anyMatch(p->p.getPlayer().getId() == user.getId())) {
+        if (!isPollParticipant(poll, user)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not participant in this poll.");
         }
+    }
+
+    public PollGetDTO toPollGetDTO(Poll poll) {
+        return LogicDTOMapper.convertPollToPollGetDTO(poll);
+    }
+
+    public PollGetDTO censorPollGetDTO (PollGetDTO pollGetDTO) {
+        pollGetDTO.setParticipants(Collections.emptyList());
+        pollGetDTO.setPollOptions(Collections.emptyList());
+        return pollGetDTO;
     }
 
     /**

@@ -22,6 +22,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.PollGetDTO;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
@@ -61,6 +62,22 @@ public class GameController {
         lobbyService.validateUserIsInLobby(user, lobby);
         Game game = gameService.getGame(lobby);
         return gameService.toGameGetDTO(game);
+    }
+
+    @GetMapping("/games/{lobbyId}/polls")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public PollGetDTO getPoll(@RequestHeader(USERAUTH_HEADER) String token, @PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId) {
+        User user = userService.getUserByToken(token);
+        Lobby lobby = lobbyService.getLobbyById(lobbyId);
+        Game game = gameService.getGame(lobby);
+        Poll poll = gameService.getCurrentPoll(game);
+        PollGetDTO pollGetDTO = gameService.toPollGetDTO(poll);
+        if (gameService.isPollParticipant(poll, user)) {
+            return pollGetDTO;
+        } else {
+            return gameService.censorPollGetDTO(pollGetDTO);
+        }
     }
 
     @PutMapping("/games/{lobbyId}/votes/{optionId}")
