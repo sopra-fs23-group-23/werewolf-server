@@ -12,8 +12,6 @@ import java.util.Collection;
 import java.util.List;
 
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
-import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
-import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
 import org.junit.jupiter.api.Test;
 
 public class LobbyTest {
