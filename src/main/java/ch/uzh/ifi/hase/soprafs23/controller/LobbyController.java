@@ -16,19 +16,15 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
-import ch.uzh.ifi.hase.soprafs23.service.wrapper.PlayerEmitter;
 
 /**
  * This class handles all requests related to lobby
@@ -50,14 +46,7 @@ public class LobbyController {
     public LobbyGetDTO createNewLobby(@RequestHeader(USERAUTH_HEADER) String userToken) {
         User user = userService.getUserByToken(userToken);
         Lobby l = lobbyService.createNewLobby(user);
-        PlayerEmitter emitter = lobbyService.createLobbyPlayerEmitter(l);
-        lobbyService.joinUserToLobbyPlayerEmitter(emitter, user);
         return LogicDTOMapper.convertLobbyToLobbyGetDTO(l);
-    }
-
-    private String lobbyToJSON(Lobby lobby) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(LogicDTOMapper.convertLobbyToLobbyGetDTO(lobby));
     }
 
     @PutMapping("/lobbies/{lobbyId}")
@@ -68,9 +57,6 @@ public class LobbyController {
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
         lobbyService.validateLobbyIsOpen(lobby);
         lobbyService.joinUserToLobby(user, lobby);
-        PlayerEmitter emitter = lobbyService.getLobbyPlayerEmitter(lobby);
-        lobbyService.sendEmitterUpdate(emitter, lobbyToJSON(lobby), LobbySseEvent.update);
-        lobbyService.joinUserToLobbyPlayerEmitter(emitter, user);
     }
 
     @GetMapping("/lobbies/{lobbyId}")
@@ -81,16 +67,6 @@ public class LobbyController {
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
         lobbyService.validateUserIsInLobby(user, lobby);
         return LogicDTOMapper.convertLobbyToLobbyGetDTO(lobby);
-    }
-
-    @GetMapping("/lobbies/{lobbyId}/sse/{token}")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public SseEmitter getLobbySseEmitter(@PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @PathVariable("token") String token) {
-        User user = userService.getUserByToken(token);
-        Lobby lobby = lobbyService.getLobbyById(lobbyId);
-        PlayerEmitter emitter = lobbyService.getLobbyPlayerEmitter(lobby);
-        return lobbyService.getUserSseEmitter(emitter, user);
     }
 
     @GetMapping("/lobbies/{lobbyId}/roles")

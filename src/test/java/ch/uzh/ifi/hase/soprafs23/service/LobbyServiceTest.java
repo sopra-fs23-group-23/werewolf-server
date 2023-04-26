@@ -22,7 +22,6 @@ import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
-import ch.uzh.ifi.hase.soprafs23.service.wrapper.PlayerEmitter;
 
 public class LobbyServiceTest {
     LobbyService lobbyService = new LobbyService();
@@ -182,14 +181,6 @@ public class LobbyServiceTest {
         Mockito.when(lobby.getLobbySize()).thenReturn(Lobby.MAX_SIZE+1);
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->lobbyService.validateLobbySize(lobby));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
-    }
-
-    // test createLobbyPlayerEmitter and getLobbyPlayerEmitter
-    @Test
-    void testCreateAndGetLobbyPlayerEmitter() {
-        Lobby lobby = mock(Lobby.class);
-        PlayerEmitter expected = lobbyService.createLobbyPlayerEmitter(lobby);
-        assertEquals(expected, lobbyService.getLobbyPlayerEmitter(lobby));
     }
 
     @Test

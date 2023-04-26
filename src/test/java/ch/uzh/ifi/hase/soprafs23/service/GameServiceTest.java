@@ -2,22 +2,17 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
-
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
@@ -25,8 +20,6 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
-import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
-import ch.uzh.ifi.hase.soprafs23.service.wrapper.PlayerEmitter;
 
 public class GameServiceTest {
     GameService gameService = new GameService();
@@ -36,20 +29,6 @@ public class GameServiceTest {
         Mockito.when(mockLobby.getId()).thenReturn(1l);
         Mockito.when(mockLobby.getLobbySize()).thenReturn(Lobby.MIN_SIZE);
         return mockLobby;
-    }
-
-    private Game createValidMockGame() {
-        Game mockGame = mock(Game.class);
-        Lobby mockLobby = createValidMockLobby();
-        Mockito.when(mockGame.getLobby()).thenReturn(mockLobby);
-        return mockGame;
-    }
-
-    @Test
-    void testCreateGameEmitter() {
-        Game game = createValidMockGame();
-        PlayerEmitter emitter = gameService.createGameEmitter(game);
-        assertEquals(emitter, gameService.getGameEmitter(game));
     }
 
     @Test
@@ -71,7 +50,6 @@ public class GameServiceTest {
         Game game = mock(Game.class);
         gameService.startGame(game);
         verify(game).startGame();
-        verify(game).addObserver(gameService);
     }
 
     @Test
@@ -170,31 +148,6 @@ public class GameServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->gameService.castVote(poll, participant, option));
         assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
         assertEquals("test", exception.getReason());   
-    }
-
-    @Test
-    void testSendPollUpdateToAffectedUsers() throws IOException {
-        PlayerEmitter gameEmitter = mock(PlayerEmitter.class);
-        Poll poll = mock(Poll.class);
-        PollParticipant p1 = mock(PollParticipant.class);
-        PollParticipant p2 = mock(PollParticipant.class);
-        Player player1 = mock(Player.class);
-        Player player2 = mock(Player.class);
-        SseEmitter emitter1 = mock(SseEmitter.class);
-        SseEmitter emitter2 = mock(SseEmitter.class);
-
-        when(p1.getPlayer()).thenReturn(player1);
-        when(p2.getPlayer()).thenReturn(player2);
-        when(player1.getId()).thenReturn(1l);
-        when(player2.getId()).thenReturn(2l);
-        when(poll.getPollParticipants()).thenReturn(List.of(p1,p2));
-        doReturn(Villager.class).when(poll).getRole();
-        when(gameEmitter.getPlayerEmitter(1l)).thenReturn(emitter1);
-        when(gameEmitter.getPlayerEmitter(2l)).thenReturn(emitter2);
-
-        gameService.sendPollUpdateToAffectedUsers(gameEmitter, poll);
-        verify(emitter1).send(Mockito.any(SseEventBuilder.class));
-        verify(emitter2).send(Mockito.any(SseEventBuilder.class));
     }
 
     @Test

@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,10 +14,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import ch.uzh.ifi.hase.soprafs23.constant.sse.GameSseEvent;
-import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
@@ -28,7 +23,6 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
-import ch.uzh.ifi.hase.soprafs23.service.wrapper.PlayerEmitter;
 
 @RestController
 public class GameController {
@@ -53,27 +47,7 @@ public class GameController {
         lobbyService.closeLobby(lobby);
         lobbyService.assignRoles(lobby);
         Game game = gameService.createNewGame(lobby);
-        gameService.createGameEmitter(game);
-        lobbyService.sendEmitterUpdate(lobbyService.getLobbyPlayerEmitter(lobby), "", LobbySseEvent.game);
-        gameService.schedule(new Runnable() {
-            @Override
-            public void run() {
-                gameService.startGame(game);
-                PlayerEmitter gameEmitter = gameService.getGameEmitter(game);
-                gameService.sendGameEmitterUpdate(gameEmitter, "", GameSseEvent.start);
-            }
-        }, 30);
-    }
-
-    @GetMapping("/games/{lobbyId}/sse/{token}")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public SseEmitter getPlayerSseEmitter(@PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @PathVariable("token") String token) {
-        User user = userService.getUserByToken(token);
-        Lobby lobby = lobbyService.getLobbyById(lobbyId);
-        lobbyService.validateUserIsInLobby(user, lobby);
-        Game game = gameService.getGame(lobby);
-        return gameService.getPlayerSseEmitter(game, user);
+        gameService.schedule(() -> gameService.startGame(game), 30);
     }
 
     @PutMapping("/games/{lobbyId}/votes/{optionId}")
@@ -88,8 +62,6 @@ public class GameController {
         PollParticipant participant = gameService.getParticipant(poll, user);
         PollOption option = gameService.getPollOption(poll, optionId);
         gameService.castVote(poll, participant, option);
-        PlayerEmitter emitter = gameService.getGameEmitter(game);
-        gameService.sendPollUpdateToAffectedUsers(emitter, poll);
     }
 
     @DeleteMapping("/games/{lobbyId}/votes/{optionId}")
@@ -104,8 +76,6 @@ public class GameController {
         PollParticipant participant = gameService.getParticipant(poll, user);
         PollOption option = gameService.getPollOption(poll, optionId);
         gameService.removeVote(poll, participant, option);
-        PlayerEmitter emitter = gameService.getGameEmitter(game);
-        gameService.sendPollUpdateToAffectedUsers(emitter, poll);
     }
 
     

@@ -17,10 +17,11 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
 public class Game implements StageObserver{
     private Lobby lobby;
     private Stage currentStage;
+    private Optional<Poll> currentPoll = Optional.empty();
+    private Optional<Fraction> winner = Optional.empty();
     private int stageCount = 0;
     private boolean finished = false;
     private List<PollCommand> lastStagePollCommands = new ArrayList<>();
-    private List<GameObserver> observers = new ArrayList<>();
 
     /**
      * @pre lobby.getLobbySize() <= Lobby.MAX_SIZE && lobby.getLobbySize() >= Lobby.MIN_SIZE && lobby roles assigned
@@ -49,7 +50,6 @@ public class Game implements StageObserver{
         currentStage = nextStage;
         currentStage.addObserver(this);
         currentStage.startStage();
-        observers.stream().forEach(o -> o.onNewStage(this));
     }
 
     public Lobby getLobby() {
@@ -64,8 +64,18 @@ public class Game implements StageObserver{
         return lastStagePollCommands;
     }
 
-    public void addObserver(GameObserver observer) {
-        observers.add(observer);
+    public Poll getCurrentPoll() throws IllegalStateException{
+        if (currentPoll.isEmpty()) {
+            throw new IllegalStateException("No poll is currently running");
+        }
+        return currentPoll.get();
+    }
+
+    public Fraction getWinner() {
+        if (winner.isEmpty()) {
+            throw new IllegalStateException("Game is not finished yet");
+        }
+        return winner.get();
     }
 
     @Override
@@ -82,7 +92,7 @@ public class Game implements StageObserver{
     }
 
     private void finishGame(Fraction winningFraction) {
-        observers.stream().forEach(o -> o.onGameEnd(this, winningFraction));
+        winner = Optional.of(winningFraction);
         finished = true;
     }
 
@@ -112,7 +122,7 @@ public class Game implements StageObserver{
 
     @Override
     public void onNewPoll(Poll poll) {
-        observers.stream().forEach(o -> o.onNewPoll(this, poll));   
+        currentPoll = Optional.of(poll);   
     }
     
 }
