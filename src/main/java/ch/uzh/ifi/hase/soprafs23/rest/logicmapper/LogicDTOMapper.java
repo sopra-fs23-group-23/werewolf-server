@@ -25,6 +25,7 @@ public final class LogicDTOMapper {
         lobbyDTO.setPlayers(
             StreamSupport.stream(lobby.getPlayers().spliterator(), false).map(LogicDTOMapper::convertPlayerToPlayerGetDTO).toList()
         );
+        lobbyDTO.setClosed(!lobby.isOpen());
         return lobbyDTO;
     }
 
@@ -72,6 +73,7 @@ public final class LogicDTOMapper {
         gameGetDTO.setActions(game.getLastStagePollCommands().stream().map(LogicDTOMapper::convertPollCommandToPollCommandGetDTO).toList());
         gameGetDTO.setLobby(convertLobbyToLobbyGetDTO(game.getLobby()));
         gameGetDTO.setStage(convertStageToStageGetDTO(game.getCurrentStage()));
+        gameGetDTO.setFinished(game.isFinished());
         return gameGetDTO;
     }
 

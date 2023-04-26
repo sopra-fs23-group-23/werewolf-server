@@ -6,21 +6,15 @@ import java.util.stream.StreamSupport;
 
 import javax.transaction.Transactional;
 
-import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
-
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
-import ch.uzh.ifi.hase.soprafs23.service.helper.EmitterHelper;
-import ch.uzh.ifi.hase.soprafs23.service.wrapper.PlayerEmitter;
 
 @Service
 @Transactional
@@ -28,7 +22,6 @@ public class LobbyService {
     public static final String LOBBYID_PATHVARIABLE = "lobbyId";
 
     private Map<Long, Lobby> lobbies = new HashMap<>();
-    private Map<Long, PlayerEmitter> lobbyEmitterMap = new HashMap<>();
 
     private Long createLobbyId() {
         Long newId = ThreadLocalRandom.current().nextLong(100000, 999999);
@@ -95,40 +88,6 @@ public class LobbyService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a lobby.");
         }
         lobby.addPlayer(LogicEntityMapper.createPlayerFromUser(user));
-    }
-
-    public PlayerEmitter createLobbyPlayerEmitter(Lobby lobby) {
-        if (lobbyEmitterMap.containsKey(lobby.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Lobby already has an emitter.");
-        }
-        PlayerEmitter emitter = new PlayerEmitter();
-        lobbyEmitterMap.put(lobby.getId(), emitter);
-        return emitter;
-    }
-
-    public void joinUserToLobbyPlayerEmitter(PlayerEmitter emitter, User user) {
-        if (emitter.containsKey(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User already has a sse emitter.");
-        }
-        emitter.addPlayerEmitter(user.getId(), PlayerEmitter.createDefaulEmitter());
-    }
-
-    public PlayerEmitter getLobbyPlayerEmitter (Lobby lobby) {
-        if (!lobbyEmitterMap.containsKey(lobby.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby sse emitter not found.");
-        }
-        return lobbyEmitterMap.get(lobby.getId());
-    }
-
-    public SseEmitter getUserSseEmitter (PlayerEmitter emitter, User user) {
-        if (!emitter.containsKey(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User sse emitter not found.");
-        }
-        return emitter.getPlayerEmitter(user.getId());
-    }
-
-    public void sendEmitterUpdate(PlayerEmitter emitter, String data, LobbySseEvent eventType) {
-        emitter.forAllPlayerEmitters(e -> EmitterHelper.sendEmitterUpdate(e, data, eventType.toString()));
     }
 
     public void validateUserIsAdmin(User user, Lobby lobby) {

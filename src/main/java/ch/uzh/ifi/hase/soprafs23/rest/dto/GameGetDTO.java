@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.rest.dto;
 import java.util.List;
 
 public class GameGetDTO {
+    private boolean finished;
     private StageGetDTO stage;
     private LobbyGetDTO lobby;
     private List<PollCommandGetDTO> actions;
@@ -24,5 +25,13 @@ public class GameGetDTO {
     }
     public void setActions(List<PollCommandGetDTO> actions) {
         this.actions = actions;
-    }  
+    }
+    public boolean isFinished() {
+        return finished;
+    }
+    public void setFinished(boolean isFinished) {
+        this.finished = isFinished;
+    }
+
+    
 }

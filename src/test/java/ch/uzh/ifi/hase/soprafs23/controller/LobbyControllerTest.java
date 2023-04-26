@@ -3,7 +3,6 @@ package ch.uzh.ifi.hase.soprafs23.controller;
 import static org.hamcrest.Matchers.is;
 
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -11,8 +10,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
-
-import ch.uzh.ifi.hase.soprafs23.constant.sse.LobbySseEvent;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
@@ -29,7 +26,6 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
-import ch.uzh.ifi.hase.soprafs23.service.wrapper.PlayerEmitter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,10 +53,8 @@ public class LobbyControllerTest {
     void createNewLobbyTest() throws Exception {
         User tUser = createTestUser("test", 1L);
         Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(tUser));
-        PlayerEmitter emitter = mock(PlayerEmitter.class);
         Mockito.when(userService.getUserByToken("token")).thenReturn(tUser);
         Mockito.when(lobbyService.createNewLobby(tUser)).thenReturn(lobby);
-        Mockito.when(lobbyService.createLobbyPlayerEmitter(lobby)).thenReturn(emitter);
 
         MockHttpServletRequestBuilder postRequest = post("/lobbies")
             .header(USERAUTH_HEADER, "token");
@@ -69,7 +63,6 @@ public class LobbyControllerTest {
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.id", is(lobby.getId().intValue())))
             .andExpect(jsonPath("$.admin.id", is(tUser.getId().intValue())));
-        verify(lobbyService).joinUserToLobbyPlayerEmitter(emitter, tUser);
     }
 
     @Test
@@ -77,11 +70,9 @@ public class LobbyControllerTest {
         User admin = createTestUser("admin", 1l);
         User joiningUser = createTestUser("joiningUser", 2l);
         Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
-        PlayerEmitter emitter = mock(PlayerEmitter.class);
 
         Mockito.when(userService.getUserByToken("token")).thenReturn(joiningUser);
         Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
-        Mockito.when(lobbyService.getLobbyPlayerEmitter(lobby)).thenReturn(emitter);
 
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1")
             .header(USERAUTH_HEADER, "token");
@@ -90,8 +81,6 @@ public class LobbyControllerTest {
             .andExpect(status().isNoContent());
 
         verify(lobbyService).joinUserToLobby(joiningUser, lobby);
-        verify(lobbyService).sendEmitterUpdate(Mockito.any(PlayerEmitter.class), Mockito.anyString(), Mockito.any(LobbySseEvent.class));
-        verify(lobbyService).joinUserToLobbyPlayerEmitter(emitter, joiningUser);
     }
 
     @Test
@@ -113,24 +102,6 @@ public class LobbyControllerTest {
             .andExpect(jsonPath("$.id", is(lobby.getId().intValue())))
             .andExpect(jsonPath("$.admin.id", is(admin.getId().intValue())))
             .andExpect(jsonPath(String.format("$.players[?(@.id == %d)]", usr.getId())).exists());
-    }
-
-    @Test
-    void testGetLobbySseEmitter() throws Exception {
-        Lobby lobby = mock(Lobby.class);
-        User user = mock(User.class);
-        PlayerEmitter emitter = mock(PlayerEmitter.class);
-
-        Mockito.when(userService.getUserByToken("token123")).thenReturn(user);
-        Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
-        Mockito.when(lobbyService.getLobbyPlayerEmitter(lobby)).thenReturn(emitter);
-
-        MockHttpServletRequestBuilder getRequest = get("/lobbies/1/sse/token123");
-
-        mockMvc.perform(getRequest)
-            .andExpect(status().isOk());
-
-        verify(lobbyService).getUserSseEmitter(emitter, user);
     }
 
     @Test

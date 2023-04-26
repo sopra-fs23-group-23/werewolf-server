@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.logic.game;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.mockito.Mockito.mock;
@@ -18,6 +19,42 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 
 public class StageTest {
+    private class StageObserverMock implements StageObserver {
+        private final Stage stage;
+        private final Poll expectedPoll;
+        private final List<PollCommand> expectedCommands;
+
+        private boolean onStageFinishedCalled = false;
+        private boolean onNewPollCalled = false;
+
+        public StageObserverMock(Stage stage, Poll expectedPoll, List<PollCommand> expectedCommands) {
+            this.stage = stage;
+            this.expectedPoll = expectedPoll;
+            this.expectedCommands = expectedCommands;
+        }
+
+        @Override
+        public void onStageFinished() {
+            assertThat("List equality without order", stage.getPollCommands(), containsInAnyOrder(expectedCommands.toArray()));
+            onStageFinishedCalled = true;
+        }
+
+        @Override
+        public void onNewPoll(Poll poll) {
+            assertEquals(expectedPoll, poll);
+            stage.onPollFinished();
+            onNewPollCalled = true;
+        }
+
+        public boolean isOnStageFinishedCalled() {
+            return onStageFinishedCalled;
+        }
+
+        public boolean isOnNewPollCalled() {
+            return onNewPollCalled;
+        }
+    }
+
     @Test
     void testStartStage() {
         Poll expected = mock(Poll.class);
@@ -32,18 +69,10 @@ public class StageTest {
         Queue<Supplier<Optional<Poll>>> pollSupplierQueue = new LinkedList<>(List.of(s1, s2, s3));
 
         Stage stage = new Stage(StageType.Day, pollSupplierQueue);
-        stage.addObserver(new StageObserver() {
-            @Override
-            public void onStageFinished() {
-                assertThat("List equality without order", stage.getPollCommands(), containsInAnyOrder(List.of(expectedCommand).toArray()));
-            }
-
-            @Override
-            public void onNewPoll(Poll poll) {
-                assertEquals(expected, poll);
-                stage.onPollFinished();
-            }
-        });
+        StageObserverMock observer = new StageObserverMock(stage, expected, List.of(expectedCommand));
+        stage.addObserver(observer);
         stage.startStage();
+        assertTrue(observer.isOnStageFinishedCalled());
+        assertTrue(observer.isOnNewPollCalled());
     }
 }

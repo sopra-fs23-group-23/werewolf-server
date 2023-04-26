@@ -1,43 +1,32 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.FractionGetDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import ch.uzh.ifi.hase.soprafs23.constant.sse.GameSseEvent;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
-import ch.uzh.ifi.hase.soprafs23.logic.game.GameObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.PollGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
-import ch.uzh.ifi.hase.soprafs23.service.helper.EmitterHelper;
-import ch.uzh.ifi.hase.soprafs23.service.wrapper.PlayerEmitter;
 
 @Service
 @Transactional
-public class GameService implements GameObserver{
+public class GameService{
     private Map<Long, Game> games = new HashMap<>();
-    private Map<Long, PlayerEmitter> gameEmitterMap = new HashMap<>();
-    private Map<Long, Poll> gamePollMap = new HashMap<>();
 
     /**
      * @pre lobby.getLobbySize() <= Lobby.MAX_SIZE && lobby.getLobbySize() >= Lobby.MIN_SIZE && lobby roles assigned
@@ -57,49 +46,18 @@ public class GameService implements GameObserver{
         return games.get(lobby.getId());
     }
 
-    public PlayerEmitter createGameEmitter(Game game) {
-        PlayerEmitter gameEmitter = new PlayerEmitter(game);
-        gameEmitterMap.put(game.getLobby().getId(), gameEmitter);
-        return gameEmitter;
-    }
-
-    /**
-     * @pre gameEmitterMap.containsKey(game.getLobby().getId())
-     * @param game
-     * @return
-     */
-    public PlayerEmitter getGameEmitter(Game game) {
-        assert gameEmitterMap.containsKey(game.getLobby().getId());
-        return gameEmitterMap.get(game.getLobby().getId());
-    }
-
-    /**
-     * @pre game lobby contains user
-     * @param game
-     * @param user
-     * @return
-     */
-    public SseEmitter getPlayerSseEmitter(Game game, User user) {
-        return gameEmitterMap.get(game.getLobby().getId()).getPlayerEmitter(user.getId());
-    }
-
-    public void sendEmitterUpdate(SseEmitter emitter, String data, GameSseEvent gameSseEvent) {
-        EmitterHelper.sendEmitterUpdate(emitter, data, gameSseEvent.toString());
-    }
-
-    public void sendGameEmitterUpdate(PlayerEmitter gameEmitterWrapper, String data, GameSseEvent event) {
-        Consumer<SseEmitter> action = new Consumer<SseEmitter>() {
-            @Override
-            public void accept(SseEmitter t) {
-                sendEmitterUpdate(t, data, event);
-            }
-        };
-        gameEmitterWrapper.forAllPlayerEmitters(action);
+    public GameGetDTO toGameGetDTO(Game game) {
+        return LogicDTOMapper.convertGameToGameGetDTO(game);
     }
 
     public void startGame(Game game) {
-        game.addObserver(this);
         game.startGame();
+    }
+
+    public void validateGameStarted(Game game) {
+        if (!game.isStarted()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Game has not started yet.");
+        }
     }
 
     public void schedule(Runnable command, int delaySeconds) {
@@ -107,69 +65,32 @@ public class GameService implements GameObserver{
         executorService.schedule(command, delaySeconds, TimeUnit.SECONDS);
     }
 
-    private String mapDTOToJson(Object dto) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(dto);
-    }
-
-    @Override
-    public void onNewStage(Game game) {
-        PlayerEmitter emitter = getGameEmitter(game);
-        GameGetDTO dto = LogicDTOMapper.convertGameToGameGetDTO(game);
-        try {
-            sendGameEmitterUpdate(emitter, mapDTOToJson(dto), GameSseEvent.stage);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void sendPollUpdateToAffectedUsers(PlayerEmitter gameEmitter, Poll poll) {
-        String pollJson;
-        try {
-            pollJson = mapDTOToJson(LogicDTOMapper.convertPollToPollGetDTO(poll));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            System.err.println("Failed to send poll updates");
-            return;
-        }
-
-        poll.getPollParticipants().forEach(p -> {
-            SseEmitter playerEmitter = gameEmitter.getPlayerEmitter(p.getPlayer().getId());
-            try {
-                sendEmitterUpdate(playerEmitter, pollJson, GameSseEvent.poll);
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.err.println("Failed to send poll update to player");
-            }
-        });
-    }
-
-    @Override
-    public void onNewPoll(Game game, Poll poll) {
-        Long gameId = game.getLobby().getId();
-        if (!gameEmitterMap.containsKey(gameId)) {
-            System.err.println("Failed to send poll to game " + gameId + " because no emitter was found");
-            return;
-        }
-        gamePollMap.put(gameId, poll);
-        PlayerEmitter emitter = getGameEmitter(game);
-        sendPollUpdateToAffectedUsers(emitter, poll);
-        schedule(poll::finish, poll.getDurationSeconds());
-    }
-
     public Poll getCurrentPoll(Game game) {
-        Long lobbyId = game.getLobby().getId();
-        if (!gamePollMap.containsKey(lobbyId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Currently there is no poll active for this game.");
+        try {
+            return game.getCurrentPoll();
+        } catch (IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
-        return gamePollMap.get(lobbyId);
+    }
+
+    public boolean isPollParticipant(Poll poll, User user) {
+        return poll.getPollParticipants().stream().anyMatch(p->p.getPlayer().getId() == user.getId());
     }
 
     public void validateParticipant(Poll poll, User user) {
-        if (!poll.getPollParticipants().stream().anyMatch(p->p.getPlayer().getId() == user.getId())) {
+        if (!isPollParticipant(poll, user)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not participant in this poll.");
         }
+    }
+
+    public PollGetDTO toPollGetDTO(Poll poll) {
+        return LogicDTOMapper.convertPollToPollGetDTO(poll);
+    }
+
+    public PollGetDTO censorPollGetDTO (PollGetDTO pollGetDTO) {
+        pollGetDTO.setParticipants(Collections.emptyList());
+        pollGetDTO.setPollOptions(Collections.emptyList());
+        return pollGetDTO;
     }
 
     /**
@@ -206,21 +127,12 @@ public class GameService implements GameObserver{
         }
     }
 
-    @Override
-    public void onGameEnd(Game game, Fraction fraction) {
-        Long gameId = game.getLobby().getId();
-        if (!gameEmitterMap.containsKey(gameId)) {
-            System.err.println("Failed to send fraction to game " + gameId + " because no emitter was found");
-            return;
-        }
-        PlayerEmitter emitter = getGameEmitter(game);
-        FractionGetDTO dto = LogicDTOMapper.convertFractionToFractionGetDTO(fraction);
-        emitter.forAllPlayerEmitters(t -> {
-            try {
-                sendEmitterUpdate(t, mapDTOToJson(dto), GameSseEvent.finish);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-        });
+    /**
+     * @pre game is finished
+     * @param game
+     */
+    public FractionGetDTO getFractionGetDTO(Game game) {
+        assert game.isFinished();
+        return LogicDTOMapper.convertFractionToFractionGetDTO(game.getWinner());
     }
 }
