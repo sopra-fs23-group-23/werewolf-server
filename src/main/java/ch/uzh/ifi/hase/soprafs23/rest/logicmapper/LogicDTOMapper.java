@@ -25,6 +25,7 @@ public final class LogicDTOMapper {
         lobbyDTO.setPlayers(
             StreamSupport.stream(lobby.getPlayers().spliterator(), false).map(LogicDTOMapper::convertPlayerToPlayerGetDTO).toList()
         );
+        lobbyDTO.setClosed(!lobby.isOpen());
         return lobbyDTO;
     }
 

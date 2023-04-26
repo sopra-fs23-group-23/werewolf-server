@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.rest.dto;
 import java.util.List;
 
 public class LobbyGetDTO {
+    private boolean closed;
     private Long id;
     private PlayerGetDTO admin;
     private List<PlayerGetDTO> players;
@@ -25,4 +26,13 @@ public class LobbyGetDTO {
     public void setPlayers(List<PlayerGetDTO> players) {
         this.players = players;
     }
+    
+    public boolean isClosed() {
+        return closed;
+    }
+    public void setClosed(boolean closed) {
+        this.closed = closed;
+    }
+
+    
 }
