@@ -126,6 +126,12 @@ public class UserService {
     }
 
     private void checkUsernameAndPWLength(User user) {
+        if (user.getUsername().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please choose a username with at least 1 symbol.");
+        }
+        if (user.getPassword().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please choose a password with at least 1 symbol.");
+        }
         if (user.getUsername().length() > 16) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please choose a username that has 16 or less symbols.");
         }
