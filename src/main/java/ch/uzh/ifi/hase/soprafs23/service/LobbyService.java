@@ -12,13 +12,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
+import ch.uzh.ifi.hase.soprafs23.logic.lobby.LobbyObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
 
 @Service
 @Transactional
-public class LobbyService {
+public class LobbyService implements LobbyObserver{
     public static final String LOBBYID_PATHVARIABLE = "lobbyId";
 
     private Map<Long, Lobby> lobbies = new HashMap<>();
@@ -37,6 +38,7 @@ public class LobbyService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already has a lobby");
         }
         Lobby l = new Lobby(createLobbyId(), admin);
+        l.addObserver(this);
         lobbies.put(l.getId(), l);
         return l;
     }
@@ -130,5 +132,21 @@ public class LobbyService {
 
     public void closeLobby(Lobby lobby) {
         lobby.setOpen(false);
+    }
+
+    /**
+     * @pre lobbies contains lobby
+     * @param lobby
+     */
+    public void removeLobby(Lobby lobby) {
+        assert lobbies.containsKey(lobby.getId());
+        lobbies.remove(lobby.getId());
+    }
+
+    @Override
+    public void onLobbyDissolved(Lobby lobby) {
+        if (lobbies.containsKey(lobby.getId())) {
+            lobbies.remove(lobby.getId());
+        }
     }
 }

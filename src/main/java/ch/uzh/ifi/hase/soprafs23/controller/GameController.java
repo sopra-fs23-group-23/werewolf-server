@@ -27,7 +27,6 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.PollGetDTO;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class GameController {
@@ -93,9 +92,7 @@ public class GameController {
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
         Game game = gameService.getGame(lobby);
         lobbyService.validateUserIsInLobby(user, lobby);
-        if(!game.isFinished()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Game is not finished yet.");
-        }
+        gameService.validateGameFinished(game);
         return gameService.getFractionGetDTO(game);
     }
 

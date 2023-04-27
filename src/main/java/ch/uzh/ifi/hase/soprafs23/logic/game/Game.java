@@ -105,6 +105,7 @@ public class Game implements StageObserver{
     private void finishGame(Fraction winningFraction) {
         winner = Optional.of(winningFraction);
         finished = true;
+        observers.stream().forEach(observer->observer.onGameFinished(this));
     }
 
     public boolean isFinished() {

@@ -11,6 +11,7 @@ public class Lobby {
     private Long id;
     private Player admin;
     private Set<Player> players;
+    private List<LobbyObserver> observers = new ArrayList<>();
     private Map<Class<? extends Role>, Role> roles;
     private boolean open;
 
@@ -24,6 +25,10 @@ public class Lobby {
         players.add(admin);
         this.open = true;
         this.roles = new HashMap<>();
+    }
+
+    public void addObserver(LobbyObserver observer) {
+        observers.add(observer);
     }
 
     public int getLobbySize(){
@@ -132,5 +137,9 @@ public class Lobby {
                 .filter(Fraction.class::isInstance)
                 .map(Fraction.class::cast)
                 .toList();
+    }
+
+    public void dissolve() {
+        observers.forEach((o) -> o.onLobbyDissolved(this));
     }
 }

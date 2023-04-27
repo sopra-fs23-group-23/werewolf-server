@@ -198,7 +198,17 @@ public class GameServiceTest {
     }
 
     @Test
-    void testOnGameEnd() {
+    void testValidateGameFinished() {
+        Game game = mock(Game.class);
+        when(game.isFinished()).thenReturn(true);
+        gameService.validateGameFinished(game);
+    }
 
+    @Test
+    void testValidateGameFinished_notFinished() {
+        Game game = mock(Game.class);
+        when(game.isFinished()).thenReturn(false);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->gameService.validateGameFinished(game));
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
     }
 }
