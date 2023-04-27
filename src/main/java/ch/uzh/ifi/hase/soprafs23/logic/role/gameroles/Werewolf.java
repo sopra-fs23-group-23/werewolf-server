@@ -50,7 +50,7 @@ public class Werewolf extends Role implements NightVoter, Fraction{
             "Who do you want to kill tonight?",
             alivePlayers.stream().map(p->new PollOption(p, new KillPlayerPollCommand(p))).toList(),
             getPlayers().stream().filter(Player::isAlive).map(p->new PollParticipant(p)).toList(),
-            30,
+            15,
             new NullResultPollDecider()));
     }
 

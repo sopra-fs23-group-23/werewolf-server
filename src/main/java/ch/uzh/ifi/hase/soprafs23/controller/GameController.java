@@ -52,7 +52,7 @@ public class GameController {
         lobbyService.closeLobby(lobby);
         lobbyService.assignRoles(lobby);
         Game game = gameService.createNewGame(lobby);
-        gameService.schedule(() -> gameService.startGame(game), 30);
+        gameService.schedule(() -> gameService.startGame(game), 15);
     }
 
     @GetMapping("/games/{lobbyId}")
