@@ -23,6 +23,7 @@ public class Game implements StageObserver{
     private int stageCount = 0;
     private boolean finished = false;
     private List<PollCommand> lastStagePollCommands = new ArrayList<>();
+    private List<GameObserver> observers = new ArrayList<>();
 
     /**
      * @pre lobby.getLobbySize() <= Lobby.MAX_SIZE && lobby.getLobbySize() >= Lobby.MIN_SIZE && lobby roles assigned
@@ -31,6 +32,10 @@ public class Game implements StageObserver{
     public Game(Lobby lobby) {
         assert lobby.getLobbySize() <= Lobby.MAX_SIZE && lobby.getLobbySize() >= Lobby.MIN_SIZE;
         this.lobby = lobby;
+    }
+
+    public void addObserver(GameObserver observer) {
+        observers.add(observer);
     }
 
     private Stage calculateNextStage() {
@@ -86,14 +91,14 @@ public class Game implements StageObserver{
 
     @Override
     public void onStageFinished() {
+        lastStagePollCommands = currentStage.getPollCommands();
+        lastStagePollCommands.stream().forEach(p->p.execute());
         for (Fraction fraction : lobby.getFractions()) {
             if(fraction.hasWon()) {
                 finishGame(fraction);
                 return;
             }
         }
-        lastStagePollCommands = currentStage.getPollCommands();
-        lastStagePollCommands.stream().forEach(p->p.execute());
         startNextStage(calculateNextStage());
     }
 
@@ -128,7 +133,8 @@ public class Game implements StageObserver{
 
     @Override
     public void onNewPoll(Poll poll) {
-        currentPoll = Optional.of(poll);   
+        currentPoll = Optional.of(poll);
+        observers.forEach(o -> o.onNewPoll(this));
     }
     
 }

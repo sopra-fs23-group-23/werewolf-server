@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.logic.poll;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,7 @@ public class Poll{
     private List<PollOption> pollOptions;
     private List<PollParticipant> pollParticipants;
     private int durationSeconds;
+    private Date scheduledFinish;
     private TiedPollDecider tiedPollDecider;
     private Optional<PollCommand> resultCommand = Optional.empty();
     private List<PollObserver> observers = new ArrayList<>();
@@ -87,6 +89,14 @@ public class Poll{
 
     public int getDurationSeconds() {
         return durationSeconds;
+    }
+
+    public Date getScheduledFinish() {
+        return scheduledFinish;
+    }
+
+    public void setScheduledFinish(Date scheduledFinish) {
+        this.scheduledFinish = scheduledFinish;
     }
 
     public Collection<PollParticipant> getPollParticipants() {

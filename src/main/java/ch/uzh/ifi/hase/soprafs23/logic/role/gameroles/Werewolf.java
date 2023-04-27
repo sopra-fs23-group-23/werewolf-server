@@ -32,7 +32,6 @@ public class Werewolf extends Role implements NightVoter, Fraction{
         return 0;
     }
 
-    // TODO: testing
     @Override
     public boolean hasWon() {
         for(Player player : alivePlayersGetter.get()) {
@@ -50,7 +49,7 @@ public class Werewolf extends Role implements NightVoter, Fraction{
             this.getClass(),
             "Who do you want to kill tonight?",
             alivePlayers.stream().map(p->new PollOption(p, new KillPlayerPollCommand(p))).toList(),
-            getPlayers().stream().map(p->new PollParticipant(p)).toList(),
+            getPlayers().stream().filter(Player::isAlive).map(p->new PollParticipant(p)).toList(),
             30,
             new NullResultPollDecider()));
     }
