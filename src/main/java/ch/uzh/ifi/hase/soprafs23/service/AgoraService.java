@@ -128,9 +128,13 @@ public class AgoraService {
     }
 
     //creates "publish_audio" ban for Troll
-    public void muteTroll(Player player) throws IOException, InterruptedException {
-        String requestBody = createRequestBody(Optional.of(player), Optional.empty(), "publish_audio", Reason.MUTE_TROLL);
-        createHttpRequest(HttpMethod.POST, requestBody);
+    public void muteTroll(Player player) {
+        try {
+            String requestBody = createRequestBody(Optional.of(player), Optional.empty(), "publish_audio", Reason.MUTE_TROLL);
+            createHttpRequest(HttpMethod.POST, requestBody);
+        } catch (IOException | InterruptedException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Troll could not be muted");
+        }
     }
 
     //creates Token for VoiceChannel. Same procedure for admin and normal players, admin's token generation automatically creates agora channel

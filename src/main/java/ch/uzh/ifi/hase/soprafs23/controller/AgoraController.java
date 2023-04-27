@@ -9,8 +9,6 @@ import ch.uzh.ifi.hase.soprafs23.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-
 import static ch.uzh.ifi.hase.soprafs23.service.LobbyService.LOBBYID_PATHVARIABLE;
 import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
 
@@ -39,7 +37,7 @@ public class AgoraController {
 
     @PostMapping("/agora/{lobbyId}/rules/audio/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void forceMutePlayerFromChannel(@PathVariable("lobbyId") Long lobbyId, @PathVariable("userId") Long userId, @RequestHeader(USERAUTH_HEADER) String userToken) throws IOException, InterruptedException {
+    public void forceMutePlayerFromChannel(@PathVariable("lobbyId") Long lobbyId, @PathVariable("userId") Long userId, @RequestHeader(USERAUTH_HEADER) String userToken) {
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
         User user = userService.getUserByToken(userToken);
         User userToMute = userService.getUser(userId);
@@ -54,36 +52,4 @@ public class AgoraController {
         // mutes the user
         agoraService.muteTroll(playerToMute);
     }
-
-    // TODO we tested them but dont need actual endpoints in the controller
-    /*
-    @PostMapping("/rules/kickVillager/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public void kickVillager(@PathVariable("userId") Long userId) throws IOException, InterruptedException {
-        Player player = new Player(userId, "willy");
-        agoraService.kickVillager(player);
-    }
-
-    @PostMapping("/rules/muteDead/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public void muteDeadPlayer(@PathVariable("userId") Long userId) throws IOException, InterruptedException {
-        Player player = new Player(userId, "willy");
-        agoraService.muteDeadPlayer(player);
-    }
-
-    @PostMapping("/kickAll")
-    @ResponseStatus(HttpStatus.OK)
-    public void kickAll() throws IOException, InterruptedException {
-
-        agoraService.kickAll("123456");
-    }
-
-    @DeleteMapping("/rules/")
-    @ResponseStatus(HttpStatus.OK)
-    public void deleteRules() throws IOException, InterruptedException {
-        Player player = new Player((long) 1, "roby");
-        agoraService.deleteRules(Reason.MUTE_DEAD, Optional.of(player));
-    }
-    */
-
 }

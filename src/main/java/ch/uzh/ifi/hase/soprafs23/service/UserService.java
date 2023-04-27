@@ -38,9 +38,11 @@ public class UserService {
         return this.userRepository.findAll();
     }
 
+    // TODO split up this method & call methods in controller
     public User createUser(User newUser) {
-        checkUsernameAndPWLength(newUser);
-        checkIfUserExists(newUser);
+        validateUsername(newUser);
+        validatePassword(newUser);
+        validateUsernameNotExists(newUser);
         newUser.setToken(UUID.randomUUID().toString());
 
         newUser = userRepository.save(newUser);
@@ -81,15 +83,16 @@ public class UserService {
     }
 
     public void updateUser(User updatedUser, Long id) throws ParseException {
-        checkUsernameAndPWLength(updatedUser);
         User userById = getUser(id);
 
-        if (!userById.getUsername().equals(updatedUser.getUsername())){
-            checkIfUserExists(updatedUser);
+        if (updatedUser.getUsername() != null && !userById.getUsername().equals(updatedUser.getUsername())){
+            validateUsername(updatedUser);
+            validateUsernameNotExists(updatedUser);
             userById.setUsername(updatedUser.getUsername());
         }
 
-        if (!userById.getPassword().equals(updatedUser.getPassword())){
+        if (updatedUser.getPassword() != null && !userById.getPassword().equals(updatedUser.getPassword())){
+            validatePassword(updatedUser);
             userById.setPassword(updatedUser.getPassword());
         }
 
@@ -110,7 +113,7 @@ public class UserService {
         }
     }
 
-    private void checkIfUserExists(User userToBeCreated) {
+    public void validateUsernameNotExists(User userToBeCreated) {
         User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
         String baseErrorMessage = "Sorry, there already exists a User with username %s";
         if (userByUsername != null) {
@@ -125,9 +128,24 @@ public class UserService {
         throw new ResponseStatusException(HttpStatus.CONFLICT, "User does not match to the player.");
     }
 
-    private void checkUsernameAndPWLength(User user) {
+    public void validateUsername(User user) {
+        if (user.getUsername() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please set username field");
+        }
+        if (user.getUsername().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please choose a username with at least 1 symbol.");
+        }
         if (user.getUsername().length() > 16) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please choose a username that has 16 or less symbols.");
+        }
+    }
+
+    public void validatePassword(User user) {
+        if (user.getPassword() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please set password field");
+        }
+        if (user.getPassword().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please choose a password with at least 1 symbol.");
         }
         if (user.getPassword().length() > 36) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please choose a password that has 36 or less symbols.");
