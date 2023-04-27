@@ -1,8 +1,10 @@
 package ch.uzh.ifi.hase.soprafs23.logic.role.gameroles;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -22,20 +24,30 @@ public class VillagerTest {
         return new Supplier<List<Player>>() {
             @Override
             public List<Player> get() {
-                return expected;
+                return expected.stream().filter(Player::isAlive).toList();
             }
             
         };
     }
 
+    private Player createMockPlayer() {
+        Player player = mock(Player.class);
+        when(player.isAlive()).thenReturn(true);
+        return player;
+    }
+
+    private List<Player> getAlivePlayers() {
+        return List.of(
+            createMockPlayer(),
+            createMockPlayer(),
+            createMockPlayer(),
+            createMockPlayer()
+        );
+    }
+
     @Test
     void testCreateDayPoll() {
-        List<Player> expected = List.of(
-            mock(Player.class),
-            mock(Player.class),
-            mock(Player.class),
-            mock(Player.class)
-        );
+        List<Player> expected = getAlivePlayers();
         TiedPollDecider tiedPollDecider = mock(TiedPollDecider.class);
         Villager villager = new Villager(null, createMockAlivePlayersGetter(expected), tiedPollDecider);
         Poll poll = villager.createDayPoll().get();
@@ -50,5 +62,17 @@ public class VillagerTest {
             containsInAnyOrder(expected.toArray())
         );
         assertTrue(poll.getPollOptions().stream().findFirst().get().getPollCommand() instanceof KillPlayerPollCommand);
+    }
+
+    @Test
+    void testHasWon() {
+        List<Player> expected = getAlivePlayers();
+        Villager villager = new Villager(null, createMockAlivePlayersGetter(expected), mock(TiedPollDecider.class));
+        villager.addPlayer(expected.get(0));
+        villager.addPlayer(expected.get(1));
+        villager.addPlayer(expected.get(3));
+        assertFalse(villager.hasWon());
+        when(expected.get(2).isAlive()).thenReturn(false);
+        assertTrue(villager.hasWon());
     }
 }

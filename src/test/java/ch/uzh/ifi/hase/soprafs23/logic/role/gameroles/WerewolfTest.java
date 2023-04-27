@@ -4,6 +4,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class WerewolfTest {
         return new Supplier<List<Player>>() {
             @Override
             public List<Player> get() {
-                return expected;
+                return expected.stream().filter(Player::isAlive).toList();
             }
             
         };
@@ -45,15 +46,16 @@ public class WerewolfTest {
 
     @Test
     void testCreateNightPoll() {
-        List<Player> expected = getAlivePlayers();
+        List<Player> alivePlayers = getAlivePlayers();
         List<Player> expectedWerewolves = List.of(
-            expected.get(0),
-            expected.get(2)
+            alivePlayers.get(0),
+            alivePlayers.get(2)
         );
-        Werewolf werewolf = new Werewolf(createMockAlivePlayersGetter(expected));
+        Werewolf werewolf = new Werewolf(createMockAlivePlayersGetter(alivePlayers));
         expectedWerewolves.stream().forEach(werewolf::addPlayer);
-        when(expected.get(3).isAlive()).thenReturn(false);
-        werewolf.addPlayer(expected.get(3));
+        when(alivePlayers.get(3).isAlive()).thenReturn(false);
+        werewolf.addPlayer(alivePlayers.get(3));
+        List<Player> expected = List.of(alivePlayers.get(0), alivePlayers.get(1), alivePlayers.get(2));
 
         Poll poll = werewolf.createNightPoll().get();
 
@@ -68,5 +70,17 @@ public class WerewolfTest {
             containsInAnyOrder(expected.toArray())
         );
         assertTrue(poll.getPollOptions().stream().findFirst().get().getPollCommand() instanceof KillPlayerPollCommand);
+    }
+
+    @Test
+    void testHasWon() {
+        List<Player> expected = getAlivePlayers();
+        Werewolf werewolf = new Werewolf(createMockAlivePlayersGetter(expected));
+        werewolf.addPlayer(expected.get(0));
+        werewolf.addPlayer(expected.get(1));
+        werewolf.addPlayer(expected.get(3));
+        assertFalse(werewolf.hasWon());
+        when(expected.get(2).isAlive()).thenReturn(false);
+        assertTrue(werewolf.hasWon());
     }
 }

@@ -32,7 +32,6 @@ public class Werewolf extends Role implements NightVoter, Fraction{
         return 0;
     }
 
-    // TODO: testing
     @Override
     public boolean hasWon() {
         for(Player player : alivePlayersGetter.get()) {

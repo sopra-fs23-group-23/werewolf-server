@@ -39,7 +39,6 @@ public class Villager extends Role implements DayVoter, Fraction{
         return 0;
     }
 
-    // TODO: testing
     @Override
     public boolean hasWon() {
         for(Player player : alivePlayersGetter.get()) {
