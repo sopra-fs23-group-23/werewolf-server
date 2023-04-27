@@ -38,6 +38,7 @@ public class UserService {
         return this.userRepository.findAll();
     }
 
+    // TODO split up this method & call methods in controller
     public User createUser(User newUser) {
         checkUsernameAndPWLength(newUser);
         checkIfUserExists(newUser);
@@ -126,6 +127,9 @@ public class UserService {
     }
 
     private void checkUsernameAndPWLength(User user) {
+        if (user.getUsername() == null || user.getPassword() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please choose a username and a password.");
+        }
         if (user.getUsername().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please choose a username with at least 1 symbol.");
         }
