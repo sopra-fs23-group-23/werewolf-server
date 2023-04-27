@@ -54,36 +54,4 @@ public class AgoraController {
         // mutes the user
         agoraService.muteTroll(playerToMute);
     }
-
-    // TODO we tested them but dont need actual endpoints in the controller
-    /*
-    @PostMapping("/rules/kickVillager/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public void kickVillager(@PathVariable("userId") Long userId) throws IOException, InterruptedException {
-        Player player = new Player(userId, "willy");
-        agoraService.kickVillager(player);
-    }
-
-    @PostMapping("/rules/muteDead/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public void muteDeadPlayer(@PathVariable("userId") Long userId) throws IOException, InterruptedException {
-        Player player = new Player(userId, "willy");
-        agoraService.muteDeadPlayer(player);
-    }
-
-    @PostMapping("/kickAll")
-    @ResponseStatus(HttpStatus.OK)
-    public void kickAll() throws IOException, InterruptedException {
-
-        agoraService.kickAll("123456");
-    }
-
-    @DeleteMapping("/rules/")
-    @ResponseStatus(HttpStatus.OK)
-    public void deleteRules() throws IOException, InterruptedException {
-        Player player = new Player((long) 1, "roby");
-        agoraService.deleteRules(Reason.MUTE_DEAD, Optional.of(player));
-    }
-    */
-
 }
