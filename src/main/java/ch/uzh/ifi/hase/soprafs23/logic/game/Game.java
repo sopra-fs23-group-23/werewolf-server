@@ -91,14 +91,14 @@ public class Game implements StageObserver{
 
     @Override
     public void onStageFinished() {
+        lastStagePollCommands = currentStage.getPollCommands();
+        lastStagePollCommands.stream().forEach(p->p.execute());
         for (Fraction fraction : lobby.getFractions()) {
             if(fraction.hasWon()) {
                 finishGame(fraction);
                 return;
             }
         }
-        lastStagePollCommands = currentStage.getPollCommands();
-        lastStagePollCommands.stream().forEach(p->p.execute());
         startNextStage(calculateNextStage());
     }
 
