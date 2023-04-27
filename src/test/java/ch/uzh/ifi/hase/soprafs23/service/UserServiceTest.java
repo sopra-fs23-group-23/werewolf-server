@@ -12,11 +12,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 public class UserServiceTest {
 
@@ -181,13 +181,12 @@ public class UserServiceTest {
     }
 
     @Test
-    public void checkIfUserExists_NoUser_success() throws Exception {
-        Method method = UserService.class.getDeclaredMethod("checkIfUserExists", User.class);
-        method.setAccessible(true);
-
+    public void validateUsernameNotExists() throws Exception {
+        User user = mock(User.class);
+        Mockito.when(user.getUsername()).thenReturn("testUsername");
         Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(null);
 
-        method.invoke(userService, testUser);
+        userService.validateUsernameNotExists(user);
     }
 
 
