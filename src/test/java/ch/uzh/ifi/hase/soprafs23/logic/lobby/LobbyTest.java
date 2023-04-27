@@ -5,6 +5,8 @@ import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInA
 import static org.hamcrest.core.IsIterableContaining.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -98,5 +100,14 @@ public class LobbyTest {
         ArrayList<Player> actual = l.shufflePlayers();
         List<Player> expected = Arrays.asList(p1,p2,p3,admin);
         assertThat("List equality without order", actual, containsInAnyOrder(expected.toArray()));
+    }
+
+    @Test
+    void testDissolveLobby() {
+        LobbyObserver observer = mock(LobbyObserver.class);
+        Lobby l = new Lobby(1l, mock(Player.class));
+        l.addObserver(observer);
+        l.dissolve();
+        verify(observer).onLobbyDissolved(l);
     }
 }

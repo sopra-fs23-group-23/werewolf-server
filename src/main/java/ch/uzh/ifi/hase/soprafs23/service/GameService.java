@@ -130,6 +130,12 @@ public class GameService implements GameObserver{
         }
     }
 
+    public void validateGameFinished(Game game) {
+        if(!game.isFinished()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Game is not finished yet.");
+        }
+    }
+
     /**
      * @pre game is finished
      * @param game
@@ -146,5 +152,23 @@ public class GameService implements GameObserver{
         calendar.add(Calendar.SECOND, poll.getDurationSeconds());
         poll.setScheduledFinish(calendar.getTime());
         schedule(poll::finish, poll.getDurationSeconds());
+    }
+
+    /**
+     * @pre hashmap games contains game
+     * @param game
+     */
+    public void removeGame(Game game) {
+        assert games.containsKey(game.getLobby().getId());
+        games.remove(game.getLobby().getId());
+        // TODO this is temporary and might be subject to change
+        game.getLobby().dissolve();
+    }
+
+    @Override
+    public void onGameFinished(Game game) {
+        if (games.containsKey(game.getLobby().getId())) {
+            schedule(()->removeGame(game), 30);
+        }
     }
 }

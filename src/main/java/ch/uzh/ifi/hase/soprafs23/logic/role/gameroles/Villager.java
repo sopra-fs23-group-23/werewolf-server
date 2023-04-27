@@ -57,7 +57,7 @@ public class Villager extends Role implements DayVoter, Fraction{
             "Who do you suspect to be a werewolf?",
             alivePlayers.stream().map(p->new PollOption(p, new KillPlayerPollCommand(p))).toList(), 
             alivePlayers.stream().map(p->new PollParticipant(p)).toList(),
-            30,
+            15,
             tiedPollDecider
         ));
     }
