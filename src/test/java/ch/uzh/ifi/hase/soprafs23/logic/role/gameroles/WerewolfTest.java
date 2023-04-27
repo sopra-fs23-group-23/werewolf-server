@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.logic.role.gameroles;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,20 +28,32 @@ public class WerewolfTest {
         };
     }
 
+    private Player createMockPlayer() {
+        Player player = mock(Player.class);
+        when(player.isAlive()).thenReturn(true);
+        return player;
+    }
+
+    private List<Player> getAlivePlayers() {
+        return List.of(
+            createMockPlayer(),
+            createMockPlayer(),
+            createMockPlayer(),
+            createMockPlayer()
+        );
+    }
+
     @Test
     void testCreateNightPoll() {
-        List<Player> expected = List.of(
-            mock(Player.class),
-            mock(Player.class),
-            mock(Player.class),
-            mock(Player.class)
-        );
+        List<Player> expected = getAlivePlayers();
         List<Player> expectedWerewolves = List.of(
             expected.get(0),
             expected.get(2)
         );
         Werewolf werewolf = new Werewolf(createMockAlivePlayersGetter(expected));
         expectedWerewolves.stream().forEach(werewolf::addPlayer);
+        when(expected.get(3).isAlive()).thenReturn(false);
+        werewolf.addPlayer(expected.get(3));
 
         Poll poll = werewolf.createNightPoll().get();
 
