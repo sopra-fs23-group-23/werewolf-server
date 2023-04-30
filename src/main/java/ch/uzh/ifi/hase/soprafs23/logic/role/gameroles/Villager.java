@@ -9,13 +9,15 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.AddPlayerToRolePollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.KillPlayerPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
+import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.FirstDayVoter;
 
-public class Villager extends Role implements DayVoter, Fraction{
+public class Villager extends Role implements DayVoter, FirstDayVoter, Fraction{
     private BiConsumer<Player, Class<? extends Role>> addPlayerToRole;
     private Supplier<List<Player>> alivePlayersGetter;
     private TiedPollDecider tiedPollDecider;
@@ -70,6 +72,19 @@ public class Villager extends Role implements DayVoter, Fraction{
     @Override
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public Optional<Poll> createFirstDayPoll() {
+        List<Player> alivePlayers = alivePlayersGetter.get();
+        return Optional.of(new Poll(
+            this.getClass(),
+            "Who should become the mayor?",
+            alivePlayers.stream().map(p->new PollOption(p, new AddPlayerToRolePollCommand(addPlayerToRole, p, Mayor.class))).toList(), 
+            alivePlayers.stream().map(p->new PollParticipant(p)).toList(),
+            15,
+            tiedPollDecider
+        ));
     }
     
 }

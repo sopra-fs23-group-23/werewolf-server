@@ -12,6 +12,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
+import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.FirstDayVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
 
 public class Game implements StageObserver{
@@ -39,6 +40,11 @@ public class Game implements StageObserver{
     }
 
     private Stage calculateNextStage() {
+        // special cases
+        if (stageCount == 1) {
+            // first day
+            return new Stage(StageType.Day, getFirstDayVoters());
+        }
         // normal cases
         if (stageCount % 2 == 0) {
             return new Stage(StageType.Night, getNightVoters());
@@ -119,6 +125,17 @@ public class Game implements StageObserver{
             .sorted()
             .map(DayVoter.class::cast)
             .forEach(voter -> pq.add(voter::createDayPoll));
+        return pq;
+    }
+
+    private Queue<Supplier<Optional<Poll>>> getFirstDayVoters() {
+        Queue<Supplier<Optional<Poll>>> pq = new LinkedList<>();
+        lobby.getRoles().stream()
+            .filter(FirstDayVoter.class::isInstance)
+            .sorted()
+            .map(FirstDayVoter.class::cast)
+            .forEach(voter -> pq.add(voter::createFirstDayPoll));
+        pq.addAll(getDayVoters());
         return pq;
     }
 

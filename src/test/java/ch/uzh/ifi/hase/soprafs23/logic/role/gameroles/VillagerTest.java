@@ -16,6 +16,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.AddPlayerToRolePollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.KillPlayerPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 
@@ -62,6 +63,25 @@ public class VillagerTest {
             containsInAnyOrder(expected.toArray())
         );
         assertTrue(poll.getPollOptions().stream().findFirst().get().getPollCommand() instanceof KillPlayerPollCommand);
+    }
+
+    @Test
+    void testCreateFirstDayPoll() {
+        List<Player> expected = getAlivePlayers();
+        TiedPollDecider tiedPollDecider = mock(TiedPollDecider.class);
+        Villager villager = new Villager(null, createMockAlivePlayersGetter(expected), tiedPollDecider);
+        Poll poll = villager.createFirstDayPoll().get();
+        assertThat(
+            "Contains all alive players in any order as participants",
+            poll.getPollParticipants().stream().map(PollParticipant::getPlayer).toList(),
+            containsInAnyOrder(expected.toArray())
+        );
+        assertThat(
+            "Contains all alive players in any order as options",
+            poll.getPollOptions().stream().map(PollOption::getPlayer).toList(),
+            containsInAnyOrder(expected.toArray())
+        );
+        assertTrue(poll.getPollOptions().stream().findFirst().get().getPollCommand() instanceof AddPlayerToRolePollCommand);
     }
 
     @Test
