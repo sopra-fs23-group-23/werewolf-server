@@ -4,9 +4,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 import ch.uzh.ifi.hase.soprafs23.rest.dto.FractionGetDTO;
@@ -17,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.game.GameObserver;
+import ch.uzh.ifi.hase.soprafs23.logic.game.Scheduler;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
@@ -61,11 +59,6 @@ public class GameService implements GameObserver{
         if (!game.isStarted()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Game has not started yet.");
         }
-    }
-
-    public void schedule(Runnable command, int delaySeconds) {
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.schedule(command, delaySeconds, TimeUnit.SECONDS);
     }
 
     public Poll getCurrentPoll(Game game) {
@@ -148,10 +141,8 @@ public class GameService implements GameObserver{
     @Override
     public void onNewPoll(Game game) {
         Poll poll = game.getCurrentPoll();
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.SECOND, poll.getDurationSeconds());
-        poll.setScheduledFinish(calendar.getTime());
-        schedule(poll::finish, poll.getDurationSeconds());
+        poll.setScheduledFinish(poll.calculateScheduledFinish(Calendar.getInstance()));
+        Scheduler.getInstance().schedule(poll::finish, poll.getDurationSeconds());
     }
 
     /**
@@ -168,7 +159,7 @@ public class GameService implements GameObserver{
     @Override
     public void onGameFinished(Game game) {
         if (games.containsKey(game.getLobby().getId())) {
-            schedule(()->removeGame(game), 30);
+            Scheduler.getInstance().schedule(()->removeGame(game), 30);
         }
     }
 }

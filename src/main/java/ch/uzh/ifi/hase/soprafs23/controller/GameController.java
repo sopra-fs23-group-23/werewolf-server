@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
+import ch.uzh.ifi.hase.soprafs23.logic.game.Scheduler;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
@@ -51,7 +52,7 @@ public class GameController {
         lobbyService.closeLobby(lobby);
         lobbyService.assignRoles(lobby);
         Game game = gameService.createNewGame(lobby);
-        gameService.schedule(() -> gameService.startGame(game), 15);
+        Scheduler.getInstance().schedule(() -> gameService.startGame(game), 15);
     }
 
     @GetMapping("/games/{lobbyId}")
