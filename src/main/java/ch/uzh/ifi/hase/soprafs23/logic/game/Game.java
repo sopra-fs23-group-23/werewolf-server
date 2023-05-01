@@ -1,19 +1,24 @@
 package ch.uzh.ifi.hase.soprafs23.logic.game;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
+import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.FirstDayVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
+import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.StageVoter;
 
 public class Game implements StageObserver{
     private Lobby lobby;
@@ -41,9 +46,13 @@ public class Game implements StageObserver{
 
     private Stage calculateNextStage() {
         // special cases
-        if (stageCount == 1) {
+        if (stageCount == 0) {
             // first day
             return new Stage(StageType.Day, getFirstDayVoters());
+        }
+        if (stageCount == 1) {
+            // first night
+            return new Stage(StageType.Night, getNightVoters());
         }
         // normal cases
         if (stageCount % 2 == 0) {
@@ -118,35 +127,24 @@ public class Game implements StageObserver{
         return finished;
     }
 
-    private Queue<Supplier<Optional<Poll>>> getDayVoters() {
-        Queue<Supplier<Optional<Poll>>> pq = new LinkedList<>();
-        lobby.getRoles().stream()
-            .filter(DayVoter.class::isInstance)
+    public static Queue<Supplier<Optional<Poll>>> getVotersOfType(Collection<Role> roles, Class<? extends StageVoter> stageVoterClass, Function<Role, Supplier<Optional<Poll>>> pollFunction) {
+        return roles.stream()
+            .filter(stageVoterClass::isInstance)
             .sorted()
-            .map(DayVoter.class::cast)
-            .forEach(voter -> pq.add(voter::createDayPoll));
-        return pq;
+            .map(s -> pollFunction.apply(s))
+            .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    private Queue<Supplier<Optional<Poll>>> getDayVoters() {
+        return Game.getVotersOfType(lobby.getRoles(), DayVoter.class, dayVoterRole -> ((DayVoter)dayVoterRole)::createDayPoll);
     }
 
     private Queue<Supplier<Optional<Poll>>> getFirstDayVoters() {
-        Queue<Supplier<Optional<Poll>>> pq = new LinkedList<>();
-        lobby.getRoles().stream()
-            .filter(FirstDayVoter.class::isInstance)
-            .sorted()
-            .map(FirstDayVoter.class::cast)
-            .forEach(voter -> pq.add(voter::createFirstDayPoll));
-        pq.addAll(getDayVoters());
-        return pq;
+        return Game.getVotersOfType(lobby.getRoles(), FirstDayVoter.class, firstDayVoterRole -> ((FirstDayVoter)firstDayVoterRole)::createFirstDayPoll);
     }
 
     private Queue<Supplier<Optional<Poll>>> getNightVoters() {
-        Queue<Supplier<Optional<Poll>>> pq = new LinkedList<>();
-        lobby.getRoles().stream()
-            .filter(NightVoter.class::isInstance)
-            .sorted()
-            .map(NightVoter.class::cast)
-            .forEach(voter -> pq.add(voter::createNightPoll));
-        return pq;
+        return Game.getVotersOfType(lobby.getRoles(), NightVoter.class, nightVoterRole -> ((NightVoter)nightVoterRole)::createNightPoll);
     }
 
     @Override
