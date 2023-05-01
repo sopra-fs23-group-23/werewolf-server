@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -131,5 +132,14 @@ public class PollTest {
         Poll poll = new Poll(Werewolf.class, "", mockOptions, mockParticipants, 0, mockTiedPollDecider);
         poll.finish();
         assertEquals(expectedCommand, poll.getResultCommand());
+    }
+
+    @Test
+    void testCalculateScheduledFinish() {
+        Poll poll = setupBasicPlayerPoll();
+        Calendar calendar = mock(Calendar.class);
+
+        poll.calculateScheduledFinish(calendar);
+        verify(calendar).add(Calendar.SECOND, poll.getDurationSeconds());
     }
 }

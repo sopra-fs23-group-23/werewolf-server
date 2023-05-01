@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.logic.poll;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
@@ -95,8 +96,25 @@ public class Poll{
         return scheduledFinish;
     }
 
+    public Date calculateScheduledFinish(Calendar calendar) {
+        calendar.add(Calendar.SECOND, getDurationSeconds());
+        return calendar.getTime();
+    }
+
     public void setScheduledFinish(Date scheduledFinish) {
         this.scheduledFinish = scheduledFinish;
+    }
+
+    public void setPollOptions(List<PollOption> pollOptions) {
+        this.pollOptions = pollOptions;
+    }
+
+    public void setPollParticipants(List<PollParticipant> pollParticipants) {
+        this.pollParticipants = pollParticipants;
+    }
+
+    public void setTiedPollDecider(TiedPollDecider tiedPollDecider) {
+        this.tiedPollDecider = tiedPollDecider;
     }
 
     public Collection<PollParticipant> getPollParticipants() {

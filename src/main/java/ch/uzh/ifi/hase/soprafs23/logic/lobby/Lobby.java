@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.logic.lobby;
 
 import java.util.*;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
+import ch.uzh.ifi.hase.soprafs23.logic.game.Scheduler;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.RandomTiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Mayor;
@@ -112,7 +113,7 @@ public class Lobby {
 
     public void instantiateRoles() {
         roles.put(Werewolf.class, new Werewolf(this::getAlivePlayers));
-        Mayor mayor = new Mayor(this::getAlivePlayers, new RandomTiedPollDecider());
+        Mayor mayor = new Mayor(this::getAlivePlayers, new RandomTiedPollDecider(), Scheduler.getInstance());
         roles.put(Mayor.class, mayor);
         roles.put(Villager.class, new Villager(this::addPlayerToRole, this::getAlivePlayers, mayor));
 
