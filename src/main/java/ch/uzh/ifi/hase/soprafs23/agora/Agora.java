@@ -109,21 +109,33 @@ public class Agora {
     }
 
     //creates "join_channel" ban for Player. Shall be used to kick villagers from channel during night
-    public static void kickVillager(Player player) throws IOException, InterruptedException{
+    public static void kickVillager(Player player){
+        try {
         String requestBody = createRequestBody(Optional.of(player), Optional.empty(), "join_channel", Reason.KICK_VILLAGER);
         createHttpRequest(HttpMethod.POST, requestBody);
+        } catch (IOException | InterruptedException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Couldn't kick all Villagers");
+        }
     }
 
     //creates "join_channel" ban for whole channel. Shall be used to kick all Players quickly from channel in the morning
-    public static void kickAll(String cname) throws IOException, InterruptedException{
-        String requestBody = createRequestBody(Optional.empty(), Optional.of(cname), "join_channel", Reason.KICK_ALL);
-        createHttpRequest(HttpMethod.POST, requestBody);
+    public static void kickAll(String cname){
+        try {
+            String requestBody = createRequestBody(Optional.empty(), Optional.of(cname), "join_channel", Reason.KICK_ALL);
+            createHttpRequest(HttpMethod.POST, requestBody);
+        } catch (IOException | InterruptedException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Couldn't kick all Players");
+        }
     }
 
     //creates "publish_audio" ban for player who died and should be muted in death view.
-    public static void muteDeadPlayer(Player player) throws IOException, InterruptedException {
+    public static void muteDeadPlayer(Player player){
+        try {
         String requestBody = createRequestBody(Optional.of(player), Optional.empty(), "publish_audio", Reason.MUTE_DEAD);
         createHttpRequest(HttpMethod.POST, requestBody);
+        } catch (IOException | InterruptedException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Player could not be muted");
+        }
     }
 
     //creates "publish_audio" ban for Troll

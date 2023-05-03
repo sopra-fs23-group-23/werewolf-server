@@ -1,9 +1,9 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
+import ch.uzh.ifi.hase.soprafs23.agora.Agora;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
-import ch.uzh.ifi.hase.soprafs23.service.AgoraService;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -17,11 +17,9 @@ import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
 public class AgoraController {
 
     private final UserService userService;
-    private final AgoraService agoraService;
     private final LobbyService lobbyService;
-    public AgoraController(AgoraService agoraService, LobbyService lobbyService, UserService userService){
+    public AgoraController(LobbyService lobbyService, UserService userService){
         this.userService = userService;
-        this.agoraService = agoraService;
         this.lobbyService = lobbyService;
     }
 
@@ -32,7 +30,7 @@ public class AgoraController {
         User user = userService.getUserByToken(userToken);
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
         lobbyService.validateUserIsInLobby(user, lobby);
-        return agoraService.createVoiceChannelToken(lobby, user);
+        return Agora.createVoiceChannelToken(lobby, user);
     }
 
     @PostMapping("/agora/{lobbyId}/rules/audio/{userId}")
@@ -50,6 +48,6 @@ public class AgoraController {
         // get player
         Player playerToMute = lobby.getPlayerById(userId);
         // mutes the user
-        agoraService.muteTroll(playerToMute);
+        Agora.muteTroll(playerToMute);
     }
 }

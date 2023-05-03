@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.Optional;
 
 import ch.uzh.ifi.hase.soprafs23.agora.Agora;
 import ch.uzh.ifi.hase.soprafs23.constant.Reason;
@@ -175,16 +176,9 @@ public class GameService implements GameObserver{
             game.getLobby().getPlayersByRole(Villager.class)
                     .stream()
                     .filter(Player::isAlive)
-                    .forEach(p -> {
-                try {
-                    Agora.kickVillager(p);
-                }
-                catch (IOException | InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+                    .forEach(Agora::kickVillager);
         } else if (game.getCurrentStage().getType() == StageType.Day) {
-            Agora.deleteRules(Reason.KICK_VILLAGER, null);
+            Agora.deleteRules(Reason.KICK_VILLAGER, Optional.empty());
         }
     }
 }
