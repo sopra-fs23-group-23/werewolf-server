@@ -1,6 +1,5 @@
-package ch.uzh.ifi.hase.soprafs23.service;
+package ch.uzh.ifi.hase.soprafs23.agora;
 
-import ch.uzh.ifi.hase.soprafs23.agora.RTCTokenBuilder;
 import ch.uzh.ifi.hase.soprafs23.constant.Reason;
 import ch.uzh.ifi.hase.soprafs23.constant.VoiceChatRole;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
@@ -28,15 +27,15 @@ import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
-public class AgoraService {
+public class Agora {
 
-    private final String authorizationHeader = "Basic MTVhNjhhYzliNjU1NDI3ZDk0YTQ4MjNiZTI5MDFhM2Q6Yjg5MmU5M2M4NjVkNDZhZGI3NzBiN2M1YmUwMjE0N2Y=";
+    private static final String authorizationHeader = "Basic MTVhNjhhYzliNjU1NDI3ZDk0YTQ4MjNiZTI5MDFhM2Q6Yjg5MmU5M2M4NjVkNDZhZGI3NzBiN2M1YmUwMjE0N2Y=";
 
-    private final String appId = "348d6a205d75436e916896366c5e315c";
+    private static final String appId = "348d6a205d75436e916896366c5e315c";
 
     //Creates RequestBody for ban rule. Ban is applied to either Optional player or Optional channelname to apply ban to whole channel. State privilege for ban and reason.
     //Privilege is either "join_channel" or "publish_audio"
-    private String createRequestBody(Optional<Player> player, Optional<String> cname, String privilege, Reason reason) throws IOException, InterruptedException {
+    private static String createRequestBody(Optional<Player> player, Optional<String> cname, String privilege, Reason reason) throws IOException, InterruptedException {
         ObjectMapper objectMapper = new ObjectMapper();
 
         Map<String, Object> requestBodyMap = new HashMap<>();
@@ -54,7 +53,7 @@ public class AgoraService {
 
     // Send Http Request by providing requestBody and method (GET, POST, DELETE allowed). Agora Server answer is given back (e.g. all Rules if GET)
     // For GET no requestBody is needed, therefore just pass "" as requestBody
-    JsonNode createHttpRequest(HttpMethod method, String requestBody) throws IOException, InterruptedException {
+    static JsonNode createHttpRequest(HttpMethod method, String requestBody) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
 
         // Create HTTP request builder object
@@ -87,12 +86,12 @@ public class AgoraService {
     }
 
     //deletes rules that match with provided filter for Reason and Player. If no player provided all rules by given Reason are deleted.
-    public void deleteRules(Reason reason, Optional<Player> player) throws IOException, InterruptedException {
+    public static void deleteRules(Reason reason, Optional<Player> player) throws IOException, InterruptedException {
         JsonNode allRules = createHttpRequest(HttpMethod.GET, "").get("rules");
         List<JsonNode> reasonRules = StreamSupport.stream(allRules.spliterator(), false)
-                                            .filter(r -> r.get("reason").asInt() == reason.ordinal() + 1)
-                                            .map(JsonNode.class::cast)
-                                            .collect(Collectors.toList());
+                .filter(r -> r.get("reason").asInt() == reason.ordinal() + 1)
+                .map(JsonNode.class::cast)
+                .collect(Collectors.toList());
 
         if (player.isPresent()){
             reasonRules = StreamSupport.stream(reasonRules.spliterator(), false)
@@ -110,25 +109,25 @@ public class AgoraService {
     }
 
     //creates "join_channel" ban for Player. Shall be used to kick villagers from channel during night
-    public void kickVillager(Player player) throws IOException, InterruptedException{
+    public static void kickVillager(Player player) throws IOException, InterruptedException{
         String requestBody = createRequestBody(Optional.of(player), Optional.empty(), "join_channel", Reason.KICK_VILLAGER);
         createHttpRequest(HttpMethod.POST, requestBody);
     }
 
     //creates "join_channel" ban for whole channel. Shall be used to kick all Players quickly from channel in the morning
-    public void kickAll(String cname) throws IOException, InterruptedException{
+    public static void kickAll(String cname) throws IOException, InterruptedException{
         String requestBody = createRequestBody(Optional.empty(), Optional.of(cname), "join_channel", Reason.KICK_ALL);
         createHttpRequest(HttpMethod.POST, requestBody);
     }
 
     //creates "publish_audio" ban for player who died and should be muted in death view.
-    public void muteDeadPlayer(Player player) throws IOException, InterruptedException {
+    public static void muteDeadPlayer(Player player) throws IOException, InterruptedException {
         String requestBody = createRequestBody(Optional.of(player), Optional.empty(), "publish_audio", Reason.MUTE_DEAD);
         createHttpRequest(HttpMethod.POST, requestBody);
     }
 
     //creates "publish_audio" ban for Troll
-    public void muteTroll(Player player) {
+    public static void muteTroll(Player player) {
         try {
             String requestBody = createRequestBody(Optional.of(player), Optional.empty(), "publish_audio", Reason.MUTE_TROLL);
             createHttpRequest(HttpMethod.POST, requestBody);
@@ -138,7 +137,7 @@ public class AgoraService {
     }
 
     //creates Token for VoiceChannel. Same procedure for admin and normal players, admin's token generation automatically creates agora channel
-    public String createVoiceChannelToken(Lobby lobby, User user) {
+    public static String createVoiceChannelToken(Lobby lobby, User user) {
         RTCTokenBuilder newToken = new RTCTokenBuilder();
         String token = newToken.buildTokenWithUserAccount(lobby.getId().toString(), user.getId().toString(), VoiceChatRole.Role_Publisher);
         if (Objects.equals(token, "")) {

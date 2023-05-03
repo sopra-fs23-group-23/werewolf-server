@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.FractionGetDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -168,6 +169,7 @@ public class GameService implements GameObserver{
     @Override
     public void onNewStage(Game game) {
         if (game.getCurrentStage().getType() == StageType.Night) {
+            Iterable<Player> villagerPlayers = game.getLobby().getPlayersByRole(Villager.class);
             // game.getLobby().getPlayersByRole(Villager.class)
             // kick all villagers
         } else if (game.getCurrentStage().getType() == StageType.Day) {
