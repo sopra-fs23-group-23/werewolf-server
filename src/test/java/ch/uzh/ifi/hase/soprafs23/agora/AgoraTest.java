@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.data.repository.init.ResourceReader.Type.JSON;
 
 public class AgoraTest {
 
@@ -43,7 +44,6 @@ public class AgoraTest {
         assertEquals("success", status);
     }
 
-    //TODO: hasn't yet worked to make a nice Test, originally wanted to sort for just one rule and then check if function made single call to delete that rule.
     @Test
     void testDeleteRules() throws IOException, InterruptedException {
 
@@ -79,22 +79,25 @@ public class AgoraTest {
     void testKickVillager() throws IOException, InterruptedException {
         Player player = new Player((long) 123, "John");
         Agora.kickVillager(player);
-        String expectedRequestBody = "{\"uid\":123,\"privileges\":[\"join_channel\"],\"reason\":1,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"time\":120}";
-        Agora.createHttpRequest(HttpMethod.POST, expectedRequestBody);
+        String expectedRequestBody = "{\"uid\":123,\"privileges\":[\"join_channel\"],\"reason\":1,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"time_in_seconds\":10}";
+        JsonNode jsonNode = Agora.createHttpRequest(HttpMethod.POST, expectedRequestBody);
+        assertTrue(jsonNode.toString().contains("success"));
     }
 
     @Test
     void testKickAll() throws IOException, InterruptedException {
         Agora.kickAll("TestChannel");
-        String expectedRequestBody = "{\"privileges\":[\"join_channel\"],\"reason\":2,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"cname\":\"TestChannel\",\"time\":120}";
-        Agora.createHttpRequest(HttpMethod.POST, expectedRequestBody);
+        String expectedRequestBody = "{\"privileges\":[\"join_channel\"],\"reason\":2,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"cname\":\"TestChannel\",\"time_in_seconds\":10}";
+        JsonNode jsonNode = Agora.createHttpRequest(HttpMethod.POST, expectedRequestBody);
+        assertTrue(jsonNode.toString().contains("success"));
     }
 
     @Test
     void testMuteDeadPlayer() throws IOException, InterruptedException {
         Player player = new Player((long) 123, "John");
         Agora.muteDeadPlayer(player);
-        String expectedRequestBody = "{\"uid\":123,\"privileges\":[\"publish_audio\"],\"reason\":3,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"time\":120}";
-        Agora.createHttpRequest(HttpMethod.POST, expectedRequestBody);
+        String expectedRequestBody = "{\"uid\":123,\"privileges\":[\"publish_audio\"],\"reason\":3,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"time_in_seconds\":10}";
+        JsonNode jsonNode = Agora.createHttpRequest(HttpMethod.POST, expectedRequestBody);
+        assertTrue(jsonNode.toString().contains("success"));
     }
 }

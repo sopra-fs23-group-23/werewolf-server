@@ -74,7 +74,6 @@ public class Agora {
                 HttpResponse.BodyHandlers.ofString());
 
         ObjectMapper objectMapper = new ObjectMapper();
-        System.out.println("-----------------------");
         System.out.println("Created a "+method+" call");
         System.out.println("Response: "+objectMapper.readTree(response.body()));
         System.out.println("-----------------------");
@@ -88,8 +87,6 @@ public class Agora {
                 .filter(r -> r.get("reason").asInt() == reason.ordinal() + 1)
                 .map(JsonNode.class::cast)
                 .collect(Collectors.toList());
-
-        System.out.println("All rules:\n"+ allRules);
 
         if (player.isPresent()) {
             reasonRules = StreamSupport.stream(reasonRules.spliterator(), false)
