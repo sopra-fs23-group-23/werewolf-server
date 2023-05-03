@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.Optional;
@@ -170,15 +171,26 @@ public class GameService implements GameObserver{
         }
     }
 
-    @Override
-    public void onNewStage(Game game) throws IOException, InterruptedException {
+    private void applyKickingRules(Game game) throws IOException, InterruptedException{
         if (game.getCurrentStage().getType() == StageType.Night) {
-            game.getLobby().getPlayersByRole(Villager.class)
+            List<Player> villagers = game.getLobby().getPlayersByRole(Villager.class)
                     .stream()
                     .filter(Player::isAlive)
-                    .forEach(Agora::kickVillager);
+                    .toList();
+            for (Player villager : villagers) {
+                Agora.kickVillager(villager);
+            }
         } else if (game.getCurrentStage().getType() == StageType.Day) {
             Agora.deleteRules(Reason.KICK_VILLAGER, Optional.empty());
+        }
+    }
+
+    @Override
+    public void onNewStage(Game game) {
+        try {
+            applyKickingRules(game);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

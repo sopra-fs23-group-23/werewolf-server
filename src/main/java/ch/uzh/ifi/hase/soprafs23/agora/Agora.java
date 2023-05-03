@@ -1,17 +1,11 @@
 package ch.uzh.ifi.hase.soprafs23.agora;
 
 import ch.uzh.ifi.hase.soprafs23.constant.Reason;
-import ch.uzh.ifi.hase.soprafs23.constant.VoiceChatRole;
-import ch.uzh.ifi.hase.soprafs23.entity.User;
-import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
 import javax.transaction.Transactional;
 
 import java.io.IOException;

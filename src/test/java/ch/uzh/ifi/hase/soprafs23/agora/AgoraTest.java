@@ -1,10 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.agora;
 
 import ch.uzh.ifi.hase.soprafs23.constant.Reason;
-import ch.uzh.ifi.hase.soprafs23.entity.User;
-import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
-import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
 import ch.uzh.ifi.hase.soprafs23.service.AgoraService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,15 +12,10 @@ import org.springframework.http.HttpMethod;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
 
 public class AgoraTest {
 
