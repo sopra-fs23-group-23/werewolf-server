@@ -15,10 +15,12 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.game.GameObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Scheduler;
+import ch.uzh.ifi.hase.soprafs23.logic.game.StageType;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.PollGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
@@ -160,6 +162,16 @@ public class GameService implements GameObserver{
     public void onGameFinished(Game game) {
         if (games.containsKey(game.getLobby().getId())) {
             Scheduler.getInstance().schedule(()->removeGame(game), 30);
+        }
+    }
+
+    @Override
+    public void onNewStage(Game game) {
+        if (game.getCurrentStage().getType() == StageType.Night) {
+            // game.getLobby().getPlayersByRole(Villager.class)
+            // kick all villagers
+        } else if (game.getCurrentStage().getType() == StageType.Day) {
+            // join all villagers
         }
     }
 }
