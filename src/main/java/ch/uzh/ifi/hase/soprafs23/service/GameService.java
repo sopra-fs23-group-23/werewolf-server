@@ -173,6 +173,7 @@ public class GameService implements GameObserver{
 
     private void applyKickingRules(Game game) throws IOException, InterruptedException{
         if (game.getCurrentStage().getType() == StageType.Night) {
+            System.out.println("It's night now -- Creating rules");
             List<Player> villagers = game.getLobby().getPlayersByRole(Villager.class)
                     .stream()
                     .filter(Player::isAlive)
@@ -181,6 +182,7 @@ public class GameService implements GameObserver{
                 Agora.kickVillager(villager);
             }
         } else if (game.getCurrentStage().getType() == StageType.Day) {
+            System.out.println("It's day now -- Deleting Rules");
             Agora.deleteRules(Reason.KICK_VILLAGER, Optional.empty());
         }
     }

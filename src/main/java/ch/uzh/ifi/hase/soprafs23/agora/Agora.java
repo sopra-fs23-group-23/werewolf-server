@@ -40,7 +40,6 @@ public class Agora {
         List<String> privileges = Arrays.asList(privilege);
         requestBodyMap.put("privileges", privileges);
         requestBodyMap.put("reason", (reason.ordinal() + 1));
-        System.out.println("Reason: " + (reason.ordinal() + 1));
 
         return objectMapper.writeValueAsString(requestBodyMap);
     }
@@ -75,7 +74,10 @@ public class Agora {
                 HttpResponse.BodyHandlers.ofString());
 
         ObjectMapper objectMapper = new ObjectMapper();
-        System.out.println(objectMapper.readTree(response.body()));
+        System.out.println("-----------------------");
+        System.out.println("Created a "+method+" call");
+        System.out.println("Response: "+objectMapper.readTree(response.body()));
+        System.out.println("-----------------------");
         return objectMapper.readTree(response.body());
     }
 
@@ -86,6 +88,8 @@ public class Agora {
                 .filter(r -> r.get("reason").asInt() == reason.ordinal() + 1)
                 .map(JsonNode.class::cast)
                 .collect(Collectors.toList());
+
+        System.out.println("All rules:\n"+ allRules);
 
         if (player.isPresent()) {
             reasonRules = StreamSupport.stream(reasonRules.spliterator(), false)
@@ -104,6 +108,7 @@ public class Agora {
     //creates "join_channel" ban for Player. Shall be used to kick villagers from channel during night
     public static void kickVillager(Player player) throws IOException, InterruptedException {
         String requestBody = createRequestBody(Optional.of(player), Optional.empty(), "join_channel", Reason.KICK_VILLAGER);
+        System.out.println("Going to kick villager with uid: "+player.getId().toString());
         createHttpRequest(HttpMethod.POST, requestBody);
     }
 
