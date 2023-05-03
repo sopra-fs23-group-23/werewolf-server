@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.logic.game;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -76,6 +77,14 @@ public class Game implements StageObserver{
         currentStage = nextStage;
         currentStage.addObserver(this);
         currentStage.startStage();
+        observers.forEach(gameObserver -> {
+            try {
+                gameObserver.onNewStage(this);
+            }
+            catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public Lobby getLobby() {

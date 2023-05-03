@@ -35,7 +35,7 @@ public class Agora {
 
     //Creates RequestBody for ban rule. Ban is applied to either Optional player or Optional channelname to apply ban to whole channel. State privilege for ban and reason.
     //Privilege is either "join_channel" or "publish_audio"
-    private static String createRequestBody(Optional<Player> player, Optional<String> cname, String privilege, Reason reason) throws IOException, InterruptedException {
+    private static String createRequestBody(Optional<Player> player, Optional<String> cname, String privilege, Reason reason) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
         Map<String, Object> requestBodyMap = new HashMap<>();
@@ -93,13 +93,12 @@ public class Agora {
                 .map(JsonNode.class::cast)
                 .collect(Collectors.toList());
 
-        if (player.isPresent()){
+        if (player.isPresent()) {
             reasonRules = StreamSupport.stream(reasonRules.spliterator(), false)
                     .filter(r -> r.get("uid").asInt() == player.get().getId())
                     .map(JsonNode.class::cast)
                     .collect(Collectors.toList());
         }
-
         ObjectMapper objectMapper = new ObjectMapper();
         for (JsonNode rule : reasonRules) {
             System.out.println("Deleting JSON Node " + rule);
@@ -109,52 +108,20 @@ public class Agora {
     }
 
     //creates "join_channel" ban for Player. Shall be used to kick villagers from channel during night
-    public static void kickVillager(Player player){
-        try {
+    public static void kickVillager(Player player) throws IOException, InterruptedException {
         String requestBody = createRequestBody(Optional.of(player), Optional.empty(), "join_channel", Reason.KICK_VILLAGER);
         createHttpRequest(HttpMethod.POST, requestBody);
-        } catch (IOException | InterruptedException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Couldn't kick all Villagers");
-        }
     }
 
     //creates "join_channel" ban for whole channel. Shall be used to kick all Players quickly from channel in the morning
-    public static void kickAll(String cname){
-        try {
-            String requestBody = createRequestBody(Optional.empty(), Optional.of(cname), "join_channel", Reason.KICK_ALL);
-            createHttpRequest(HttpMethod.POST, requestBody);
-        } catch (IOException | InterruptedException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Couldn't kick all Players");
-        }
+    public static void kickAll(String cname) throws IOException, InterruptedException {
+        String requestBody = createRequestBody(Optional.empty(), Optional.of(cname), "join_channel", Reason.KICK_ALL);
+        createHttpRequest(HttpMethod.POST, requestBody);
     }
 
     //creates "publish_audio" ban for player who died and should be muted in death view.
-    public static void muteDeadPlayer(Player player){
-        try {
+    public static void muteDeadPlayer(Player player) throws IOException, InterruptedException {
         String requestBody = createRequestBody(Optional.of(player), Optional.empty(), "publish_audio", Reason.MUTE_DEAD);
         createHttpRequest(HttpMethod.POST, requestBody);
-        } catch (IOException | InterruptedException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Player could not be muted");
-        }
-    }
-
-    //creates "publish_audio" ban for Troll
-    public static void muteTroll(Player player) {
-        try {
-            String requestBody = createRequestBody(Optional.of(player), Optional.empty(), "publish_audio", Reason.MUTE_TROLL);
-            createHttpRequest(HttpMethod.POST, requestBody);
-        } catch (IOException | InterruptedException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Troll could not be muted");
-        }
-    }
-
-    //creates Token for VoiceChannel. Same procedure for admin and normal players, admin's token generation automatically creates agora channel
-    public static String createVoiceChannelToken(Lobby lobby, User user) {
-        RTCTokenBuilder newToken = new RTCTokenBuilder();
-        String token = newToken.buildTokenWithUserAccount(lobby.getId().toString(), user.getId().toString(), VoiceChatRole.Role_Publisher);
-        if (Objects.equals(token, "")) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        return token;
     }
 }
