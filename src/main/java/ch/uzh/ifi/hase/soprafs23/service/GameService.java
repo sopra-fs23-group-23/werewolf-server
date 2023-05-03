@@ -1,11 +1,14 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import ch.uzh.ifi.hase.soprafs23.agora.Agora;
+import ch.uzh.ifi.hase.soprafs23.constant.Reason;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.FractionGetDTO;
 import org.springframework.http.HttpStatus;
@@ -167,13 +170,21 @@ public class GameService implements GameObserver{
     }
 
     @Override
-    public void onNewStage(Game game) {
+    public void onNewStage(Game game) throws IOException, InterruptedException {
         if (game.getCurrentStage().getType() == StageType.Night) {
-            Iterable<Player> villagerPlayers = game.getLobby().getPlayersByRole(Villager.class);
-            // game.getLobby().getPlayersByRole(Villager.class)
-            // kick all villagers
+            game.getLobby().getPlayersByRole(Villager.class)
+                    .stream()
+                    .filter(Player::isAlive)
+                    .forEach(p -> {
+                try {
+                    Agora.kickVillager(p);
+                }
+                catch (IOException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         } else if (game.getCurrentStage().getType() == StageType.Day) {
-            // join all villagers
+            Agora.deleteRules(Reason.KICK_VILLAGER, null);
         }
     }
 }
