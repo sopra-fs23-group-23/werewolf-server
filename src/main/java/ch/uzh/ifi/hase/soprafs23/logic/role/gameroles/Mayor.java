@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.logic.role.gameroles;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -37,6 +38,7 @@ public class Mayor extends Role implements TiedPollDecider{
         poll.setPollParticipants(getPlayers().stream().map(player -> new PollParticipant(player)).toList());
         poll.setPollOptions(pollOptions);
         poll.setTiedPollDecider(noMayorDecider);
+        poll.setScheduledFinish(poll.calculateScheduledFinish(Calendar.getInstance()));
         scheduler.schedule(poll::finish, poll.getDurationSeconds());
     }
 
