@@ -15,6 +15,10 @@ public abstract class Role implements Comparable<Role>{
         this.players.add(player);
     }
 
+    public void clearPlayers() {
+        this.players.removeAll(this.players);
+    }
+
     public List<Player> getPlayers() {
         return players;
     }
