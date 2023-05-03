@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.StreamSupport;
 
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
@@ -91,7 +90,7 @@ public class LobbyServiceTest {
         joiningUser.setUsername("Test");
         Lobby lobby = new Lobby(1L, LogicEntityMapper.createPlayerFromUser(admin));
         lobbyService.joinUserToLobby(joiningUser, lobby);
-        assertTrue(StreamSupport.stream(lobby.getPlayers().spliterator(), false).anyMatch(p->p.getId() == joiningUser.getId()), "Joining player was not added to lobby");
+        assertTrue(lobby.getPlayers().stream().anyMatch(p->p.getId() == joiningUser.getId()), "Joining player was not added to lobby");
     }
 
     @Test
