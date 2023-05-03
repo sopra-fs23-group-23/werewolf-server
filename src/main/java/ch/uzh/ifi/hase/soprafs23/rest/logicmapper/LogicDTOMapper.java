@@ -1,7 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.rest.logicmapper;
 
-import java.util.stream.StreamSupport;
-
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Stage;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
@@ -22,7 +20,7 @@ public final class LogicDTOMapper {
         lobbyDTO.setId(lobby.getId());
         lobbyDTO.setAdmin(convertPlayerToPlayerGetDTO(lobby.getAdmin()));
         lobbyDTO.setPlayers(
-            StreamSupport.stream(lobby.getPlayers().spliterator(), false).map(LogicDTOMapper::convertPlayerToPlayerGetDTO).toList()
+            lobby.getPlayers().stream().map(LogicDTOMapper::convertPlayerToPlayerGetDTO).toList()
         );
         lobbyDTO.setClosed(!lobby.isOpen());
         return lobbyDTO;

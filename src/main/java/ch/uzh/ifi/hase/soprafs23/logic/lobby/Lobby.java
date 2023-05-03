@@ -61,7 +61,7 @@ public class Lobby {
         }
     }
 
-    public Iterable<Player> getPlayers() {
+    public Collection<Player> getPlayers() {
         return players;
     }
 
@@ -92,7 +92,7 @@ public class Lobby {
         return roles.values().stream().filter(r->r.getPlayers().contains(player)).toList();
     }
 
-    public Iterable<Player> getPlayersByRole(Class<? extends Role> roleClass) {
+    public Collection<Player> getPlayersByRole(Class<? extends Role> roleClass) {
         return roles.get(roleClass).getPlayers();
     }
 

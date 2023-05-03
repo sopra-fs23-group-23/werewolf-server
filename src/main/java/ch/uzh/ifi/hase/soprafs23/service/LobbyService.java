@@ -2,7 +2,6 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.StreamSupport;
 
 import javax.transaction.Transactional;
 
@@ -56,12 +55,12 @@ public class LobbyService implements LobbyObserver{
 
     private boolean userInALobby(User user) {
         return lobbies.values().stream().anyMatch(
-            l -> StreamSupport.stream(l.getPlayers().spliterator(), false).anyMatch(p->p.getId().equals(user.getId()))
+            l -> l.getPlayers().stream().anyMatch(p->p.getId().equals(user.getId()))
         );
     }
 
     private boolean userIsInLobby(User user, Lobby lobby) {
-        return StreamSupport.stream(lobby.getPlayers().spliterator(), false).anyMatch(p->p.getId().equals(user.getId()));
+        return lobby.getPlayers().stream().anyMatch(p->p.getId().equals(user.getId()));
     }
 
     public void validateUserIsInLobby(User user, Lobby lobby) {
