@@ -6,6 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Date;
 import java.util.List;
 
 import org.assertj.core.util.Arrays;
@@ -50,6 +51,7 @@ public class MayorTest {
             poll.getPollParticipants().stream().map(PollParticipant::getPlayer).toList(),
             containsInAnyOrder(Arrays.array(p1)));
         assertEquals(pollOptions, poll.getPollOptions());
+        assertEquals(Date.class, poll.getScheduledFinish().getClass());
         verify(scheduler).schedule(Mockito.any(Runnable.class), Mockito.anyInt());
         
 
