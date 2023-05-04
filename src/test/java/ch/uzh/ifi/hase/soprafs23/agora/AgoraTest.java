@@ -54,9 +54,9 @@ public class AgoraTest {
 
 
         Agora.createHttpRequest(HttpMethod.GET, "rules");
-        Agora.deleteRules(Reason.KICK_VILLAGER, Optional.empty());
-        Agora.deleteRules(Reason.KICK_ALL, Optional.empty());
-        Agora.deleteRules(Reason.MUTE_DEAD, Optional.empty());
+        Agora.deleteRules(Reason.KICK_VILLAGER, "Testchannel");
+        Agora.deleteRules(Reason.KICK_ALL, "Testchannel");
+        Agora.deleteRules(Reason.MUTE_DEAD, "Testchannel");
     }
 
     private JsonNode createJsonNode(long id, int reason, int uid) {
@@ -78,7 +78,7 @@ public class AgoraTest {
     @Test
     void testKickVillager() throws IOException, InterruptedException {
         Player player = new Player((long) 123, "John");
-        Agora.kickVillager(player);
+        Agora.kickVillager(player, "Testchannel");
         String expectedRequestBody = "{\"uid\":123,\"privileges\":[\"join_channel\"],\"reason\":1,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"time_in_seconds\":10}";
         JsonNode jsonNode = Agora.createHttpRequest(HttpMethod.POST, expectedRequestBody);
         assertTrue(jsonNode.toString().contains("success"));
@@ -95,7 +95,7 @@ public class AgoraTest {
     @Test
     void testMuteDeadPlayer() throws IOException, InterruptedException {
         Player player = new Player((long) 123, "John");
-        Agora.muteDeadPlayer(player);
+        Agora.muteDeadPlayer(player, "Testchannel");
         String expectedRequestBody = "{\"uid\":123,\"privileges\":[\"publish_audio\"],\"reason\":3,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"time_in_seconds\":10}";
         JsonNode jsonNode = Agora.createHttpRequest(HttpMethod.POST, expectedRequestBody);
         assertTrue(jsonNode.toString().contains("success"));

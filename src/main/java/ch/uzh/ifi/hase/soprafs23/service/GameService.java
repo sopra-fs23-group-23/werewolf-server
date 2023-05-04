@@ -179,11 +179,11 @@ public class GameService implements GameObserver{
                     .filter(Player::isAlive)
                     .toList();
             for (Player villager : villagers) {
-                Agora.kickVillager(villager);
+                Agora.kickVillager(villager, game.getLobby().getId().toString());
             }
         } else if (game.getCurrentStage().getType() == StageType.Day) {
             System.out.println("It's day now -- Deleting Rules");
-            Agora.deleteRules(Reason.KICK_VILLAGER, Optional.empty());
+            Agora.deleteRules(Reason.KICK_VILLAGER, game.getLobby().getId().toString());
         }
     }
 
@@ -195,4 +195,10 @@ public class GameService implements GameObserver{
             e.printStackTrace();
         }
     }
+
+
+    /* TODO Miro
+    *   On player dead, apply Agora.muteDeadPlayer(player, cname)
+    *   On game end, apply Agora.deleteAllRules(cname)
+    * */
 }
