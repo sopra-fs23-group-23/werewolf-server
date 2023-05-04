@@ -50,6 +50,7 @@ public class Mayor extends Role implements TiedPollDecider, DayVoter, NightVoter
             noMayorDecider.executeTiePoll(poll, pollOptions, onTiePollFinished);
             return;
         }
+        pollOptions.forEach(option -> option.clearSupporters());
         poll.setRole(this.getClass());
         poll.setPollParticipants(getPlayers().stream().map(player -> new PollParticipant(player)).toList());
         poll.setPollOptions(pollOptions);
