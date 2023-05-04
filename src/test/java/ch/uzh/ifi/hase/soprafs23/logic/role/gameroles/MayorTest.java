@@ -27,7 +27,7 @@ public class MayorTest {
     @Test
     void testExecuteTiePoll_noMayor() {
         TiedPollDecider tiedPollDecider = mock(TiedPollDecider.class);
-        Mayor mayor = new Mayor(null, null, tiedPollDecider, null);
+        Mayor mayor = new Mayor(null, tiedPollDecider, null);
 
         Poll poll = mock(Poll.class);
         List<PollOption> pollOptions = List.of();
@@ -40,7 +40,7 @@ public class MayorTest {
     void testExecuteTiePoll() {
         TiedPollDecider tiedPollDecider = mock(TiedPollDecider.class);
         Scheduler scheduler = mock(Scheduler.class);
-        Mayor mayor = new Mayor(null, null, tiedPollDecider, scheduler);
+        Mayor mayor = new Mayor(null, tiedPollDecider, scheduler);
         Player p1 = mock(Player.class);
         mayor.addPlayer(p1);
         List<PollOption> pollOptions = List.of(mock(PollOption.class), mock(PollOption.class));
@@ -59,7 +59,7 @@ public class MayorTest {
 
     @Test
     void testAddPlayer() {
-        Mayor mayor = new Mayor(null, null, null, null);
+        Mayor mayor = new Mayor(null, null, null);
         Player p1 = mock(Player.class);
         Player p2 = mock(Player.class);
         mayor.addPlayer(p1);
@@ -72,7 +72,7 @@ public class MayorTest {
 
     @Test
     void testCreateNightPoll_MayorAlive() {
-        Mayor mayor = new Mayor(null, null, null, null);
+        Mayor mayor = new Mayor(null, null, null);
         Player p1 = mock(Player.class);
         mayor.addPlayer(p1);
         Optional<Poll> poll = mayor.createNightPoll();
@@ -81,7 +81,7 @@ public class MayorTest {
 
     @Test
     void testCreateDayPoll_MayorAlive() {
-        Mayor mayor = new Mayor(null, null, null, null);
+        Mayor mayor = new Mayor(null, null, null);
         Player p1 = mock(Player.class);
         mayor.addPlayer(p1);
         Optional<Poll> poll = mayor.createDayPoll();
@@ -106,7 +106,7 @@ public class MayorTest {
     @Test
     void testCreateNightPoll_MayorDead() {
         TiedPollDecider tiedPollDecider = mock(TiedPollDecider.class);
-        Mayor mayor = new Mayor(this::getPlayers, null, tiedPollDecider, null);
+        Mayor mayor = new Mayor(this::getPlayers, tiedPollDecider, null);
         Player p1 = mock(Player.class);
         mayor.addPlayer(p1);
         mayor.onPlayerKilled();
@@ -117,7 +117,7 @@ public class MayorTest {
     @Test
     void testCreateDayPoll_MayorDead() {
         TiedPollDecider tiedPollDecider = mock(TiedPollDecider.class);
-        Mayor mayor = new Mayor(this::getPlayers, null, tiedPollDecider, null);
+        Mayor mayor = new Mayor(this::getPlayers, tiedPollDecider, null);
         Player p1 = mock(Player.class);
         mayor.addPlayer(p1);
         mayor.onPlayerKilled();

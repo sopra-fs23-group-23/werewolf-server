@@ -117,6 +117,10 @@ public class Poll{
         this.tiedPollDecider = tiedPollDecider;
     }
 
+    public void setRole(Class<? extends Role> role) {
+        this.role = role;
+    }
+
     public Collection<PollParticipant> getPollParticipants() {
         return this.pollParticipants;
     }

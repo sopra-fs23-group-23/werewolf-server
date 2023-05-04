@@ -113,7 +113,7 @@ public class Lobby {
 
     public void instantiateRoles() {
         roles.put(Werewolf.class, new Werewolf(this::getAlivePlayers));
-        Mayor mayor = new Mayor(this::getAlivePlayers, this::addPlayerToRole, new RandomTiedPollDecider(), Scheduler.getInstance());
+        Mayor mayor = new Mayor(this::getAlivePlayers, new RandomTiedPollDecider(), Scheduler.getInstance());
         roles.put(Mayor.class, mayor);
         roles.put(Villager.class, new Villager(this::addPlayerToRole, this::getAlivePlayers, mayor));
 
