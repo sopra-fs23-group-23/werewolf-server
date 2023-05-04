@@ -9,8 +9,8 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.AddPlayerToRolePollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.KillPlayerPollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.AddPlayerToRoleInstantPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
@@ -33,12 +33,6 @@ public class Villager extends Role implements DayVoter, FirstDayVoter, Fraction{
         this.addPlayerToRole = addPlayerToRole;
         this.alivePlayersGetter = alivePlayersGetter;
         this.tiedPollDecider = tiedPollDecider;
-    }
-
-    @Override
-    public int compareTo(Role arg0) {
-        // TODO Auto-generated method stub
-        return 0;
     }
 
     @Override
@@ -80,7 +74,7 @@ public class Villager extends Role implements DayVoter, FirstDayVoter, Fraction{
         return Optional.of(new Poll(
             this.getClass(),
             "Who should become the mayor?",
-            alivePlayers.stream().map(p->new PollOption(p, new AddPlayerToRolePollCommand(addPlayerToRole, p, Mayor.class))).toList(), 
+            alivePlayers.stream().map(p->new PollOption(p, new AddPlayerToRoleInstantPollCommand(addPlayerToRole, p, Mayor.class))).toList(), 
             alivePlayers.stream().map(p->new PollParticipant(p)).toList(),
             15,
             tiedPollDecider

@@ -56,9 +56,9 @@ public class Game implements StageObserver{
         }
         // normal cases
         if (stageCount % 2 == 0) {
-            return new Stage(StageType.Night, getNightVoters());
-        } else {
             return new Stage(StageType.Day, getDayVoters());
+        } else {
+            return new Stage(StageType.Night, getNightVoters());
         }
     }
 

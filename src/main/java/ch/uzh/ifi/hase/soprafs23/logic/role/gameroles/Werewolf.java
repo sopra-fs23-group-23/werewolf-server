@@ -27,12 +27,6 @@ public class Werewolf extends Role implements NightVoter, Fraction{
     }
 
     @Override
-    public int compareTo(Role arg0) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
     public boolean hasWon() {
         for(Player player : alivePlayersGetter.get()) {
             if(!getPlayers().contains(player)) {
