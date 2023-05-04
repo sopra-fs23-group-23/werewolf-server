@@ -16,8 +16,8 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.AddPlayerToRolePollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.KillPlayerPollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.AddPlayerToRoleInstantPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 
 public class VillagerTest {
@@ -81,7 +81,7 @@ public class VillagerTest {
             poll.getPollOptions().stream().map(PollOption::getPlayer).toList(),
             containsInAnyOrder(expected.toArray())
         );
-        assertTrue(poll.getPollOptions().stream().findFirst().get().getPollCommand() instanceof AddPlayerToRolePollCommand);
+        assertTrue(poll.getPollOptions().stream().findFirst().get().getPollCommand() instanceof AddPlayerToRoleInstantPollCommand);
     }
 
     @Test
