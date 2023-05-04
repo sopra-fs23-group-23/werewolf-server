@@ -22,4 +22,9 @@ public abstract class Role implements Comparable<Role>{
     public List<Player> getPlayers() {
         return players;
     }
+
+    @Override
+    public int compareTo(Role o) {
+        return RolePrioritiser.getPriority(this) - RolePrioritiser.getPriority(o);
+    }
 }
