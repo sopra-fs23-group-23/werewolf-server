@@ -74,9 +74,6 @@ public class Agora {
                 HttpResponse.BodyHandlers.ofString());
 
         ObjectMapper objectMapper = new ObjectMapper();
-        System.out.println("Created a "+method+" call");
-        System.out.println("Response: "+objectMapper.readTree(response.body()));
-        System.out.println("-----------------------");
         return objectMapper.readTree(response.body());
     }
     // gets all kicking rules
@@ -100,7 +97,7 @@ public class Agora {
         }
     }
     public static void deleteAllRules(String cname) throws IOException, InterruptedException {
-        JsonNode allRules = createHttpRequest(HttpMethod.GET, "").get("rules");
+        JsonNode allRules = getRules();
         List<JsonNode> reasonRules = StreamSupport.stream(allRules.spliterator(), false)
                 .filter(r -> Objects.equals(r.get("cname").asText(), cname))
                 .map(JsonNode.class::cast)
@@ -108,7 +105,6 @@ public class Agora {
 
         ObjectMapper objectMapper = new ObjectMapper();
         for (JsonNode rule : reasonRules) {
-            System.out.println("Deleting JSON Node " + rule);
             String requestBody = objectMapper.writeValueAsString(Map.of("appid", appId, "id", String.valueOf(rule.get("id"))));
             createHttpRequest(HttpMethod.DELETE, requestBody);
         }
@@ -116,11 +112,12 @@ public class Agora {
     //creates "join_channel" ban for Player. Shall be used to kick villagers from channel during night
     public static void kickVillager(Player player, String cname) throws IOException, InterruptedException {
         String requestBody = createRequestBody(Optional.of(player), Optional.of(cname), "join_channel", Reason.KICK_VILLAGER);
-        System.out.println("Going to kick villager with uid: "+player.getId().toString());
         createHttpRequest(HttpMethod.POST, requestBody);
     }
 
     //creates "join_channel" ban for whole channel. Shall be used to kick all Players quickly from channel in the morning
+
+    // TODO probably delete this since not needed until now
     public static void kickAll(String cname) throws IOException, InterruptedException {
         String requestBody = createRequestBody(Optional.empty(), Optional.of(cname), "join_channel", Reason.KICK_ALL);
         createHttpRequest(HttpMethod.POST, requestBody);

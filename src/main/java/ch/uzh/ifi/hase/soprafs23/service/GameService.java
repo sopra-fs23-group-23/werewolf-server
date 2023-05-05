@@ -168,11 +168,17 @@ public class GameService implements GameObserver{
         if (games.containsKey(game.getLobby().getId())) {
             Scheduler.getInstance().schedule(()->removeGame(game), 30);
         }
+        try {
+            Agora.deleteAllRules(game.getLobby().getId().toString());
+        }
+        catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private void applyKickingRules(Game game) throws IOException, InterruptedException{
         if (game.getCurrentStage().getType() == StageType.Night) {
-            System.out.println("It's night now -- Creating rules");
             List<Player> villagers = game.getLobby().getPlayersByRole(Villager.class)
                     .stream()
                     .filter(Player::isAlive)
@@ -181,7 +187,6 @@ public class GameService implements GameObserver{
                 Agora.kickVillager(villager, game.getLobby().getId().toString());
             }
         } else if (game.getCurrentStage().getType() == StageType.Day) {
-            System.out.println("It's day now -- Deleting Rules");
             Agora.deleteRules(Reason.KICK_VILLAGER, game.getLobby().getId().toString());
         }
     }
@@ -198,6 +203,5 @@ public class GameService implements GameObserver{
 
     /* TODO Miro
     *   On player dead, apply Agora.muteDeadPlayer(player, cname)
-    *   On game end, apply Agora.deleteAllRules(cname)
     * */
 }
