@@ -57,7 +57,7 @@ public class Player {
         if (getClass() != obj.getClass())
             return false;
         final Player other = (Player) obj;
-        return id == other.id;
+        return id.equals(other.id);
     }
 
     @Override

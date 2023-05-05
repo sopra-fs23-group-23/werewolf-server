@@ -76,6 +76,7 @@ public class Game implements StageObserver{
         currentStage = nextStage;
         currentStage.addObserver(this);
         currentStage.startStage();
+        observers.forEach(gameObserver -> gameObserver.onNewStage(this));
     }
 
     public Lobby getLobby() {
