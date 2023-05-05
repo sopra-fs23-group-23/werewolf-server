@@ -2,7 +2,11 @@ package ch.uzh.ifi.hase.soprafs23.logic.role.gameroles;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.KillPlayerPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.NullResultPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DoubleNightVoter;
 
@@ -43,11 +47,28 @@ public class Witch extends Role implements DoubleNightVoter {
 
     @Override
     public Optional<Poll> createSecondNightPoll() {
+        if(this.remainingResurrectPotions > 0){
+            // TODO filter out player who just got killed by the werewolves
+        }
         return Optional.empty();
     }
 
     @Override
     public Optional<Poll> createNightPoll() {
+        // use kill potion
+        if(this.remainingKillPotions > 0){
+            // TODO filter out player who already got killed to not appear in alivePlayers
+            List<Player> alivePlayers = alivePlayersGetter.get();
+            return Optional.of(new Poll(
+                    this.getClass(),
+                    "Select a player to kill with your poison potion.",
+                    alivePlayers.stream().map(p->new PollOption(p, new KillPlayerPollCommand(p))).toList(),
+                    // TODO: JAN wie chani filtere das nur d witch participant isch? (next line)
+                    getPlayers().stream().filter(Player::isAlive).map(p->new PollParticipant(p)).toList(),
+                    15,
+                    new NullResultPollDecider()));
+        }
+        // TODO: JAN was sölli returne wenn sie kein kill pot me het?
         return Optional.empty();
     }
 }
