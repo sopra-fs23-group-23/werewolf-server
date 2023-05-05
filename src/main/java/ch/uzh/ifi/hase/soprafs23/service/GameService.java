@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import java.util.Optional;
 
 import ch.uzh.ifi.hase.soprafs23.agora.Agora;
 import ch.uzh.ifi.hase.soprafs23.constant.Reason;
@@ -78,7 +77,7 @@ public class GameService implements GameObserver{
     }
 
     public boolean isPollParticipant(Poll poll, User user) {
-        return poll.getPollParticipants().stream().anyMatch(p->p.getPlayer().getId() == user.getId());
+        return poll.getPollParticipants().stream().anyMatch(p->p.getPlayer().getId().equals(user.getId()));
     }
 
     public void validateParticipant(Poll poll, User user) {
@@ -104,11 +103,11 @@ public class GameService implements GameObserver{
      * @return
      */
     public PollParticipant getParticipant (Poll poll, User user) {
-        return poll.getPollParticipants().stream().filter(p->p.getPlayer().getId() == user.getId()).findFirst().get();
+        return poll.getPollParticipants().stream().filter(p->p.getPlayer().getId().equals(user.getId())).findFirst().get();
     }
 
     public PollOption getPollOption(Poll poll, Long pollOptionId) {
-        Predicate<? super PollOption> optionFilter = (p->p.getPlayer().getId() == pollOptionId);
+        Predicate<? super PollOption> optionFilter = (p->p.getPlayer().getId().equals(pollOptionId));
         if (!poll.getPollOptions().stream().anyMatch(optionFilter)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Selected option is not a valid option for this poll.");
         }
