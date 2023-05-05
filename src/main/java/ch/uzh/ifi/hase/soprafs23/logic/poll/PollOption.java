@@ -24,6 +24,10 @@ public class PollOption {
         supporters.remove(supporter);
     }
 
+    public void clearSupporters() {
+        supporters.clear();
+    }
+
     public List<PollParticipant> getSupporters() {
         return supporters;
     }

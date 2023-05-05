@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.LinkedList;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.InstantPollCommand;
 
 public class StageTest {
     private class StageObserverMock implements StageObserver {
@@ -74,5 +76,21 @@ public class StageTest {
         stage.startStage();
         assertTrue(observer.isOnStageFinishedCalled());
         assertTrue(observer.isOnNewPollCalled());
+    }
+
+    @Test
+    void testOnNewPoll_instantPollCommand() {
+        Poll expected = mock(Poll.class);
+        InstantPollCommand expectedCommand = mock(InstantPollCommand.class);
+        when(expected.getResultCommand()).thenReturn(expectedCommand);
+        Optional<Poll> p1 = Optional.of(expected);
+        Supplier<Optional<Poll>> s1 = () -> p1;
+        Queue<Supplier<Optional<Poll>>> pollSupplierQueue = new LinkedList<>(List.of(s1));
+        Stage stage = new Stage(StageType.Day, pollSupplierQueue);
+        stage.startStage();
+        stage.onPollFinished();
+
+        verify(expectedCommand).execute_instantly();
+        assertEquals(List.of(expectedCommand), stage.getPollCommands());
     }
 }
