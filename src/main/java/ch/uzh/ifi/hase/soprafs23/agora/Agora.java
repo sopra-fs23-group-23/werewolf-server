@@ -91,7 +91,6 @@ public class Agora {
 
         ObjectMapper objectMapper = new ObjectMapper();
         for (JsonNode rule : reasonRules) {
-            System.out.println("Deleting JSON Node " + rule);
             String requestBody = objectMapper.writeValueAsString(Map.of("appid", appId, "id", String.valueOf(rule.get("id"))));
             createHttpRequest(HttpMethod.DELETE, requestBody);
         }

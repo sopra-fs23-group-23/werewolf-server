@@ -14,22 +14,45 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.data.repository.init.ResourceReader.Type.JSON;
 
 public class AgoraTest {
 
+    private JsonNode createSampleKickVillagerRule() throws IOException, InterruptedException{
+        Player player = new Player((long) 123, "John");
+        Agora.kickVillager(player, "Testchannel");
+        String expectedRequestBody = "{\"uid\":123,\"cname\":\"Testchannel\",\"privileges\":[\"join_channel\"],\"reason\":1,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"time_in_seconds\":10}";
+        return Agora.createHttpRequest(HttpMethod.POST, expectedRequestBody);
+    }
+
+    private JsonNode createSampleMuteDeadRule() throws IOException, InterruptedException{
+        Player player = new Player((long) 1234, "Eggmann");
+        Agora.muteDeadPlayer(player, "Testchannel");
+        String expectedRequestBody = "{\"uid\":1234,\"cname\":\"Testchannel\",\"privileges\":[\"publish_audio\"],\"reason\":3,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"time_in_seconds\":10}";
+        return Agora.createHttpRequest(HttpMethod.POST, expectedRequestBody);
+    }
+
+    private List<JsonNode> createMultipleRules() throws IOException, InterruptedException{
+        List<JsonNode> sampleRules = new ArrayList<>();
+        sampleRules.add(createSampleMuteDeadRule());
+        sampleRules.add(createSampleKickVillagerRule());
+        return sampleRules;
+    }
     @Test
     void createRequestBody() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Player aPlayer = new Player((long) 10, "Willy");
-        String expectedRequestBody = "{\"uid\":10,\"privileges\":[\"join_channel\"],\"reason\":1,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"cname\":\"TestChannel\",\"time\":120}";
+        String expectedRequestBody = "{\"uid\":10,\"privileges\":[\"join_channel\"],\"reason\":1,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"cname\":\"Testchannel\",\"time\":120}";
 
         Method privateMethod = Agora.class.getDeclaredMethod("createRequestBody", Optional.class, Optional.class, String.class, Reason.class);
         privateMethod.setAccessible(true);
-        String result = (String) privateMethod.invoke(new AgoraService(), Optional.of(aPlayer), Optional.of("TestChannel"), "join_channel", Reason.KICK_VILLAGER);
-        System.out.println(result);
+        String result = (String) privateMethod.invoke(new AgoraService(), Optional.of(aPlayer), Optional.of("Testchannel"), "join_channel", Reason.KICK_VILLAGER);
         assertEquals(expectedRequestBody, result);
     }
 
@@ -46,35 +69,20 @@ public class AgoraTest {
 
     @Test
     void testDeleteRules() throws IOException, InterruptedException {
+        createSampleMuteDeadRule();
+        createSampleKickVillagerRule();
 
-        List<JsonNode> sampleRules = new ArrayList<>();
-        sampleRules.add(createJsonNode(7510442816L, 1, 2));
-        sampleRules.add(createJsonNode(7510371326L, 3, 1717));
-        sampleRules.add(createJsonNode(7510367011L, 2, 1));
-
-
-        Agora.createHttpRequest(HttpMethod.GET, "rules");
         Agora.deleteRules(Reason.KICK_VILLAGER, "Testchannel");
-        Agora.deleteRules(Reason.KICK_ALL, "Testchannel");
         Agora.deleteRules(Reason.MUTE_DEAD, "Testchannel");
-    }
 
-    private JsonNode createJsonNode(long id, int reason, int uid) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode node = objectMapper.createObjectNode();
-        node.put("id", id);
-        node.put("uid", uid);
-        node.put("reason", reason);
-        return node;
-    }
+        JsonNode jsonNode = Agora.getRules();
+        List<JsonNode> rules = StreamSupport.stream(jsonNode.spliterator(), false)
+                .filter(r -> r.get("cname").asText() == "Testchannel")
+                .map(JsonNode.class::cast)
+                .toList();
 
-    private JsonNode createJsonNode(List<JsonNode> nodes) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode node = objectMapper.createObjectNode();
-        node.putArray("rules").addAll(nodes);
-        return node;
+        assertTrue(rules.isEmpty());
     }
-
     @Test
     void testKickVillager() throws IOException, InterruptedException {
         Player player = new Player((long) 123, "John");
@@ -85,9 +93,21 @@ public class AgoraTest {
     }
 
     @Test
+    void testDeleteAllRules() throws IOException, InterruptedException{
+        createMultipleRules();
+        Agora.deleteAllRules("Testchannel");
+        JsonNode jsonNode = Agora.getRules();
+        List<JsonNode> rules = StreamSupport.stream(jsonNode.spliterator(), false)
+                .filter(r -> r.get("cname").asText() == "Testchannel")
+                .map(JsonNode.class::cast)
+                .toList();
+        assertTrue(rules.isEmpty());
+    }
+
+    @Test
     void testKickAll() throws IOException, InterruptedException {
-        Agora.kickAll("TestChannel");
-        String expectedRequestBody = "{\"privileges\":[\"join_channel\"],\"reason\":2,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"cname\":\"TestChannel\",\"time_in_seconds\":10}";
+        Agora.kickAll("Testchannel");
+        String expectedRequestBody = "{\"privileges\":[\"join_channel\"],\"reason\":2,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"cname\":\"Testchannel\",\"time_in_seconds\":10}";
         JsonNode jsonNode = Agora.createHttpRequest(HttpMethod.POST, expectedRequestBody);
         assertTrue(jsonNode.toString().contains("success"));
     }
