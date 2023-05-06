@@ -69,6 +69,16 @@ public class LobbyService implements LobbyObserver{
         }
     }
 
+    /**
+     * @pre lobby contains player
+     * @param lobby
+     * @param playerId
+     * @return
+     */
+    public Player getPlayerById(Lobby lobby, Long playerId) {
+        return lobby.getPlayerById(playerId);
+    }
+
     public void validateLobbyIsOpen(Lobby lobby) {
         if (!lobby.isOpen()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby is closed.");
