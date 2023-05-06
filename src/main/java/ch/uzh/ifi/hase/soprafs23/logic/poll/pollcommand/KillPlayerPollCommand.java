@@ -9,10 +9,6 @@ public class KillPlayerPollCommand implements PollCommand{
         this.player = player;
     }
 
-    public Player getPlayer() {
-        return player;
-    }
-
     @Override
     public void execute() {
         player.killPlayer();
@@ -21,6 +17,11 @@ public class KillPlayerPollCommand implements PollCommand{
     @Override
     public String toString() {
         return String.format("%s was killed.", player.getName());
+    }
+
+    @Override
+    public Player getAffectedPlayer() {
+        return player;
     }
     
 }
