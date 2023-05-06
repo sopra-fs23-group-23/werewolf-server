@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.NullPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
@@ -93,7 +94,7 @@ public class Game implements StageObserver{
     }
 
     public List<PollCommand> getLastStagePollCommands() {
-        return lastStagePollCommands;
+        return lastStagePollCommands.stream().filter(pollCommand -> !(pollCommand instanceof NullPollCommand)).toList();
     }
 
     public Poll getCurrentPoll() throws IllegalStateException{
