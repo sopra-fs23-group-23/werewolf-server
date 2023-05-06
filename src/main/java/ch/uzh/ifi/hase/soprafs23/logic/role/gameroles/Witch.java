@@ -53,10 +53,32 @@ public class Witch extends Role implements DoubleNightVoter {
         return Optional.empty();
     }
 
+    private boolean witchKillCommandExists(List<Player> playersKilledInStage) { 
+        return playersKilledInStage.contains(getPlayers().stream().findFirst().get());
+    }
+
+    private boolean isWitchAlive() {
+        return getPlayers().stream().findFirst().get().isAlive();
+    }
+
+    private List<Player> getPlayersKilledInStage() {
+        return currentStageCommands.get().stream()
+                .filter(KillPlayerPollCommand.class::isInstance)
+                .map(c->((KillPlayerPollCommand)c).getPlayer())
+                .toList();
+    }
+
+    private List<Player> filterAlivePlayers() {
+        List<Player> playersKilledInStage = getPlayersKilledInStage();
+        return alivePlayersGetter.get().stream()
+                .filter(p->!playersKilledInStage.contains(p))
+                .toList();
+    }
+
     @Override
     public Optional<Poll> createNightPoll() {
         // use kill potion
-        if(this.remainingKillPotions > 0){
+        if(this.remainingKillPotions > 0 && !witchKillCommandExists(getPlayersKilledInStage()) && isWitchAlive()){
             // TODO filter out player who already got killed to not appear in alivePlayers
             List<Player> alivePlayers = alivePlayersGetter.get();
             return Optional.of(new Poll(
@@ -64,7 +86,7 @@ public class Witch extends Role implements DoubleNightVoter {
                     "Select a player to kill with your poison potion.",
                     alivePlayers.stream().map(p->new PollOption(p, new KillPlayerPollCommand(p))).toList(),
                     // TODO: JAN wie chani filtere das nur d witch participant isch? (next line)
-                    getPlayers().stream().filter(Player::isAlive).map(p->new PollParticipant(p)).toList(),
+                    this.getPlayers().stream().filter(Player::isAlive).map(p->new PollParticipant(p)).toList(),
                     15,
                     new NullResultPollDecider()));
         }
