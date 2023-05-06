@@ -3,8 +3,10 @@ package ch.uzh.ifi.hase.soprafs23.service;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import ch.uzh.ifi.hase.soprafs23.rest.dto.FractionGetDTO;
 import org.springframework.http.HttpStatus;
@@ -16,10 +18,13 @@ import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.game.GameObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Scheduler;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
+import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.PrivateInstantPollCommand;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.PollCommandGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.PollGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 
@@ -49,6 +54,17 @@ public class GameService implements GameObserver{
 
     public GameGetDTO toGameGetDTO(Game game) {
         return LogicDTOMapper.convertGameToGameGetDTO(game);
+    }
+
+    public List<PollCommandGetDTO> toPollCommandGetDTO(List<PrivateInstantPollCommand> list) {
+        return list.stream().map(LogicDTOMapper::convertPollCommandToPollCommandGetDTO).toList();
+    }
+
+    public GameGetDTO mergePlayerPollCommandsToGameGetDTO(GameGetDTO gameGetDTO, Player player) {
+        gameGetDTO.setActions(
+            Stream.concat(gameGetDTO.getActions().stream(), toPollCommandGetDTO(player.getPrivatePollCommands()).stream()).toList()
+        );
+        return gameGetDTO;
     }
 
     public void startGame(Game game) {
