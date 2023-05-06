@@ -69,6 +69,16 @@ public class LobbyService implements LobbyObserver{
         }
     }
 
+    /**
+     * @pre user is in lobby
+     * @param user
+     * @param lobby
+     * @return
+     */
+    public Player getPlayerOfUser(User user, Lobby lobby) {
+        return lobby.getPlayerById(user.getId());
+    }
+
     public void validateLobbyIsOpen(Lobby lobby) {
         if (!lobby.isOpen()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lobby is closed.");
@@ -111,13 +121,12 @@ public class LobbyService implements LobbyObserver{
     }
 
     /**
-     * @pre user is in lobby
+     * @pre player is in lobby
      * @param user
      * @param lobby
      * @return
      */
-    public Collection<RoleGetDTO> getOwnRolesInformation(User user, Lobby lobby) {
-        Player player = lobby.getPlayerById(user.getId());
+    public Collection<RoleGetDTO> getPlayerRoleInformation(Player player, Lobby lobby) {
         return lobby.getRolesOfPlayer(player).stream().map(role -> LogicDTOMapper.convertRoleToRoleGetDTO(role)).toList();
     }
 
