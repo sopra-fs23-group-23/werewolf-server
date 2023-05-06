@@ -6,9 +6,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
@@ -16,6 +18,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
+import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DoubleNightVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.FirstDayVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.StageVoter;
@@ -136,6 +139,14 @@ public class Game implements StageObserver{
             .collect(Collectors.toCollection(LinkedList::new));
     }
 
+    public static void forVoterRolesOfType(Collection<Role> roles, Class<? extends StageVoter> stageVoterClass, Consumer<? super Role> stageVoterClassAction) {
+        // TODO test
+        roles.stream()
+            .filter(stageVoterClass::isInstance)
+            .sorted()
+            .forEach(stageVoterClassAction);
+    }
+
     private Queue<Supplier<Optional<Poll>>> getDayVoters() {
         return Game.getVotersOfType(lobby.getRoles(), DayVoter.class, dayVoterRole -> ((DayVoter)dayVoterRole)::createDayPoll);
     }
@@ -145,7 +156,14 @@ public class Game implements StageObserver{
     }
 
     private Queue<Supplier<Optional<Poll>>> getNightVoters() {
-        return Game.getVotersOfType(lobby.getRoles(), NightVoter.class, nightVoterRole -> ((NightVoter)nightVoterRole)::createNightPoll);
+        Queue<Supplier<Optional<Poll>>> nightVoters = new LinkedList<>();
+        Game.forVoterRolesOfType(lobby.getRoles(), NightVoter.class, nightVoterRole -> {
+            nightVoters.add(((NightVoter)nightVoterRole)::createNightPoll);
+            if (nightVoterRole instanceof DoubleNightVoter) {
+                nightVoters.add(((DoubleNightVoter)nightVoterRole)::createSecondNightPoll);
+            }
+        });
+        return nightVoters;
     }
 
     @Override
