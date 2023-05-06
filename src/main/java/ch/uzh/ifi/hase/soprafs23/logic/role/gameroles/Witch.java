@@ -28,7 +28,8 @@ public class Witch extends Role implements DoubleNightVoter {
             "In addition, the witch has the possibility to poison a person once in the game.";
     private int remainingKillPotions;
     private int remainingResurrectPotions;
-    public Witch(Supplier<List<Player>> alivePlayersGetter, Supplier<List<PollCommand>> currentStageCommands, Consumer<PollCommand> removePollCommand, int remainingKillPotions, int remainingResurrectPotions){
+    public Witch(Supplier<List<Player>> alivePlayersGetter, Supplier<List<PollCommand>> currentStageCommands,
+                 Consumer<PollCommand> removePollCommand){
         this.alivePlayersGetter = alivePlayersGetter;
         this. currentStageCommands = currentStageCommands;
         this.removePollCommand = removePollCommand;
@@ -48,6 +49,8 @@ public class Witch extends Role implements DoubleNightVoter {
     @Override
     public Optional<Poll> createSecondNightPoll() {
         if(this.remainingResurrectPotions > 0){
+            // TODO only set to 0 if action takes place
+            //this.remainingResurrectPotions = 0;
             // TODO filter out player who just got killed by the werewolves
         }
         return Optional.empty();
@@ -68,7 +71,8 @@ public class Witch extends Role implements DoubleNightVoter {
                     15,
                     new NullResultPollDecider()));
         }
-        // TODO: JAN was sölli returne wenn sie kein kill pot me het?
         return Optional.empty();
     }
+
+    // priv decreaseheal kill potion methods
 }
