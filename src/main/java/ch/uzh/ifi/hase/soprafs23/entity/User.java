@@ -20,8 +20,11 @@ public class User implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
+
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pet_seq")
+  @SequenceGenerator(name = "pet_seq", sequenceName = "pet_sequence", initialValue = 10000, allocationSize = 1)
+  @Column(name = "id", nullable = false)
   private Long id;
 
   @Column(nullable = false, unique = true)

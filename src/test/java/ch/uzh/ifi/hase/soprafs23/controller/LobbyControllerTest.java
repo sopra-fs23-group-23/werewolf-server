@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.controller;
 import static org.hamcrest.Matchers.is;
 
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -18,8 +19,10 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.server.ResponseStatusException;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
@@ -122,16 +125,56 @@ public class LobbyControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    void testGetOwnRoles() throws Exception {
-        User user = createTestUser("test", 1L);
-        Player player = LogicEntityMapper.createPlayerFromUser(user);
-        Lobby lobby = new Lobby(1L, player);
+    // @Test
+    // void testGetOwnRoles() throws Exception {
+    //     User user = createTestUser("test", 1L);
+    //     Player player = LogicEntityMapper.createPlayerFromUser(user);
+    //     Lobby lobby = new Lobby(1L, player);
 
-        Mockito.when(lobbyService.getLobbyById(1L)).thenReturn(lobby);
+    //     Mockito.when(lobbyService.getLobbyById(1L)).thenReturn(lobby);
+    //     Mockito.when(userService.getUser(1L)).thenReturn(user);
+    //     doNothing().when(userService).validateTokenMatch(user, "token");
+    //     doNothing().when(lobbyService).validateUserIsInLobby(user, lobby);
+
+    //     MockHttpServletRequestBuilder getRequest = get("/lobbies/1/roles/1").
+    //             header(USERAUTH_HEADER, "token");
+
+    //     mockMvc.perform(getRequest)
+    //             .andExpect(status().isOk());
+    // }
+
+    @Test
+    void testGetPlayerRole_ownInfo() throws Exception {
+        User user = mock(User.class);
+        Player player = mock(Player.class);
+        Lobby lobby = mock(Lobby.class);
+
+        Mockito.when(userService.getUserByToken(Mockito.anyString())).thenReturn(user);
         Mockito.when(userService.getUser(1L)).thenReturn(user);
-        doNothing().when(userService).validateTokenMatch(user, "token");
-        doNothing().when(lobbyService).validateUserIsInLobby(user, lobby);
+        Mockito.when(lobbyService.getLobbyById(1L)).thenReturn(lobby);
+        Mockito.when(lobbyService.getPlayerOfUser(user, lobby)).thenReturn(player);
+        Mockito.when(player.isAlive()).thenReturn(true);
+
+        MockHttpServletRequestBuilder getRequest = get("/lobbies/1/roles/1").
+                header(USERAUTH_HEADER, "token");
+
+        mockMvc.perform(getRequest)
+                .andExpect(status().isOk());
+        verify(userService).validateTokenMatch(user, "token");
+    }
+
+    @Test
+    void testGetPlayerRole_playerDead() throws Exception {
+        User user = mock(User.class);
+        Player player = mock(Player.class);
+        Lobby lobby = mock(Lobby.class);
+
+        Mockito.when(userService.getUserByToken(Mockito.anyString())).thenReturn(user);
+        Mockito.when(userService.getUser(1L)).thenReturn(user);
+        Mockito.when(lobbyService.getLobbyById(1L)).thenReturn(lobby);
+        Mockito.when(lobbyService.getPlayerOfUser(user, lobby)).thenReturn(player);
+        Mockito.when(player.isAlive()).thenReturn(false);
+        Mockito.doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not allowed to access this resource")).when(userService).validateTokenMatch(user, "token");
 
         MockHttpServletRequestBuilder getRequest = get("/lobbies/1/roles/1").
                 header(USERAUTH_HEADER, "token");

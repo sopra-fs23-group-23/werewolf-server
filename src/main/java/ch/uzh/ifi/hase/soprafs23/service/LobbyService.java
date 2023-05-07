@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
+import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.LobbyObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
@@ -70,13 +71,13 @@ public class LobbyService implements LobbyObserver{
     }
 
     /**
-     * @pre lobby contains player
+     * @pre user is in lobby
+     * @param user
      * @param lobby
-     * @param playerId
      * @return
      */
-    public Player getPlayerById(Lobby lobby, Long playerId) {
-        return lobby.getPlayerById(playerId);
+    public Player getPlayerOfUser(User user, Lobby lobby) {
+        return lobby.getPlayerById(user.getId());
     }
 
     public void validateLobbyIsOpen(Lobby lobby) {
@@ -121,22 +122,25 @@ public class LobbyService implements LobbyObserver{
     }
 
     /**
-     * @pre user is in lobby
+     * @pre player is in lobby
      * @param user
      * @param lobby
      * @return
      */
-    public Collection<RoleGetDTO> getOwnRolesInformation(User user, Lobby lobby) {
-        Player player = lobby.getPlayerById(user.getId());
+    public Collection<RoleGetDTO> getPlayerRoleInformation(Player player, Lobby lobby) {
         return lobby.getRolesOfPlayer(player).stream().map(role -> LogicDTOMapper.convertRoleToRoleGetDTO(role)).toList();
     }
 
+    public void instantiateRoles(Lobby lobby, Game game) {
+        lobby.instantiateRoles(lobby::getAlivePlayers, lobby::addPlayerToRole, game::getCurrentStagePollCommands, game::removePollCommandFromCurrentStage);
+    }
+
     /**
-     * @pre executing user is admin
+     * @pre executing user is admin, lobby roles instantiated
      * @param lobby
      */
     public void assignRoles(Lobby lobby) {
-        lobby.instantiateRoles();
+        lobby.assignRoles();;
     }
 
     public void closeLobby(Lobby lobby) {

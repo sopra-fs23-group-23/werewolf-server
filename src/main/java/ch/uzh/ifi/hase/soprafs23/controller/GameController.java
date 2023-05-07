@@ -51,9 +51,10 @@ public class GameController {
         lobbyService.validateUserIsAdmin(user, lobby);
         lobbyService.validateLobbySize(lobby);
         lobbyService.closeLobby(lobby);
-        lobbyService.assignRoles(lobby);
         Game game = gameService.createNewGame(lobby);
-        Scheduler.getInstance().schedule(() -> gameService.startGame(game), 15);
+        lobbyService.instantiateRoles(lobby, game);
+        lobbyService.assignRoles(lobby);
+        Scheduler.getInstance().schedule(() -> gameService.startGame(game), 10);
     }
 
     @GetMapping("/games/{lobbyId}")
@@ -63,7 +64,7 @@ public class GameController {
         User user = userService.getUserByToken(token);
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
         lobbyService.validateUserIsInLobby(user, lobby);
-        Player player = lobbyService.getPlayerById(lobby, user.getId());
+        Player player = lobbyService.getPlayerOfUser(user, lobby);
         Game game = gameService.getGame(lobby);
         gameService.validateGameStarted(game);
         GameGetDTO gameGetDTO = gameService.toGameGetDTO(game);

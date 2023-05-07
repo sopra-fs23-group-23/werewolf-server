@@ -25,5 +25,10 @@ public class AddPlayerToRoleInstantPollCommand implements InstantPollCommand{
     public String toString() {
         return String.format("%s is now a %s", player.getName(), roleClass.getSimpleName());
     }
+
+    @Override
+    public Player getAffectedPlayer() {
+        return player;
+    }
     
 }

@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.rest.dto;
 
 public class PollCommandGetDTO {
     public String type;
+    public PlayerGetDTO affectedPlayer;
     public String message;
     
     public String getType() {
@@ -16,6 +17,10 @@ public class PollCommandGetDTO {
     public void setMessage(String message) {
         this.message = message;
     }
-
-    
+    public PlayerGetDTO getAffectedPlayer() {
+        return affectedPlayer;
+    }
+    public void setAffectedPlayer(PlayerGetDTO affectedPlayer) {
+        this.affectedPlayer = affectedPlayer;
+    }
 }

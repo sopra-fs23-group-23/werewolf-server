@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,6 +9,9 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import ch.uzh.ifi.hase.soprafs23.agora.Agora;
+import ch.uzh.ifi.hase.soprafs23.constant.Reason;
+import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.FractionGetDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,12 +21,15 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.game.GameObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Scheduler;
+import ch.uzh.ifi.hase.soprafs23.logic.game.StageType;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
-import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.NullPollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.PrivateInstantPollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.PollCommandGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.PollGetDTO;
@@ -52,8 +59,14 @@ public class GameService implements GameObserver{
         return games.get(lobby.getId());
     }
 
+    private List<PollCommand> filterOutNullPollCommands(List<PollCommand> pollCommands) {
+        return pollCommands.stream().filter(p->!(p instanceof NullPollCommand)).toList();
+    }
+
     public GameGetDTO toGameGetDTO(Game game) {
-        return LogicDTOMapper.convertGameToGameGetDTO(game);
+        List<PollCommand> pollCommands = filterOutNullPollCommands(game.getLastStagePollCommands());
+        List<PollCommandGetDTO> pollCommandGetDTOs = pollCommands.stream().map(LogicDTOMapper::convertPollCommandToPollCommandGetDTO).toList();
+        return LogicDTOMapper.convertGameToGameGetDTO(game, pollCommandGetDTOs);
     }
 
     public List<PollCommandGetDTO> toPollCommandGetDTO(List<PrivateInstantPollCommand> list) {
@@ -86,7 +99,7 @@ public class GameService implements GameObserver{
     }
 
     public boolean isPollParticipant(Poll poll, User user) {
-        return poll.getPollParticipants().stream().anyMatch(p->p.getPlayer().getId() == user.getId());
+        return poll.getPollParticipants().stream().anyMatch(p->p.getPlayer().getId().equals(user.getId()));
     }
 
     public void validateParticipant(Poll poll, User user) {
@@ -112,11 +125,11 @@ public class GameService implements GameObserver{
      * @return
      */
     public PollParticipant getParticipant (Poll poll, User user) {
-        return poll.getPollParticipants().stream().filter(p->p.getPlayer().getId() == user.getId()).findFirst().get();
+        return poll.getPollParticipants().stream().filter(p->p.getPlayer().getId().equals(user.getId())).findFirst().get();
     }
 
     public PollOption getPollOption(Poll poll, Long pollOptionId) {
-        Predicate<? super PollOption> optionFilter = (p->p.getPlayer().getId() == pollOptionId);
+        Predicate<? super PollOption> optionFilter = (p->p.getPlayer().getId().equals(pollOptionId));
         if (!poll.getPollOptions().stream().anyMatch(optionFilter)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Selected option is not a valid option for this poll.");
         }
@@ -177,5 +190,40 @@ public class GameService implements GameObserver{
         if (games.containsKey(game.getLobby().getId())) {
             Scheduler.getInstance().schedule(()->removeGame(game), 30);
         }
+        try {
+            Agora.deleteAllRules(game.getLobby().getId().toString());
+        }
+        catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
     }
+
+    private void applyKickingRules(Game game) throws IOException, InterruptedException{
+        if (game.getCurrentStage().getType() == StageType.Night) {
+            List<Player> villagers = game.getLobby().getPlayersByRole(Villager.class)
+                    .stream()
+                    .filter(Player::isAlive)
+                    .toList();
+            for (Player villager : villagers) {
+                Agora.kickVillager(villager, game.getLobby().getId().toString());
+            }
+        } else if (game.getCurrentStage().getType() == StageType.Day) {
+            Agora.deleteRules(Reason.KICK_VILLAGER, game.getLobby().getId().toString());
+        }
+    }
+
+    @Override
+    public void onNewStage(Game game) {
+        try {
+            applyKickingRules(game);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /* TODO Miro
+    *   On player dead, apply Agora.muteDeadPlayer(player, cname)
+    * */
 }
