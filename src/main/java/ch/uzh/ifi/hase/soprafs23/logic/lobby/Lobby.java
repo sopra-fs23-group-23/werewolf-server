@@ -115,15 +115,15 @@ public class Lobby {
         roles.get(role).addPlayer(player);
     }
 
-    private List<PollCommand> getCurrentStagePollCommands(Game game){
-        game.getCurrentStage().getPollCommands()
-    }
+//    private List<PollCommand> getCurrentStagePollCommands(Game game){
+//        game.getCurrentStage().getPollCommands()
+//    }
 
     public void instantiateRoles(Game game) {
         roles.put(Werewolf.class, new Werewolf(this::getAlivePlayers));
         Mayor mayor = new Mayor(this::getAlivePlayers, new RandomTiedPollDecider(), Scheduler.getInstance());
         roles.put(Mayor.class, mayor);
-        roles.put(Witch.class, new Witch(this::getAlivePlayers, this::getCurrentStagePollCommands, ));
+        //roles.put(Witch.class, new Witch(this::getAlivePlayers, this::getCurrentStagePollCommands, ));
         roles.put(Villager.class, new Villager(this::addPlayerToRole, this::getAlivePlayers, mayor));
 
         ArrayList<Player> playerList = shufflePlayers();

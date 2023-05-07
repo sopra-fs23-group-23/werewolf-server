@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import org.junit.jupiter.api.Test;
 
@@ -75,7 +76,7 @@ public class LobbyTest {
         Lobby l = new Lobby(1l, admin);
         l.addPlayer(p1);
         l.addPlayer(p2);
-        l.instantiateRoles();
+        l.instantiateRoles(mock(Game.class));
         Collection<Role> roles = l.getRoles();
 
         for (Player player : l.getPlayers()) {

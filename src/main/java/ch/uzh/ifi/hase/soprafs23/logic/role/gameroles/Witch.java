@@ -11,6 +11,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.Remov
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.NullResultPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DoubleNightVoter;
+import javassist.NotFoundException;
 
 import java.util.List;
 import java.util.Optional;

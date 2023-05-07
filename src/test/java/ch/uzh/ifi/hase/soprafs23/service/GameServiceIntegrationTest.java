@@ -24,11 +24,11 @@ public class GameServiceIntegrationTest {
         lobby.addPlayer(player3);
         lobby.addPlayer(player4);
         lobby.addPlayer(player5);
-        lobby.instantiateRoles();
 
         Game game = new Game(lobby);
 
         gameService.createNewGame(lobby);
+        lobby.instantiateRoles(game);
 
         assertEquals(gameService.getGame(lobby).getLobby().getAdmin().getId(), player1.getId());
         assertFalse(game.isFinished());

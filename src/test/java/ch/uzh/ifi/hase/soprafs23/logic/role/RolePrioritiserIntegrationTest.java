@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 
+import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import org.junit.jupiter.api.Test;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
@@ -20,7 +21,7 @@ public class RolePrioritiserIntegrationTest {
     void testAllRolesInPriorityList() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         Player admin = mock(Player.class);
         Lobby lobby = new Lobby(1l, admin);
-        lobby.instantiateRoles();
+        lobby.instantiateRoles(mock(Game.class));
         Collection<Role> roles = lobby.getRoles();
 
         Field priority = RolePrioritiser.class.getDeclaredField("priority");

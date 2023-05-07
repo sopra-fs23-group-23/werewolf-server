@@ -5,6 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import javax.transaction.Transactional;
 
+import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -125,8 +126,8 @@ public class LobbyService implements LobbyObserver{
      * @pre executing user is admin
      * @param lobby
      */
-    public void assignRoles(Lobby lobby) {
-        lobby.instantiateRoles();
+    public void assignRoles(Lobby lobby, Game game) {
+        lobby.instantiateRoles(game);
     }
 
     public void closeLobby(Lobby lobby) {
