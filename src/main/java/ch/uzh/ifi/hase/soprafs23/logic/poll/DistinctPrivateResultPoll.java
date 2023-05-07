@@ -42,7 +42,7 @@ public class DistinctPrivateResultPoll extends PrivateResultPoll {
         }
     }
 
-    public void executeSelectedPrivateInstantPollCommands(List<PrivateInstantPollCommand> privateInstantPollCommands) {
+    private void executeSelectedPrivateInstantPollCommands(List<PrivateInstantPollCommand> privateInstantPollCommands) {
         privateInstantPollCommands.stream()
             .forEach(privateInstantPollCommand -> {
                 privateInstantPollCommand.execute_instantly();
