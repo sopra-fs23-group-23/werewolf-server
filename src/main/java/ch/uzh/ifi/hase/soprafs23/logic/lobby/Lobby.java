@@ -1,6 +1,9 @@
 package ch.uzh.ifi.hase.soprafs23.logic.lobby;
 
 import java.util.*;
+
+import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Scheduler;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.RandomTiedPollDecider;
@@ -8,6 +11,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Mayor;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Witch;
 
 public class Lobby {
     private Long id;
@@ -111,10 +115,15 @@ public class Lobby {
         roles.get(role).addPlayer(player);
     }
 
-    public void instantiateRoles() {
+    private List<PollCommand> getCurrentStagePollCommands(Game game){
+        game.getCurrentStage().getPollCommands()
+    }
+
+    public void instantiateRoles(Game game) {
         roles.put(Werewolf.class, new Werewolf(this::getAlivePlayers));
         Mayor mayor = new Mayor(this::getAlivePlayers, new RandomTiedPollDecider(), Scheduler.getInstance());
         roles.put(Mayor.class, mayor);
+        roles.put(Witch.class, new Witch(this::getAlivePlayers, this::getCurrentStagePollCommands, ));
         roles.put(Villager.class, new Villager(this::addPlayerToRole, this::getAlivePlayers, mayor));
 
         ArrayList<Player> playerList = shufflePlayers();

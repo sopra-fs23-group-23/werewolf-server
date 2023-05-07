@@ -6,6 +6,8 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.KillPlayerPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.WitchKillPlayerPollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.RemoveCommandInstantPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.NullResultPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DoubleNightVoter;
@@ -31,32 +33,12 @@ public class Witch extends Role implements DoubleNightVoter {
     public Witch(Supplier<List<Player>> alivePlayersGetter, Supplier<List<PollCommand>> currentStageCommands,
                  Consumer<PollCommand> removePollCommand){
         this.alivePlayersGetter = alivePlayersGetter;
-        this. currentStageCommands = currentStageCommands;
+        this.currentStageCommands = currentStageCommands;
         this.removePollCommand = removePollCommand;
         this.remainingKillPotions = 1;
         this.remainingResurrectPotions = 1;
     }
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public Optional<Poll> createSecondNightPoll() {
-        if(this.remainingResurrectPotions > 0){
-            // TODO only set to 0 if action takes place
-            //this.remainingResurrectPotions = 0;
-            // TODO filter out player who just got killed by the werewolves
-        }
-        return Optional.empty();
-    }
-
-    private boolean witchKillCommandExists(List<Player> playersKilledInStage) { 
+    private boolean witchKillCommandExists(List<Player> playersKilledInStage) {
         return playersKilledInStage.contains(getPlayers().stream().findFirst().get());
     }
 
@@ -71,30 +53,63 @@ public class Witch extends Role implements DoubleNightVoter {
                 .toList();
     }
 
+    private List<KillPlayerPollCommand> getKillPlayerPollCommands(){
+        return currentStageCommands.get().stream()
+                .filter(KillPlayerPollCommand.class::isInstance)
+                .map(KillPlayerPollCommand.class::cast)
+                .toList();
+    }
+
     private List<Player> filterAlivePlayers() {
         List<Player> playersKilledInStage = getPlayersKilledInStage();
         return alivePlayersGetter.get().stream()
                 .filter(p->!playersKilledInStage.contains(p))
                 .toList();
     }
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
 
     @Override
     public Optional<Poll> createNightPoll() {
-        // use kill potion
-        if(this.remainingKillPotions > 0 && !witchKillCommandExists(getPlayersKilledInStage()) && isWitchAlive()){
-            // TODO filter out player who already got killed to not appear in alivePlayers
-            List<Player> alivePlayers = alivePlayersGetter.get();
+        if(this.remainingResurrectPotions > 0 && isWitchAlive()){
+            List<KillPlayerPollCommand> killedPlayerPollCommands = getKillPlayerPollCommands();
             return Optional.of(new Poll(
                     this.getClass(),
-                    "Select a player to kill with your poison potion.",
-                    alivePlayers.stream().map(p->new PollOption(p, new KillPlayerPollCommand(p))).toList(),
-                    // TODO: JAN wie chani filtere das nur d witch participant isch? (next line)
+                    "Save this player from dying with your heal potion.",
+                    killedPlayerPollCommands.stream().map(killPollCommand -> new PollOption(killPollCommand.getPlayer(), new RemoveCommandInstantPollCommand(this.removePollCommand, killPollCommand, this::decreaseResurrectPotions))).toList(),
                     this.getPlayers().stream().filter(Player::isAlive).map(p->new PollParticipant(p)).toList(),
                     15,
                     new NullResultPollDecider()));
         }
         return Optional.empty();
     }
+    @Override
+    public Optional<Poll> createSecondNightPoll() {
+        // use kill potion
+        if(this.remainingKillPotions > 0 && !witchKillCommandExists(getPlayersKilledInStage()) && isWitchAlive()){
+            List<Player> alivePlayers = filterAlivePlayers();
+            return Optional.of(new Poll(
+                    this.getClass(),
+                    "Select a player to kill with your poison potion.",
+                    alivePlayers.stream().map(p->new PollOption(p, new WitchKillPlayerPollCommand(p, this::decreaseKillPotion))).toList(),
+                    this.getPlayers().stream().filter(Player::isAlive).map(p->new PollParticipant(p)).toList(),
+                    15,
+                    new NullResultPollDecider()));
+        }
+        return Optional.empty();
+    }
+    private void decreaseKillPotion(){
+        this.remainingKillPotions--;
+    }
 
-    // priv decreaseheal kill potion methods
+    private void decreaseResurrectPotions(){
+        this.remainingResurrectPotions--;
+    }
 }
