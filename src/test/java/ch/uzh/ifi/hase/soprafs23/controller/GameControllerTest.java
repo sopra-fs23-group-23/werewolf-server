@@ -62,7 +62,7 @@ public class GameControllerTest {
         
         verify(lobbyService).validateUserIsAdmin(user, lobby);
         verify(lobbyService).validateLobbySize(lobby);
-        verify(lobbyService).assignRoles(lobby, game);
+        verify(lobbyService).assignRoles(lobby);
     }
 
     @Test

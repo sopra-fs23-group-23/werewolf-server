@@ -50,7 +50,7 @@ public class Witch extends Role implements DoubleNightVoter {
     private List<Player> getPlayersKilledInStage() {
         return currentStageCommands.get().stream()
                 .filter(KillPlayerPollCommand.class::isInstance)
-                .map(c->((KillPlayerPollCommand)c).getPlayer())
+                .map(c-> c.getAffectedPlayer())
                 .toList();
     }
 
@@ -79,12 +79,13 @@ public class Witch extends Role implements DoubleNightVoter {
 
     @Override
     public Optional<Poll> createNightPoll() {
-        if(this.remainingResurrectPotions > 0 && isWitchAlive()){
+        List<Player> playerKilledInStage = getPlayersKilledInStage();
+        if(this.remainingResurrectPotions > 0 && isWitchAlive() && !playerKilledInStage.isEmpty()){
             List<KillPlayerPollCommand> killedPlayerPollCommands = getKillPlayerPollCommands();
             return Optional.of(new Poll(
                     this.getClass(),
                     "Save this player from dying with your heal potion.",
-                    killedPlayerPollCommands.stream().map(killPollCommand -> new PollOption(killPollCommand.getPlayer(), new RemoveCommandInstantPollCommand(this.removePollCommand, killPollCommand, this::decreaseResurrectPotions))).toList(),
+                    killedPlayerPollCommands.stream().map(killPollCommand -> new PollOption(killPollCommand.getAffectedPlayer(), new RemoveCommandInstantPollCommand(this.removePollCommand, killPollCommand, this::decreaseResurrectPotions, killPollCommand.getAffectedPlayer()))).toList(),
                     this.getPlayers().stream().filter(Player::isAlive).map(p->new PollParticipant(p)).toList(),
                     15,
                     new NullResultPollDecider()));

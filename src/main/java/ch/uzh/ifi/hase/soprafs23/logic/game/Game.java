@@ -30,6 +30,7 @@ public class Game implements StageObserver{
     private Optional<Poll> currentPoll = Optional.empty();
     private Optional<Fraction> winner = Optional.empty();
     private int stageCount = 0;
+    private int pollCount = 0;
     private boolean finished = false;
     private List<PollCommand> lastStagePollCommands = new ArrayList<>();
     private List<GameObserver> observers = new ArrayList<>();
@@ -88,6 +89,26 @@ public class Game implements StageObserver{
 
     public Stage getCurrentStage() {
         return currentStage;
+    }
+
+    public int getPollCount() {
+        return pollCount;
+    }
+
+    /**
+     * @pre isStarted()
+     * @return List<PollCommand> of the current stage
+     */
+    public List<PollCommand> getCurrentStagePollCommands() {
+        return currentStage.getPollCommands();
+    }
+
+    /**
+     * @pre isStarted()
+     * @param pollCommand
+     */
+    public void removePollCommandFromCurrentStage(PollCommand pollCommand) {
+        currentStage.removePollCommand(pollCommand);
     }
 
     public List<PollCommand> getLastStagePollCommands() {
@@ -168,6 +189,7 @@ public class Game implements StageObserver{
 
     @Override
     public void onNewPoll(Poll poll) {
+        pollCount++;
         currentPoll = Optional.of(poll);
         observers.forEach(o -> o.onNewPoll(this));
     }

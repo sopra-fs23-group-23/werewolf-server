@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
+import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
 
 public class LobbyServiceTest {
@@ -201,15 +202,27 @@ public class LobbyServiceTest {
     }
 
     @Test
-    void testGetOwnRolesInformation() {
+    void testGetPlayerRoleInformation() {
         Collection<Role> rolesReturn = new ArrayList<>();
-        Lobby mock = mock(Lobby.class);
-        rolesReturn.add(new Werewolf(mock::getAlivePlayers));
-        User user = createTestUser(1L, "testUser");
-        Mockito.when(mock.getPlayerById(1L)).thenReturn(LogicEntityMapper.createPlayerFromUser(user));
-        Mockito.when(mock.getRolesOfPlayer(Mockito.any())).thenReturn(rolesReturn);
-        ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>(lobbyService.getOwnRolesInformation(user, mock));
+        Lobby lobby = mock(Lobby.class);
+        Player player = mock(Player.class);
+        rolesReturn.add(new Werewolf(lobby::getAlivePlayers));
+
+        Mockito.when(lobby.getRolesOfPlayer(player)).thenReturn(rolesReturn);
+        
+        ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>(lobbyService.getPlayerRoleInformation(player, lobby));
         assertEquals("Werewolf", roleGetDTOS.get(0).getRoleName());
         assertEquals(0, roleGetDTOS.get(0).getAmount());
+    }
+
+    @Test
+    void testGetPlayerOfUser() {
+        User user = mock(User.class);
+        Lobby lobby = mock(Lobby.class);
+        Player player = mock(Player.class);
+        Mockito.when(user.getId()).thenReturn(1l);
+        Mockito.when(lobby.getPlayerById(1l)).thenReturn(player);
+        
+        assertEquals(player, lobbyService.getPlayerOfUser(user, lobby));
     }
 }

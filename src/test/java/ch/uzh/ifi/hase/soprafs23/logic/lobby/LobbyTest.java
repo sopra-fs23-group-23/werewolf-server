@@ -69,14 +69,17 @@ public class LobbyTest {
     }
 
     @Test
-    void testInstantiateRoles(){
+    void testAssignRoles(){
         Player admin = new Player(12l, "admin");
         Player p1 = new Player(13l, "player1");
         Player p2 = new Player(14l, "player2");
         Lobby l = new Lobby(1l, admin);
         l.addPlayer(p1);
         l.addPlayer(p2);
-        l.instantiateRoles(mock(Game.class));
+
+        l.instantiateRoles(null, null, null, null);
+        l.assignRoles();
+
         Collection<Role> roles = l.getRoles();
 
         for (Player player : l.getPlayers()) {

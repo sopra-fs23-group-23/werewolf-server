@@ -25,8 +25,11 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.NullPollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.PollCommandGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.PollGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 
@@ -54,8 +57,14 @@ public class GameService implements GameObserver{
         return games.get(lobby.getId());
     }
 
+    private List<PollCommand> filterOutNullPollCommands(List<PollCommand> pollCommands) {
+        return pollCommands.stream().filter(p->!(p instanceof NullPollCommand)).toList();
+    }
+
     public GameGetDTO toGameGetDTO(Game game) {
-        return LogicDTOMapper.convertGameToGameGetDTO(game);
+        List<PollCommand> pollCommands = filterOutNullPollCommands(game.getLastStagePollCommands());
+        List<PollCommandGetDTO> pollCommandGetDTOs = pollCommands.stream().map(LogicDTOMapper::convertPollCommandToPollCommandGetDTO).toList();
+        return LogicDTOMapper.convertGameToGameGetDTO(game, pollCommandGetDTOs);
     }
 
     public void startGame(Game game) {

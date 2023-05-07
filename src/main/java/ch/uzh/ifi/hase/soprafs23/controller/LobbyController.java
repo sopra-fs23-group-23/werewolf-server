@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
+import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
@@ -82,12 +83,18 @@ public class LobbyController {
     @GetMapping("/lobbies/{lobbyId}/roles/{uid}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Collection<RoleGetDTO> getOwnRole(@PathVariable(LOBBYID_PATHVARIABLE) Long LobbyId, @PathVariable("uid") Long userId,
+    public Collection<RoleGetDTO> getPlayerRole(@PathVariable(LOBBYID_PATHVARIABLE) Long LobbyId, @PathVariable("uid") Long userId,
                                              @RequestHeader(USERAUTH_HEADER) String token) {
+        User user = userService.getUserByToken(token);
+        User userToGetRole = userService.getUser(userId);
         Lobby lobby = lobbyService.getLobbyById(LobbyId);
-        User user = userService.getUser(userId);
-        userService.validateTokenMatch(user, token);
         lobbyService.validateUserIsInLobby(user, lobby);
-        return lobbyService.getOwnRolesInformation(user, lobby);
+        lobbyService.validateUserIsInLobby(userToGetRole, lobby);
+        Player playerToGetRole = lobbyService.getPlayerOfUser(userToGetRole, lobby);
+        if (playerToGetRole.isAlive()) {
+            // if player is alive, only the user himself can see his role
+            userService.validateTokenMatch(userToGetRole, token);
+        }
+        return lobbyService.getPlayerRoleInformation(playerToGetRole, lobby);
     }
 }

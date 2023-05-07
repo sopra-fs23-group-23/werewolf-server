@@ -13,4 +13,8 @@ public class WitchKillPlayerPollCommand extends KillPlayerPollCommand{
         super.execute();
         decreaseKillPotion.run();
     }
+    @Override
+    public String toString() {
+        return String.format("%s was killed by the witch.", this.getAffectedPlayer().getName());
+    }
 }

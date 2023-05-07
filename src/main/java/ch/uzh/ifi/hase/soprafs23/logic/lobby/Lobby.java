@@ -2,7 +2,11 @@ package ch.uzh.ifi.hase.soprafs23.logic.lobby;
 
 import java.util.*;
 
-import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Scheduler;
@@ -115,17 +119,20 @@ public class Lobby {
         roles.get(role).addPlayer(player);
     }
 
-//    private List<PollCommand> getCurrentStagePollCommands(Game game){
-//        game.getCurrentStage().getPollCommands()
-//    }
 
-    public void instantiateRoles(Game game) {
-        roles.put(Werewolf.class, new Werewolf(this::getAlivePlayers));
-        Mayor mayor = new Mayor(this::getAlivePlayers, new RandomTiedPollDecider(), Scheduler.getInstance());
+    public void instantiateRoles(Supplier<List<Player>> alivePlayersSupplier, BiConsumer<Player, Class<? extends Role>> addPlayerToRoleConsumer, Supplier<List<PollCommand>> currentStagePollCommandsSupplier, Consumer<PollCommand> removePollCommandConsumer) {
+        roles.put(Werewolf.class, new Werewolf(alivePlayersSupplier));
+        Mayor mayor = new Mayor(alivePlayersSupplier, new RandomTiedPollDecider(), Scheduler.getInstance());
         roles.put(Mayor.class, mayor);
-        //roles.put(Witch.class, new Witch(this::getAlivePlayers, this::getCurrentStagePollCommands, ));
-        roles.put(Villager.class, new Villager(this::addPlayerToRole, this::getAlivePlayers, mayor));
+        roles.put(Witch.class, new Witch(alivePlayersSupplier, currentStagePollCommandsSupplier, removePollCommandConsumer));
+        roles.put(Villager.class, new Villager(addPlayerToRoleConsumer, alivePlayersSupplier, mayor));
+    }
 
+
+    /**
+     * @pre roles instantiated
+     */
+    public void assignRoles() {
         ArrayList<Player> playerList = shufflePlayers();
 
         Map<Class<? extends Role>, List<Player>> mapOfPlayersPerRole = new HashMap<>();

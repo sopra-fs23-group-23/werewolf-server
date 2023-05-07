@@ -4,6 +4,7 @@ import java.util.List;
 
 public class GameGetDTO {
     private boolean finished;
+    private int pollCount;
     private StageGetDTO stage;
     private LobbyGetDTO lobby;
     private List<PollCommandGetDTO> actions;
@@ -32,6 +33,10 @@ public class GameGetDTO {
     public void setFinished(boolean isFinished) {
         this.finished = isFinished;
     }
-
-    
+    public int getPollCount() {
+        return pollCount;
+    }
+    public void setPollCount(int pollCount) {
+        this.pollCount = pollCount;
+    }
 }

@@ -14,6 +14,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 
 public class Poll{
+    private String id = java.util.UUID.randomUUID().toString();
     private Class<? extends Role> role;
     private String question;
     private List<PollOption> pollOptions;
@@ -135,6 +136,10 @@ public class Poll{
 
     public Class<? extends Role> getRole() {
         return role;
+    }
+
+    public String getId() {
+        return id;
     }
     
 }
