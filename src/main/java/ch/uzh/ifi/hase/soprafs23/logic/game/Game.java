@@ -92,6 +92,22 @@ public class Game implements StageObserver{
         return pollCount;
     }
 
+    /**
+     * @pre isStarted()
+     * @return List<PollCommand> of the current stage
+     */
+    public List<PollCommand> getCurrentStagePollCommands() {
+        return currentStage.getPollCommands();
+    }
+
+    /**
+     * @pre isStarted()
+     * @param pollCommand
+     */
+    public void removePollCommandFromCurrentStage(PollCommand pollCommand) {
+        currentStage.removePollCommand(pollCommand);
+    }
+
     public List<PollCommand> getLastStagePollCommands() {
         return lastStagePollCommands;
     }

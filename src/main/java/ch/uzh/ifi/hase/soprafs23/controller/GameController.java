@@ -50,8 +50,9 @@ public class GameController {
         lobbyService.validateUserIsAdmin(user, lobby);
         lobbyService.validateLobbySize(lobby);
         lobbyService.closeLobby(lobby);
-        lobbyService.assignRoles(lobby);
         Game game = gameService.createNewGame(lobby);
+        lobbyService.instantiateRoles(lobby, game);
+        lobbyService.assignRoles(lobby);
         Scheduler.getInstance().schedule(() -> gameService.startGame(game), 10);
     }
 

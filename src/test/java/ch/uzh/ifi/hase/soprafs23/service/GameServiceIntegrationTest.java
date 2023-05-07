@@ -24,9 +24,11 @@ public class GameServiceIntegrationTest {
         lobby.addPlayer(player3);
         lobby.addPlayer(player4);
         lobby.addPlayer(player5);
-        lobby.instantiateRoles();
 
         Game game = new Game(lobby);
+
+        lobby.instantiateRoles(lobby::getAlivePlayers, lobby::addPlayerToRole, game::getCurrentStagePollCommands, game::removePollCommandFromCurrentStage);
+        lobby.assignRoles();
 
         gameService.createNewGame(lobby);
 
