@@ -1,5 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.rest.logicmapper;
 
+import java.util.List;
+
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Stage;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
@@ -58,6 +60,11 @@ public final class LogicDTOMapper {
         return stageGetDTO;
     }
 
+    /**
+     * @pre PollCommand is not instance of NullPollCommand
+     * @param pollCommand
+     * @return
+     */
     public static PollCommandGetDTO convertPollCommandToPollCommandGetDTO (PollCommand pollCommand) {
         PollCommandGetDTO pollCommandGetDTO = new PollCommandGetDTO();
         pollCommandGetDTO.setType(pollCommand.getClass().getSimpleName());
@@ -66,9 +73,9 @@ public final class LogicDTOMapper {
         return pollCommandGetDTO;
     }
 
-    public static GameGetDTO convertGameToGameGetDTO(Game game) {
+    public static GameGetDTO convertGameToGameGetDTO(Game game, List<PollCommandGetDTO> actions) {
         GameGetDTO gameGetDTO = new GameGetDTO();
-        gameGetDTO.setActions(game.getLastStagePollCommands().stream().map(LogicDTOMapper::convertPollCommandToPollCommandGetDTO).toList());
+        gameGetDTO.setActions(actions);
         gameGetDTO.setLobby(convertLobbyToLobbyGetDTO(game.getLobby()));
         gameGetDTO.setStage(convertStageToStageGetDTO(game.getCurrentStage()));
         gameGetDTO.setFinished(game.isFinished());
