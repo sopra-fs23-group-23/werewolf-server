@@ -10,6 +10,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Scheduler;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.RandomTiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Hunter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Mayor;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
@@ -121,6 +122,7 @@ public class Lobby {
         Mayor mayor = new Mayor(alivePlayersSupplier, new RandomTiedPollDecider(), Scheduler.getInstance());
         roles.put(Mayor.class, mayor);
         //roles.put(Witch.class, new Witch(alivePlayersSupplier, currentStagePollCommandsSupplier, removePollCommandConsumer));
+        roles.put(Hunter.class, new Hunter(addPlayerToRoleConsumer, alivePlayersSupplier));
         roles.put(Villager.class, new Villager(addPlayerToRoleConsumer, alivePlayersSupplier, mayor));
     }
 

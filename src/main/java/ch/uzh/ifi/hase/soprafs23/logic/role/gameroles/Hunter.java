@@ -27,7 +27,7 @@ public class Hunter extends Role implements DayVoter, NightVoter, PlayerObserver
                 This enables him to choose a person who is still alive and who will die as well.
                 """;
 
-    public Hunter(Supplier<List<Player>> alivePlayersGetter, BiConsumer<Player, Class<? extends Role>> addPlayerToRole) {
+    public Hunter(BiConsumer<Player, Class<? extends Role>> addPlayerToRole, Supplier<List<Player>> alivePlayersGetter) {
         this.addPlayerToRole = addPlayerToRole;
         this.alivePlayersGetter = alivePlayersGetter;
     }
