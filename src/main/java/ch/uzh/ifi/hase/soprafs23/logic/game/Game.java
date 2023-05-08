@@ -109,6 +109,10 @@ public class Game implements StageObserver{
         currentStage.removePollCommand(pollCommand);
     }
 
+    public void addPollCommandToCurrentStage(PollCommand pollCommand) {
+        currentStage.addPollCommand(pollCommand);
+    }
+
     public List<PollCommand> getLastStagePollCommands() {
         return lastStagePollCommands;
     }
@@ -129,14 +133,15 @@ public class Game implements StageObserver{
 
     @Override
     public void onStageFinished() {
-        lastStagePollCommands = currentStage.getPollCommands();
-        lastStagePollCommands.stream().forEach(p->p.execute());
+        List<PollCommand> currentStagePollCommands = new ArrayList<>(currentStage.getPollCommands());
+        currentStagePollCommands.stream().forEach(p->p.execute());
         for (Fraction fraction : lobby.getFractions()) {
             if(fraction.hasWon()) {
                 finishGame(fraction);
                 return;
             }
         }
+        lastStagePollCommands = currentStage.getPollCommands();
         startNextStage(calculateNextStage());
     }
 

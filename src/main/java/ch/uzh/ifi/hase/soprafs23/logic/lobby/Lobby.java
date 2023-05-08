@@ -118,14 +118,20 @@ public class Lobby {
         roles.get(role).addPlayer(player);
     }
 
-    public void instantiateRoles(Supplier<List<Player>> alivePlayersSupplier, BiConsumer<Player, Class<? extends Role>> addPlayerToRoleConsumer, Supplier<List<PollCommand>> currentStagePollCommandsSupplier, Consumer<PollCommand> removePollCommandConsumer) {
+    public void instantiateRoles(
+        Supplier<List<Player>> alivePlayersSupplier,
+        BiConsumer<Player, Class<? extends Role>> addPlayerToRoleConsumer,
+        Supplier<List<PollCommand>> currentStagePollCommandsSupplier,
+        Consumer<PollCommand> removePollCommandConsumer,
+        Consumer<PollCommand> addPollCommandConsumer
+    ) {
         roles.put(Werewolf.class, new Werewolf(alivePlayersSupplier));
         Mayor mayor = new Mayor(alivePlayersSupplier, new RandomTiedPollDecider(), Scheduler.getInstance());
         roles.put(Mayor.class, mayor);
         //roles.put(Witch.class, new Witch(alivePlayersSupplier, currentStagePollCommandsSupplier, removePollCommandConsumer));
         roles.put(Villager.class, new Villager(addPlayerToRoleConsumer, alivePlayersSupplier, mayor));
         roles.put(Cupid.class, new Cupid(alivePlayersSupplier, addPlayerToRoleConsumer));
-        roles.put(Lover.class, new Lover(alivePlayersSupplier));
+        roles.put(Lover.class, new Lover(alivePlayersSupplier, addPollCommandConsumer));
     }
 
     private void addSpecialVillagerRoles(Map<Class<? extends Role>, List<Player>> mapOfPlayersPerRole, List<Player> villagers) {

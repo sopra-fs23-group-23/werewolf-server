@@ -63,6 +63,10 @@ public class Stage implements PollObserver{
         throw new UnsupportedOperationException("Unimplemented method 'removePollCommand'");
     }
 
+    public void addPollCommand(PollCommand pollCommand) {
+        pollCommands.add(pollCommand);
+    }
+
     public void addObserver(StageObserver observer) {
         observers.add(observer);
     }
