@@ -9,10 +9,17 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 
 public class Lover extends Role implements Fraction, PlayerObserver {
-    Supplier<List<Player>> alivePlayersGetter;
+    private final Supplier<List<Player>> alivePlayersGetter;
+    private boolean killCommandExecuted = false;
 
     public Lover(Supplier<List<Player>> alivePlayersGetter) {
         this.alivePlayersGetter = alivePlayersGetter;
+    }
+
+    @Override
+    public void addPlayer(Player player) {
+        player.addObserver(this);
+        super.addPlayer(player);
     }
 
     @Override
@@ -36,9 +43,16 @@ public class Lover extends Role implements Fraction, PlayerObserver {
         return "TODO";
     }
 
+    private void killLovers() {
+        getPlayers().stream().forEach(Player::killPlayer);
+    }
+
     @Override
     public void onPlayerKilled() {
-        getPlayers().stream().forEach(Player::killPlayer);
+        if (!killCommandExecuted) {
+            killCommandExecuted = true;
+            killLovers();
+        }
     }
     
 }

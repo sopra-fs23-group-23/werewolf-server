@@ -15,13 +15,11 @@ public class DistinctRandomTiedPollDecider implements TiedPollDecider {
      */
     @Override
     public void executeTiePoll(Poll poll, List<PollOption> pollOptions, Runnable onTiePollFinished) {
-        List<PollOption> selected = new ArrayList<>(pollOptions);
-        List<PollOption> unselected = poll.getPollOptions().stream().filter(pollOption -> !selected.contains(pollOption)).collect(Collectors.toCollection(ArrayList::new));
+        List<PollOption> unselected = poll.getPollOptions().stream().filter(pollOption -> !pollOptions.contains(pollOption)).collect(Collectors.toCollection(ArrayList::new));
         PollParticipant pollParticipant = poll.getPollParticipants().stream().findFirst().get();
-        while (selected.size() < pollParticipant.getRemainingVotes()) {
+        while (pollParticipant.getRemainingVotes() != 0) {
             PollOption randomUnselected = unselected.get(new Random().nextInt(unselected.size()));
-            randomUnselected.addSupporter(pollParticipant);
-            selected.add(randomUnselected);
+            poll.castVote(pollParticipant, randomUnselected);
             unselected.remove(randomUnselected);
         }
         onTiePollFinished.run();

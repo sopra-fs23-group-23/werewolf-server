@@ -3,7 +3,6 @@ package ch.uzh.ifi.hase.soprafs23.logic.role.gameroles;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -48,12 +47,11 @@ public class LoverTest {
     @Test
     void testOnPlayerKilled() {
         Lover lover = new Lover(null);
-        Player p1 = mock(Player.class);
-        Player p2 = mock(Player.class);
+        Player p1 = new Player(1L, "Lover1");
+        Player p2 = new Player(1L, "Lover2");
         lover.addPlayer(p1);
         lover.addPlayer(p2);
-        lover.onPlayerKilled();
-        verify(p1).killPlayer();
-        verify(p1).killPlayer();
+        p1.killPlayer();
+        assertFalse(p2.isAlive(), "Lover2 should be dead after killing lover1");
     }
 }
