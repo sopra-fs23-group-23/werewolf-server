@@ -33,6 +33,15 @@ public class Hunter extends Role implements DayVoter, NightVoter, PlayerObserver
     }
 
     @Override
+    public void addPlayer(Player player) {
+        // ensure there is always only one hunter
+        clearPlayers();
+        died = false;
+        player.addObserver(this);
+        super.addPlayer(player);
+    }
+
+    @Override
     public Optional<Poll> createDayPoll() {
         return createHunterDiedPoll();
     }

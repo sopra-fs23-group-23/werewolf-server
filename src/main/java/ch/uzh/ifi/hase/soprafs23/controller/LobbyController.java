@@ -47,6 +47,15 @@ public class LobbyController {
     public LobbyGetDTO createNewLobby(@RequestHeader(USERAUTH_HEADER) String userToken) {
         User user = userService.getUserByToken(userToken);
         Lobby l = lobbyService.createNewLobby(user);
+
+        for(long i = user.getId(); i < user.getId() + 3L; i++) {
+            User aUser = new User();
+            aUser.setPassword("1234");
+            aUser.setUsername("user" + Long.toString(i));
+            userService.createUser(aUser);
+            lobbyService.joinUserToLobby(aUser, l);
+        }
+
         return LogicDTOMapper.convertLobbyToLobbyGetDTO(l);
     }
 
