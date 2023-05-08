@@ -31,6 +31,6 @@ public class RemoveCommandInstantPollCommand implements InstantPollCommand{
 
     @Override
     public Player getAffectedPlayer() {
-        return null;
+        return player;
     }
 }

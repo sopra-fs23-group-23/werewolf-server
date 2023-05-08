@@ -139,6 +139,11 @@ public class Lobby {
 
         mapOfPlayersPerRole.put(Werewolf.class, playerList.subList(0, this.getLobbySize() / 3));
         mapOfPlayersPerRole.put(Villager.class, playerList.subList(this.getLobbySize() / 3, this.getLobbySize()));
+        mapOfPlayersPerRole.put(Witch.class, playerList.subList(this.getLobbySize() / 3, (this.getLobbySize() / 3) + 1));
+        /*
+        mapOfPlayersPerRole.put(Amor.class, playerList.subList(this.getLobbySize() / 3 + 1, (this.getLobbySize() / 3) + 2));
+        mapOfPlayersPerRole.put(Hunter.class, playerList.subList(this.getLobbySize() / 3 + 2, (this.getLobbySize() / 3) + 3));
+         */
 
         for (Map.Entry<Class<? extends Role>, List<Player>> entry : mapOfPlayersPerRole.entrySet()){
             for (Player player : entry.getValue()){
