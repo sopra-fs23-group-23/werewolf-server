@@ -16,7 +16,7 @@ public class KillPlayerPollCommand implements PollCommand, StageFinishedCommand{
 
     @Override
     public void executeAfterStageFinished() {
-        player.setUnrevivable();
+        player.setDeadPlayerUnrevivable();
     }
 
     @Override

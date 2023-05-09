@@ -49,12 +49,11 @@ public class Player {
         this.alive = false;
     }
 
-    /**
-     * @pre player died
-     */
-    public void setUnrevivable() {
-        this.revivable = false;
-        notifyObservers();
+    public void setDeadPlayerUnrevivable() {
+        if (!this.alive) {
+            this.revivable = false;
+            notifyObservers();
+        }
     }
 
     private void notifyObservers() {

@@ -21,29 +21,19 @@ public class Witch extends Role implements DoubleNightVoter {
     private Supplier<List<Player>> alivePlayersGetter;
     private Supplier<List<PollCommand>> currentStageCommands;
     private Consumer<PollCommand> removePollCommand;
-    private final static String name = "Witch";
-    private final static String description =
-            "The witch is part of the villager faction. Therefore, her goal is to save the village from the werewolves. " +
-            "Thanks to her alchemical knowledge, the witch has two powerful potions which she may use once each. " +
-            "The witch wakes up every night after the werewolves. When she does so, she is shown who the victim of the werewolves is. " +
-            "Once in the game, she may save the victim of that night with a healing potion. " +
-            "In addition, the witch has the possibility to poison a person once in the game.";
-    private int remainingKillPotions;
-    private int remainingResurrectPotions;
+            
+    private int remainingKillPotions = 1;
+    private int remainingResurrectPotions = 1;
+    
     public Witch(Supplier<List<Player>> alivePlayersGetter, Supplier<List<PollCommand>> currentStageCommands,
                  Consumer<PollCommand> removePollCommand){
         this.alivePlayersGetter = alivePlayersGetter;
         this.currentStageCommands = currentStageCommands;
         this.removePollCommand = removePollCommand;
-        this.remainingKillPotions = 1;
-        this.remainingResurrectPotions = 1;
-    }
-    private boolean witchKillCommandExists(List<Player> playersKilledInStage) {
-        return playersKilledInStage.contains(getPlayers().stream().findFirst().get());
     }
 
-    private boolean isWitchAlive() {
-        return getPlayers().stream().findFirst().get().isAlive();
+    private Player getWitch() {
+        return getPlayers().stream().findFirst().get();
     }
 
     private List<Player> getPlayersKilledInStage() {
@@ -60,26 +50,25 @@ public class Witch extends Role implements DoubleNightVoter {
                 .toList();
     }
 
-    private List<Player> filterAlivePlayers() {
-        List<Player> playersKilledInStage = getPlayersKilledInStage();
-        return alivePlayersGetter.get().stream()
-                .filter(p->!playersKilledInStage.contains(p))
-                .toList();
-    }
     @Override
     public String getName() {
-        return name;
+        return "Witch";
     }
 
     @Override
     public String getDescription() {
-        return description;
+        return "The witch is part of the villager faction. Therefore, her goal is to save the village from the werewolves. " +
+        "Thanks to her alchemical knowledge, the witch has two powerful potions which she may use once each. " +
+        "The witch wakes up every night after the werewolves. When she does so, she is shown who the victim of the werewolves is. " +
+        "Once in the game, she may save the victim of that night with a healing potion. " +
+        "In addition, the witch has the possibility to poison a person once in the game.";
     }
 
     @Override
     public Optional<Poll> createNightPoll() {
         List<Player> playerKilledInStage = getPlayersKilledInStage();
-        if(this.remainingResurrectPotions > 0 && isWitchAlive() && !playerKilledInStage.isEmpty()){
+        Player witch = getWitch();
+        if(this.remainingResurrectPotions > 0 && (witch.isAlive() || witch.isRevivable()) &&!playerKilledInStage.isEmpty()){
             List<KillPlayerPollCommand> killedPlayerPollCommands = getKillPlayerPollCommands();
             return Optional.of(new Poll(
                     this.getClass(),
@@ -94,8 +83,8 @@ public class Witch extends Role implements DoubleNightVoter {
     @Override
     public Optional<Poll> createSecondNightPoll() {
         // use kill potion
-        if(this.remainingKillPotions > 0 && !witchKillCommandExists(getPlayersKilledInStage()) && isWitchAlive()){
-            List<Player> alivePlayers = filterAlivePlayers();
+        if(this.remainingKillPotions > 0 && getWitch().isAlive()){
+            List<Player> alivePlayers = alivePlayersGetter.get();
             return Optional.of(new Poll(
                     this.getClass(),
                     "Select a player to kill with your poison potion.",

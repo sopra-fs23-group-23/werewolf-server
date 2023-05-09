@@ -39,7 +39,6 @@ public class PlayerTest {
         public boolean isPlayerAlive() {
             return playerAlive;
         }
-
     }
 
     @Test
@@ -49,8 +48,18 @@ public class PlayerTest {
         player.addObserver(observer);
         assertTrue(observer.isPlayerAlive());
         player.killPlayer();
-        player.setUnrevivable();
+        assertTrue(observer.isPlayerAlive());
+        player.setDeadPlayerUnrevivable();
         assertFalse(observer.isPlayerAlive());
+    }
+
+    @Test
+    void setDeadPlayerUnrevivableTest_notDead() {
+        Player player = new Player(12l, "Test");
+        MockObserver observer = new MockObserver();
+        player.addObserver(observer);
+        player.setDeadPlayerUnrevivable();
+        assertTrue(observer.isPlayerAlive());
     }
 
     @Test
