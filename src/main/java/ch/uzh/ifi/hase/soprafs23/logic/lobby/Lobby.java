@@ -12,6 +12,8 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Scheduler;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.RandomTiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Cupid;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Lover;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Mayor;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
@@ -119,13 +121,26 @@ public class Lobby {
         roles.get(role).addPlayer(player);
     }
 
-
-    public void instantiateRoles(Supplier<List<Player>> alivePlayersSupplier, BiConsumer<Player, Class<? extends Role>> addPlayerToRoleConsumer, Supplier<List<PollCommand>> currentStagePollCommandsSupplier, Consumer<PollCommand> removePollCommandConsumer) {
+    public void instantiateRoles(
+        Supplier<List<Player>> alivePlayersSupplier,
+        BiConsumer<Player, Class<? extends Role>> addPlayerToRoleConsumer,
+        Supplier<List<PollCommand>> currentStagePollCommandsSupplier,
+        Consumer<PollCommand> removePollCommandConsumer,
+        Consumer<PollCommand> addPollCommandConsumer
+    ) {
         roles.put(Werewolf.class, new Werewolf(alivePlayersSupplier));
         Mayor mayor = new Mayor(alivePlayersSupplier, new RandomTiedPollDecider(), Scheduler.getInstance());
         roles.put(Mayor.class, mayor);
         roles.put(Witch.class, new Witch(alivePlayersSupplier, currentStagePollCommandsSupplier, removePollCommandConsumer));
         roles.put(Villager.class, new Villager(addPlayerToRoleConsumer, alivePlayersSupplier, mayor));
+        roles.put(Cupid.class, new Cupid(alivePlayersSupplier, addPlayerToRoleConsumer));
+        roles.put(Lover.class, new Lover(alivePlayersSupplier, addPollCommandConsumer));
+    }
+
+    private void addSpecialVillagerRoles(Map<Class<? extends Role>, List<Player>> mapOfPlayersPerRole, List<Player> villagers) {
+        // TODO make this dynamic
+        mapOfPlayersPerRole.put(Cupid.class, List.of(villagers.get(0)));
+        mapOfPlayersPerRole.put(Witch.class, List.of(villagers.get(1)));
     }
 
 
@@ -138,13 +153,9 @@ public class Lobby {
         Map<Class<? extends Role>, List<Player>> mapOfPlayersPerRole = new HashMap<>();
 
         mapOfPlayersPerRole.put(Werewolf.class, playerList.subList(0, this.getLobbySize() / 3));
-        mapOfPlayersPerRole.put(Villager.class, playerList.subList(this.getLobbySize() / 3, this.getLobbySize()));
-        mapOfPlayersPerRole.put(Witch.class, playerList.subList(this.getLobbySize() / 3, (this.getLobbySize() / 3) + 1));
-        /*
-        mapOfPlayersPerRole.put(Amor.class, playerList.subList(this.getLobbySize() / 3 + 1, (this.getLobbySize() / 3) + 2));
-        mapOfPlayersPerRole.put(Hunter.class, playerList.subList(this.getLobbySize() / 3 + 2, (this.getLobbySize() / 3) + 3));
-         */
-
+        List<Player> villagers = playerList.subList(this.getLobbySize() / 3, this.getLobbySize());
+        mapOfPlayersPerRole.put(Villager.class, villagers);
+        addSpecialVillagerRoles(mapOfPlayersPerRole, villagers);
         for (Map.Entry<Class<? extends Role>, List<Player>> entry : mapOfPlayersPerRole.entrySet()){
             for (Player player : entry.getValue()){
                 addPlayerToRole(player, entry.getKey());

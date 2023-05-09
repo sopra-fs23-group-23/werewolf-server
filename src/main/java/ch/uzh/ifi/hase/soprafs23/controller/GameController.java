@@ -20,6 +20,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Scheduler;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
+import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
@@ -63,9 +64,11 @@ public class GameController {
         User user = userService.getUserByToken(token);
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
         lobbyService.validateUserIsInLobby(user, lobby);
+        Player player = lobbyService.getPlayerOfUser(user, lobby);
         Game game = gameService.getGame(lobby);
         gameService.validateGameStarted(game);
-        return gameService.toGameGetDTO(game);
+        GameGetDTO gameGetDTO = gameService.toGameGetDTO(game);
+        return gameService.mergePlayerPollCommandsToGameGetDTO(gameGetDTO, player);
     }
 
     @GetMapping("/games/{lobbyId}/polls")

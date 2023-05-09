@@ -76,8 +76,7 @@ public class LobbyTest {
         Lobby l = new Lobby(1l, admin);
         l.addPlayer(p1);
         l.addPlayer(p2);
-
-        l.instantiateRoles(null, null, null, null);
+        l.instantiateRoles(null, null, null, null, null);
         l.assignRoles();
 
         Collection<Role> roles = l.getRoles();

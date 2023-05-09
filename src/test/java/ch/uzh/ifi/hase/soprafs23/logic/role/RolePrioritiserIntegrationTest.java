@@ -21,9 +21,7 @@ public class RolePrioritiserIntegrationTest {
     void testAllRolesInPriorityList() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         Player admin = mock(Player.class);
         Lobby lobby = new Lobby(1l, admin);
-
-        lobby.instantiateRoles(null, null, null, null);
-
+        lobby.instantiateRoles(null, null, null, null, null);
         Collection<Role> roles = lobby.getRoles();
 
         Field priority = RolePrioritiser.class.getDeclaredField("priority");

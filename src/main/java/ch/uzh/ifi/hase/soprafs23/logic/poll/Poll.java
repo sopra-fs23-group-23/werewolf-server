@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.NullPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
@@ -29,7 +30,7 @@ public class Poll{
         observers.add(observer);
     }
 
-    private void notifyObserversFinished() {
+    protected void notifyObserversFinished() {
         observers.stream().forEach(o->o.onPollFinished());
     }
 
@@ -69,12 +70,16 @@ public class Poll{
     }
 
     public void finish() {
+        finish(this::setResultCommand);
+    }
+
+    protected void finish(Consumer<PollCommand> resultCommandConsumer) {
         List<PollOption> pollOptionsOrderedBySupporters = pollOptions.stream().sorted(Comparator.comparing(PollOption::getSupportersAmount).reversed()).toList();
         PollOption first = pollOptionsOrderedBySupporters.get(0);
         PollOption second = pollOptionsOrderedBySupporters.get(1);
         boolean tie = first.getSupportersAmount() == second.getSupportersAmount();
         if (!tie) {
-            setResultCommand(first.getPollCommand());
+            resultCommandConsumer.accept(first.getPollCommand());
             notifyObserversFinished();
         } else {
             tiedPollDecider.executeTiePoll(this, getTiedPollOptions(first.getSupportersAmount(), pollOptionsOrderedBySupporters), this::notifyObserversFinished);

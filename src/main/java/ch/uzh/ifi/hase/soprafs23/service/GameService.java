@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import ch.uzh.ifi.hase.soprafs23.agora.Agora;
 import ch.uzh.ifi.hase.soprafs23.constant.Reason;
@@ -27,6 +28,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.NullPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.PrivateInstantPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.PollCommandGetDTO;
@@ -65,6 +67,17 @@ public class GameService implements GameObserver{
         List<PollCommand> pollCommands = filterOutNullPollCommands(game.getLastStagePollCommands());
         List<PollCommandGetDTO> pollCommandGetDTOs = pollCommands.stream().map(LogicDTOMapper::convertPollCommandToPollCommandGetDTO).toList();
         return LogicDTOMapper.convertGameToGameGetDTO(game, pollCommandGetDTOs);
+    }
+
+    public List<PollCommandGetDTO> toPollCommandGetDTO(List<PrivateInstantPollCommand> list) {
+        return list.stream().map(LogicDTOMapper::convertPollCommandToPollCommandGetDTO).toList();
+    }
+
+    public GameGetDTO mergePlayerPollCommandsToGameGetDTO(GameGetDTO gameGetDTO, Player player) {
+        gameGetDTO.setActions(
+            Stream.concat(gameGetDTO.getActions().stream(), toPollCommandGetDTO(player.getPrivatePollCommands()).stream()).toList()
+        );
+        return gameGetDTO;
     }
 
     public void startGame(Game game) {

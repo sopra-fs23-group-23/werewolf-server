@@ -11,7 +11,7 @@ public class PollParticipant {
         this.remainingVotes = 1;
     }
 
-    public PollParticipant(int remainingVotes, Player player) {
+    public PollParticipant(Player player, int remainingVotes) {
         this.remainingVotes = remainingVotes;
         this.player = player;
     }

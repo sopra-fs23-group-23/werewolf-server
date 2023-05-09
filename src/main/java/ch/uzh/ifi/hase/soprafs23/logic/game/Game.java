@@ -20,6 +20,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DoubleNightVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.FirstDayVoter;
+import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.FirstNightVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.StageVoter;
 
@@ -56,7 +57,7 @@ public class Game implements StageObserver{
         }
         if (stageCount == 1) {
             // first night
-            return new Stage(StageType.Night, getNightVoters());
+            return new Stage(StageType.Night, getFirstNightVoters());
         }
         // normal cases
         if (stageCount % 2 == 0) {
@@ -111,6 +112,10 @@ public class Game implements StageObserver{
         currentStage.removePollCommand(pollCommand);
     }
 
+    public void addPollCommandToCurrentStage(PollCommand pollCommand) {
+        currentStage.addPollCommand(pollCommand);
+    }
+
     public List<PollCommand> getLastStagePollCommands() {
         return lastStagePollCommands;
     }
@@ -131,14 +136,15 @@ public class Game implements StageObserver{
 
     @Override
     public void onStageFinished() {
-        lastStagePollCommands = currentStage.getPollCommands();
-        lastStagePollCommands.stream().forEach(p->p.execute());
+        List<PollCommand> currentStagePollCommands = new ArrayList<>(currentStage.getPollCommands());
+        currentStagePollCommands.stream().forEach(p->p.execute());
         for (Fraction fraction : lobby.getFractions()) {
             if(fraction.hasWon()) {
                 finishGame(fraction);
                 return;
             }
         }
+        lastStagePollCommands = currentStage.getPollCommands();
         startNextStage(calculateNextStage());
     }
 
@@ -185,6 +191,10 @@ public class Game implements StageObserver{
             }
         });
         return nightVoters;
+    }
+
+    private Queue<Supplier<Optional<Poll>>> getFirstNightVoters() {
+        return Game.getVotersOfType(lobby.getRoles(), FirstNightVoter.class, firstNightVoterRole -> ((FirstNightVoter)firstNightVoterRole)::createFirstNightPoll);
     }
 
     @Override

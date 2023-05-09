@@ -3,11 +3,14 @@ package ch.uzh.ifi.hase.soprafs23.logic.lobby;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.PrivateInstantPollCommand;
+
 public class Player {
     private Long id;
     private String name;
     private boolean alive = true;
     private List<PlayerObserver> observers = new ArrayList<>();
+    private List<PrivateInstantPollCommand> privatePollCommands = new ArrayList<>();
     private final String avatarUrl;
 
     public Player(Long id, String name) {
@@ -46,6 +49,14 @@ public class Player {
         for (PlayerObserver playerObserver : observers) {
             playerObserver.onPlayerKilled();
         }
+    }
+
+    public void addPrivatePollCommand(PrivateInstantPollCommand privateInstantPollCommand) {
+        privatePollCommands.add(privateInstantPollCommand);
+    }
+
+    public List<PrivateInstantPollCommand> getPrivatePollCommands() {
+        return privatePollCommands;
     }
 
     @Override
