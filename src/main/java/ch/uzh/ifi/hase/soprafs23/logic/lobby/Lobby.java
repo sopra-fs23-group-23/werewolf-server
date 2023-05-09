@@ -8,10 +8,11 @@ import java.util.function.Supplier;
 
 
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.role.FractionRole;
+import ch.uzh.ifi.hase.soprafs23.logic.role.FractionRoleComparator;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Scheduler;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.RandomTiedPollDecider;
-import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Cupid;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Lover;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Mayor;
@@ -169,10 +170,11 @@ public class Lobby {
         return playerList;
     }
 
-    public List<Fraction> getFractions() {
+    public List<FractionRole> getFractions() {
         return roles.values().stream()
-                .filter(Fraction.class::isInstance)
-                .map(Fraction.class::cast)
+                .filter(FractionRole.class::isInstance)
+                .map(FractionRole.class::cast)
+                .sorted(new FractionRoleComparator())
                 .toList();
     }
 

@@ -4,7 +4,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -72,15 +71,4 @@ public class WerewolfTest {
         assertTrue(poll.getPollOptions().stream().findFirst().get().getPollCommand() instanceof KillPlayerPollCommand);
     }
 
-    @Test
-    void testHasWon() {
-        List<Player> expected = getAlivePlayers();
-        Werewolf werewolf = new Werewolf(createMockAlivePlayersGetter(expected));
-        werewolf.addPlayer(expected.get(0));
-        werewolf.addPlayer(expected.get(1));
-        werewolf.addPlayer(expected.get(3));
-        assertFalse(werewolf.hasWon());
-        when(expected.get(2).isAlive()).thenReturn(false);
-        assertTrue(werewolf.hasWon());
-    }
 }

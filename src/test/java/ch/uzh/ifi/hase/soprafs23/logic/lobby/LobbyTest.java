@@ -13,7 +13,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import ch.uzh.ifi.hase.soprafs23.logic.role.FractionRole;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Lover;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
+
 import org.junit.jupiter.api.Test;
 
 public class LobbyTest {
@@ -111,5 +116,16 @@ public class LobbyTest {
         l.addObserver(observer);
         l.dissolve();
         verify(observer).onLobbyDissolved(l);
+    }
+
+    @Test
+    void testGetFractions() {
+        Lobby lobby = new Lobby(1L, mock(Player.class));
+        lobby.instantiateRoles(null, null, null, null, null);
+        List<FractionRole> fractions = lobby.getFractions();
+        assertEquals(3, fractions.size(), "Wrong number of fractions");
+        assertTrue(fractions.get(0) instanceof Lover, "First fraction is not Lover");
+        assertTrue(fractions.get(1) instanceof Werewolf, "Second fraction is not Werewolf");
+        assertTrue(fractions.get(2) instanceof Villager, "Third fraction is not Villager");
     }
 }

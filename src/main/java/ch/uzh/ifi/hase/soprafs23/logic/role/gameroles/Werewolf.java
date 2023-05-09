@@ -10,12 +10,10 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.KillPlayerPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.NullResultPollDecider;
-import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
-import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
+import ch.uzh.ifi.hase.soprafs23.logic.role.FractionRole;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
 
-public class Werewolf extends Role implements NightVoter, Fraction{
-    private Supplier<List<Player>> alivePlayersGetter;
+public class Werewolf extends FractionRole implements NightVoter {
     private final static String name = "Werewolf";
     private final static String description = "The werewolves take on the role of the antagonists in this game. " +
             "They win as soon as no villagers are left alive. Every night the werewolves wake up and vote on " +
@@ -23,22 +21,12 @@ public class Werewolf extends Role implements NightVoter, Fraction{
             " as no one dies if they can’t agree.";
 
     public Werewolf(Supplier<List<Player>> alivePlayersGetter) {
-        this.alivePlayersGetter = alivePlayersGetter;
-    }
-
-    @Override
-    public boolean hasWon() {
-        for(Player player : alivePlayersGetter.get()) {
-            if(!getPlayers().contains(player)) {
-                return false;
-            }
-        }
-        return true;
+        super(alivePlayersGetter);
     }
 
     @Override
     public Optional<Poll> createNightPoll() {
-        List<Player> alivePlayers = alivePlayersGetter.get();
+        List<Player> alivePlayers = super.getAllAlivePlayers();
         return Optional.of(new Poll(
             this.getClass(),
             "Who do you want to kill tonight?",

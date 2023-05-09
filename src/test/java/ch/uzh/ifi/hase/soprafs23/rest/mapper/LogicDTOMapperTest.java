@@ -2,7 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.rest.mapper;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
-import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
+import ch.uzh.ifi.hase.soprafs23.logic.role.FractionRole;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.FractionGetDTO;
@@ -18,7 +18,7 @@ public class LogicDTOMapperTest {
 
     @Test
     public void testConvertFractionToFractionGetDTO() {
-        Fraction fraction = new Werewolf(mockLobby::getAlivePlayers);
+        FractionRole fraction = new Werewolf(mockLobby::getAlivePlayers);
 
         FractionGetDTO fractionGetDTO = LogicDTOMapper.convertFractionToFractionGetDTO(fraction);
 

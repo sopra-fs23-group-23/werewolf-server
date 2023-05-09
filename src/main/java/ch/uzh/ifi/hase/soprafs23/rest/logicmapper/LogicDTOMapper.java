@@ -10,7 +10,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
-import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
+import ch.uzh.ifi.hase.soprafs23.logic.role.FractionRole;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.*;
 
@@ -114,7 +114,7 @@ public final class LogicDTOMapper {
         return pollGetDTO;
     }
 
-    public static FractionGetDTO convertFractionToFractionGetDTO (Fraction fraction) {
+    public static FractionGetDTO convertFractionToFractionGetDTO (FractionRole fraction) {
         FractionGetDTO fractionGetDTO = new FractionGetDTO();
         fractionGetDTO.setWinner(fraction.getName());
         fractionGetDTO.setPlayers(

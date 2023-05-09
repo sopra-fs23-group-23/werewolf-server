@@ -8,16 +8,14 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.PlayerObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.KillPlayerPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
-import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
-import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
+import ch.uzh.ifi.hase.soprafs23.logic.role.FractionRole;
 
-public class Lover extends Role implements Fraction, PlayerObserver {
-    private final Supplier<List<Player>> alivePlayersGetter;
+public class Lover extends FractionRole implements PlayerObserver {
     private final Consumer<PollCommand> pollCommandAdderConsumer;
     private boolean killCommandExecuted = false;
 
     public Lover(Supplier<List<Player>> alivePlayersGetter, Consumer<PollCommand> pollCommandAdderConsumer) {
-        this.alivePlayersGetter = alivePlayersGetter;
+        super(alivePlayersGetter);
         this.pollCommandAdderConsumer = pollCommandAdderConsumer;
     }
 
@@ -25,16 +23,6 @@ public class Lover extends Role implements Fraction, PlayerObserver {
     public void addPlayer(Player player) {
         player.addObserver(this);
         super.addPlayer(player);
-    }
-
-    @Override
-    public boolean hasWon() {
-        for(Player player : alivePlayersGetter.get()) {
-            if(!getPlayers().contains(player)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override

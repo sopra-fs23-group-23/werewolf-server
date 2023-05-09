@@ -14,7 +14,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.StageFinishedCommand;
-import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
+import ch.uzh.ifi.hase.soprafs23.logic.role.FractionRole;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DoubleNightVoter;
@@ -28,7 +28,7 @@ public class Game implements StageObserver{
     private Stage currentStage;
     private boolean started = false;
     private Optional<Poll> currentPoll = Optional.empty();
-    private Optional<Fraction> winner = Optional.empty();
+    private Optional<FractionRole> winner = Optional.empty();
     private int stageCount = 0;
     private int pollCount = 0;
     private boolean finished = false;
@@ -126,7 +126,7 @@ public class Game implements StageObserver{
         return currentPoll.get();
     }
 
-    public Fraction getWinner() {
+    public FractionRole getWinner() {
         if (winner.isEmpty()) {
             throw new IllegalStateException("Game is not finished yet");
         }
@@ -140,7 +140,7 @@ public class Game implements StageObserver{
             .filter(StageFinishedCommand.class::isInstance)
             .map(StageFinishedCommand.class::cast)
             .forEach(p->p.executeAfterStageFinished());
-        for (Fraction fraction : lobby.getFractions()) {
+        for (FractionRole fraction : lobby.getFractions()) {
             if(fraction.hasWon()) {
                 finishGame(fraction);
                 return;
@@ -150,7 +150,7 @@ public class Game implements StageObserver{
         startNextStage(calculateNextStage());
     }
 
-    private void finishGame(Fraction winningFraction) {
+    private void finishGame(FractionRole winningFraction) {
         winner = Optional.of(winningFraction);
         finished = true;
         observers.stream().forEach(observer->observer.onGameFinished(this));

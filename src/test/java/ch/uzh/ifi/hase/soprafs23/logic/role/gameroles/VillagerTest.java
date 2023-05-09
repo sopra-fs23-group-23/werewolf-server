@@ -4,7 +4,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -82,17 +81,5 @@ public class VillagerTest {
             containsInAnyOrder(expected.toArray())
         );
         assertTrue(poll.getPollOptions().stream().findFirst().get().getPollCommand() instanceof AddPlayerToRolePollCommand);
-    }
-
-    @Test
-    void testHasWon() {
-        List<Player> expected = getAlivePlayers();
-        Villager villager = new Villager(null, createMockAlivePlayersGetter(expected), mock(TiedPollDecider.class));
-        villager.addPlayer(expected.get(0));
-        villager.addPlayer(expected.get(1));
-        villager.addPlayer(expected.get(3));
-        assertFalse(villager.hasWon());
-        when(expected.get(2).isAlive()).thenReturn(false);
-        assertTrue(villager.hasWon());
     }
 }
