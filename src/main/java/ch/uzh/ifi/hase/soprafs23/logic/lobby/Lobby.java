@@ -11,9 +11,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.game.Scheduler;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.RandomTiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Hunter;
-import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Mayor;
-import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
-import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.*;
 
 public class Lobby {
     private Long id;
