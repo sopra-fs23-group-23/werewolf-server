@@ -24,21 +24,6 @@ public class HunterTest {
         };
     }
 
-    private Player createMockPlayer() {
-        Player player = mock(Player.class);
-        when(player.isAlive()).thenReturn(true);
-        return player;
-    }
-
-    private List<Player> getAlivePlayers() {
-        return List.of(
-                createMockPlayer(),
-                createMockPlayer(),
-                createMockPlayer(),
-                createMockPlayer()
-        );
-    }
-
     private List<Player> getPlayers() {
         Player p1 = mock(Player.class);
         Player p2 = mock(Player.class);
@@ -46,9 +31,15 @@ public class HunterTest {
         return List.of(p1, p2, p3);
     }
 
+    private void checkHunterKilledPoll(Optional<Poll> poll, Player p1) {
+        assertTrue(poll.isPresent());
+        assertEquals(1, poll.get().getPollParticipants().size());
+        assertEquals(p1, poll.get().getPollParticipants().stream().findFirst().get().getPlayer());
+        assertEquals(3, poll.get().getPollOptions().size());
+    }
+
     @Test
     void testCreateDayPoll_HunterDead() {
-        NullResultPollDecider nullResultPollDecider = mock(NullResultPollDecider.class);
         Hunter hunter = new Hunter(null, this::getPlayers);
         Player p1 = mock(Player.class);
         hunter.addPlayer(p1);
@@ -57,11 +48,14 @@ public class HunterTest {
         checkHunterKilledPoll(poll, p1);
     }
 
-    private void checkHunterKilledPoll(Optional<Poll> poll, Player p1) {
-        assertTrue(poll.isPresent());
-        assertEquals(1, poll.get().getPollParticipants().size());
-        assertEquals(p1, poll.get().getPollParticipants().stream().findFirst().get().getPlayer());
-        assertEquals(3, poll.get().getPollOptions().size());
+    @Test
+    void testCreateNightPoll_HunterDead() {
+        Hunter hunter = new Hunter(null, this::getPlayers);
+        Player p1 = mock(Player.class);
+        hunter.addPlayer(p1);
+        hunter.onPlayerKilled();
+        Optional<Poll> poll = hunter.createNightPoll();
+        checkHunterKilledPoll(poll, p1);
     }
 
     @Test
