@@ -8,6 +8,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.PlayerObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.KillPlayerPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PrivateLoverNotificationPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.role.FractionRole;
 
 public class Lover extends FractionRole implements PlayerObserver {
@@ -23,6 +24,17 @@ public class Lover extends FractionRole implements PlayerObserver {
     public void addPlayer(Player player) {
         player.addObserver(this);
         super.addPlayer(player);
+        if (getPlayers().size() >= 2) {
+            notifyLoversAboutOtherLover();
+        }
+    }
+
+    private void notifyLoversAboutOtherLover() {
+        List<Player> lovers = getPlayers();
+        for (Player lover : lovers) {
+            List<Player> otherLovers = lovers.stream().filter(p -> p != lover).toList();
+            otherLovers.stream().forEach(otherLover -> lover.addPrivatePollCommand(new PrivateLoverNotificationPollCommand(otherLover, lover)));
+        }
     }
 
     @Override
