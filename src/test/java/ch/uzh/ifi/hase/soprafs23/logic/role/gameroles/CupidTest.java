@@ -15,7 +15,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.PrivateAddPlayerToRoleInstantPollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PrivateAddPlayerToRolePollCommand;
 
 public class CupidTest {
     private Supplier<List<Player>> createMockAlivePlayersGetter (List<Player> expected) {
@@ -65,6 +65,6 @@ public class CupidTest {
             poll.getPollOptions().stream().map(PollOption::getPlayer).toList(),
             containsInAnyOrder(expected.toArray())
         );
-        assertTrue(poll.getPollOptions().stream().findFirst().get().getPollCommand() instanceof PrivateAddPlayerToRoleInstantPollCommand);
+        assertTrue(poll.getPollOptions().stream().findFirst().get().getPollCommand() instanceof PrivateAddPlayerToRolePollCommand);
     }
 }

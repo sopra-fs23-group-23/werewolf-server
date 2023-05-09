@@ -11,7 +11,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.PlayerObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.AddPlayerToRoleInstantPollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.AddPlayerToRolePollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
@@ -78,7 +78,7 @@ public class Mayor extends Role implements TiedPollDecider, DayVoter, NightVoter
         return new Poll(
             this.getClass(),
             "Who should become the mayor?",
-            alivePlayers.stream().map(p->new PollOption(p, new AddPlayerToRoleInstantPollCommand(this::addPlayer_BiConsumerAdapter, p, Mayor.class))).toList(), 
+            alivePlayers.stream().map(p->new PollOption(p, new AddPlayerToRolePollCommand(this::addPlayer_BiConsumerAdapter, p, Mayor.class))).toList(), 
             getPlayers().stream().map(p->new PollParticipant(p)).toList(),
             15,
             noMayorDecider

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.NullPollCommand;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.PrivateInstantPollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PrivatePollCommand;
 
 public class PrivateResultPollTest {
     private List<PrivateResultPollOption> createMockPollOptions() {
@@ -22,9 +22,9 @@ public class PrivateResultPollTest {
         when(pollOption2.getSupportersAmount()).thenReturn(2);
         when(pollOption3.getSupportersAmount()).thenReturn(3);
 
-        when(pollOption1.getPollCommand()).thenReturn(mock(PrivateInstantPollCommand.class));
-        when(pollOption2.getPollCommand()).thenReturn(mock(PrivateInstantPollCommand.class));
-        when(pollOption3.getPollCommand()).thenReturn(mock(PrivateInstantPollCommand.class));
+        when(pollOption1.getPollCommand()).thenReturn(mock(PrivatePollCommand.class));
+        when(pollOption2.getPollCommand()).thenReturn(mock(PrivatePollCommand.class));
+        when(pollOption3.getPollCommand()).thenReturn(mock(PrivatePollCommand.class));
         return List.of(pollOption1, pollOption2, pollOption3);
     }
 
@@ -38,7 +38,7 @@ public class PrivateResultPollTest {
             List.of(),
             0, 
             null);
-        PrivateInstantPollCommand expectedResultCommand = (PrivateInstantPollCommand)pollOptions.get(2).getPollCommand();
+        PrivatePollCommand expectedResultCommand = (PrivatePollCommand)pollOptions.get(2).getPollCommand();
         Player player = mock(Player.class);
         when(expectedResultCommand.getInformationOwner()).thenReturn(player);
         privateResultPoll.finish();

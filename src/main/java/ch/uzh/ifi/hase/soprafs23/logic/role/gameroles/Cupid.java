@@ -10,7 +10,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.DistinctPrivateResultPoll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PrivateResultPollOption;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.PrivateAddPlayerToRoleInstantPollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PrivateAddPlayerToRolePollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.DistinctRandomTiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.FirstNightVoter;
@@ -30,7 +30,7 @@ public class Cupid extends Role implements FirstNightVoter {
             new DistinctPrivateResultPoll(
                 this.getClass(),
                 "Which two players should fall in love?",
-                alivePlayersGetter.get().stream().map(player -> new PrivateResultPollOption(player, new PrivateAddPlayerToRoleInstantPollCommand(addPlayerToRole, player, Lover.class, player))).toList(),
+                alivePlayersGetter.get().stream().map(player -> new PrivateResultPollOption(player, new PrivateAddPlayerToRolePollCommand(addPlayerToRole, player, Lover.class, player))).toList(),
                 getPlayers().stream().map(player -> new PollParticipant(player, 2)).findFirst().get(),
                 15,
                 new DistinctRandomTiedPollDecider())

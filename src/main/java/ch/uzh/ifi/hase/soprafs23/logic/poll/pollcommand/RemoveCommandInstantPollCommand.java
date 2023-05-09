@@ -1,11 +1,10 @@
-package ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand;
+package ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 
 import java.util.function.Consumer;
 
-public class RemoveCommandInstantPollCommand implements InstantPollCommand{
+public class RemoveCommandInstantPollCommand implements PollCommand{
     private Consumer<PollCommand> removeCommand;
     private Runnable decreaseHealPotion;
     private PollCommand pollCommand;
@@ -19,7 +18,7 @@ public class RemoveCommandInstantPollCommand implements InstantPollCommand{
     }
 
     @Override
-    public void execute_instantly() {
+    public void execute() {
         removeCommand.accept(pollCommand);
         decreaseHealPotion.run();
     }

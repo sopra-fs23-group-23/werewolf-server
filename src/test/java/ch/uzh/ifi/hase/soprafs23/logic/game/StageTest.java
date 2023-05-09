@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.InstantPollCommand;
 
 public class StageTest {
     private class StageObserverMock implements StageObserver {
@@ -81,7 +80,7 @@ public class StageTest {
     @Test
     void testOnNewPoll_instantPollCommand() {
         Poll expected = mock(Poll.class);
-        InstantPollCommand expectedCommand = mock(InstantPollCommand.class);
+        PollCommand expectedCommand = mock(PollCommand.class);
         when(expected.getResultCommand()).thenReturn(expectedCommand);
         Optional<Poll> p1 = Optional.of(expected);
         Supplier<Optional<Poll>> s1 = () -> p1;
@@ -90,7 +89,7 @@ public class StageTest {
         stage.startStage();
         stage.onPollFinished();
 
-        verify(expectedCommand).execute_instantly();
+        verify(expectedCommand).execute();
         assertEquals(List.of(expectedCommand), stage.getPollCommands());
     }
 }

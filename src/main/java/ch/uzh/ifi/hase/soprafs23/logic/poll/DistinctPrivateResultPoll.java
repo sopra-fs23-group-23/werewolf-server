@@ -2,7 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.logic.poll;
 
 import java.util.List;
 
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.PrivateInstantPollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PrivatePollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.DistinctRandomTiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 
@@ -23,11 +23,11 @@ public class DistinctPrivateResultPoll extends PrivateResultPoll {
             .toList();
     }
 
-    private List<PrivateInstantPollCommand> toPrivateInstantPollCommands(List<PollOption> pollOptions) {
+    private List<PrivatePollCommand> toPrivateInstantPollCommands(List<PollOption> pollOptions) {
         return pollOptions.stream()
             .map(PrivateResultPollOption.class::cast)
             .map(PrivateResultPollOption::getPollCommand)
-            .map(PrivateInstantPollCommand.class::cast)
+            .map(PrivatePollCommand.class::cast)
             .toList();
     }
 
@@ -42,10 +42,10 @@ public class DistinctPrivateResultPoll extends PrivateResultPoll {
         }
     }
 
-    private void executeSelectedPrivateInstantPollCommands(List<PrivateInstantPollCommand> privateInstantPollCommands) {
+    private void executeSelectedPrivateInstantPollCommands(List<PrivatePollCommand> privateInstantPollCommands) {
         privateInstantPollCommands.stream()
             .forEach(privateInstantPollCommand -> {
-                privateInstantPollCommand.execute_instantly();
+                privateInstantPollCommand.execute();
                 privateInstantPollCommand.getInformationOwner().addPrivatePollCommand(privateInstantPollCommand);
             });
     }

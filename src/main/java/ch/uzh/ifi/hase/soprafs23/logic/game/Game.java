@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.StageFinishedCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Fraction;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
@@ -135,7 +136,10 @@ public class Game implements StageObserver{
     @Override
     public void onStageFinished() {
         List<PollCommand> currentStagePollCommands = new ArrayList<>(currentStage.getPollCommands());
-        currentStagePollCommands.stream().forEach(p->p.execute());
+        currentStagePollCommands.stream()
+            .filter(StageFinishedCommand.class::isInstance)
+            .map(StageFinishedCommand.class::cast)
+            .forEach(p->p.executeAfterStageFinished());
         for (Fraction fraction : lobby.getFractions()) {
             if(fraction.hasWon()) {
                 finishGame(fraction);

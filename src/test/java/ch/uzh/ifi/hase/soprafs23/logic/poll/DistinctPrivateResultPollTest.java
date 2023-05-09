@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.PrivateInstantPollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PrivatePollCommand;
 
 public class DistinctPrivateResultPollTest {
     @Test
@@ -37,9 +37,9 @@ public class DistinctPrivateResultPollTest {
         PrivateResultPollOption pollOption2 = mock(PrivateResultPollOption.class);
         PrivateResultPollOption pollOption3 = mock(PrivateResultPollOption.class);
 
-        PrivateInstantPollCommand pollCommand1 = mock(PrivateInstantPollCommand.class);
-        PrivateInstantPollCommand pollCommand2 = mock(PrivateInstantPollCommand.class);
-        PrivateInstantPollCommand pollCommand3 = mock(PrivateInstantPollCommand.class);
+        PrivatePollCommand pollCommand1 = mock(PrivatePollCommand.class);
+        PrivatePollCommand pollCommand2 = mock(PrivatePollCommand.class);
+        PrivatePollCommand pollCommand3 = mock(PrivatePollCommand.class);
 
         Player p1 = mock(Player.class);
         Player p2 = mock(Player.class);
@@ -62,8 +62,8 @@ public class DistinctPrivateResultPollTest {
             null);
 
         distinctPrivateResultPoll.finish();
-        verify(pollCommand1).execute_instantly();
-        verify(pollCommand2).execute_instantly();
+        verify(pollCommand1).execute();
+        verify(pollCommand2).execute();
         verify(p1).addPrivatePollCommand(pollCommand1);
         verify(p2).addPrivatePollCommand(pollCommand2);
     }

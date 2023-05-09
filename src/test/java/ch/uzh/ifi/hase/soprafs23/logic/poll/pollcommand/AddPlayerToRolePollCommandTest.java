@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand;
+package ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,8 +38,8 @@ public class AddPlayerToRolePollCommandTest {
         Player player = mock(Player.class);
         Class<? extends Role> roleClass = Mayor.class;
         MockPlayerAdder mockPlayerAdder = new MockPlayerAdder(roleClass, player);
-        AddPlayerToRoleInstantPollCommand addPlayerToRolePollCommand = new AddPlayerToRoleInstantPollCommand(mockPlayerAdder::verifyPlayerWasAdded, player, roleClass);
-        addPlayerToRolePollCommand.execute_instantly();
+        AddPlayerToRolePollCommand addPlayerToRolePollCommand = new AddPlayerToRolePollCommand(mockPlayerAdder::verifyPlayerWasAdded, player, roleClass);
+        addPlayerToRolePollCommand.execute();
         assertTrue(mockPlayerAdder.isCalled());
     }
 
@@ -48,7 +48,7 @@ public class AddPlayerToRolePollCommandTest {
         Player player = mock(Player.class);
         Class<? extends Role> roleClass = Mayor.class;
         when(player.getName()).thenReturn("testPlayer");
-        AddPlayerToRoleInstantPollCommand addPlayerToRolePollCommand = new AddPlayerToRoleInstantPollCommand((p, r) -> {}, player, roleClass);
+        AddPlayerToRolePollCommand addPlayerToRolePollCommand = new AddPlayerToRolePollCommand((p, r) -> {}, player, roleClass);
         assertEquals("testPlayer is now a Mayor", addPlayerToRolePollCommand.toString());
     }
 }

@@ -6,8 +6,9 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.KillPlayerPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.RemoveCommandInstantPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.WitchKillPlayerPollCommand;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.RemoveCommandInstantPollCommand;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

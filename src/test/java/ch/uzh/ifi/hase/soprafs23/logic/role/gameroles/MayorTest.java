@@ -19,7 +19,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.AddPlayerToRoleInstantPollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.AddPlayerToRolePollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 
 public class MayorTest {
@@ -100,7 +100,7 @@ public class MayorTest {
         assertEquals(1, poll.get().getPollParticipants().size());
         assertEquals(p1, poll.get().getPollParticipants().stream().findFirst().get().getPlayer());
         assertEquals(3, poll.get().getPollOptions().size());
-        assertTrue(poll.get().getPollOptions().stream().findFirst().get().getPollCommand() instanceof AddPlayerToRoleInstantPollCommand);
+        assertTrue(poll.get().getPollOptions().stream().findFirst().get().getPollCommand() instanceof AddPlayerToRolePollCommand);
     }
 
     @Test

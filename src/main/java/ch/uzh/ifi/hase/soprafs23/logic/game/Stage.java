@@ -9,7 +9,6 @@ import java.util.function.Supplier;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.instantpollcommand.InstantPollCommand;
 
 public class Stage implements PollObserver{
     private StageType type;
@@ -75,9 +74,7 @@ public class Stage implements PollObserver{
     public void onPollFinished() {
         PollCommand command = currentPoll.getResultCommand();
         pollCommands.add(command);
-        if (command instanceof InstantPollCommand) {
-            ((InstantPollCommand) command).execute_instantly();
-        }
+        command.execute();
         startNextPoll();
     }
     

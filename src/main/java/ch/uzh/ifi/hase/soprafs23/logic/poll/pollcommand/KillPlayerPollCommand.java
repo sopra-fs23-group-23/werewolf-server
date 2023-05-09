@@ -2,7 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 
-public class KillPlayerPollCommand implements PollCommand{
+public class KillPlayerPollCommand implements PollCommand, StageFinishedCommand{
     private Player player;
 
     public KillPlayerPollCommand(Player player) {
@@ -12,6 +12,11 @@ public class KillPlayerPollCommand implements PollCommand{
     @Override
     public void execute() {
         player.killPlayer();
+    }
+
+    @Override
+    public void executeAfterStageFinished() {
+        player.setUnrevivable();
     }
 
     @Override
