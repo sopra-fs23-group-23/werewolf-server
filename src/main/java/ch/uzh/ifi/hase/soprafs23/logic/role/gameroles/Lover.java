@@ -41,6 +41,7 @@ public class Lover extends FractionRole implements PlayerObserver {
         for (Player player : aliveLovers) {
             KillPlayerPollCommand killPlayerPollCommand = new KillPlayerPollCommand(player);
             killPlayerPollCommand.execute();
+            killPlayerPollCommand.executeAfterStageFinished();
             pollCommandAdderConsumer.accept(killPlayerPollCommand);
         }
     }
