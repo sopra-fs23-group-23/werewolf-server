@@ -1,11 +1,9 @@
 package ch.uzh.ifi.hase.soprafs23.logic.lobby;
 
 import java.util.*;
-
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
 
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.role.FractionRole;
@@ -14,6 +12,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Scheduler;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.RandomTiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Cupid;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Hunter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Lover;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Mayor;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
@@ -133,6 +132,7 @@ public class Lobby {
         Mayor mayor = new Mayor(alivePlayersSupplier, new RandomTiedPollDecider(), Scheduler.getInstance());
         roles.put(Mayor.class, mayor);
         roles.put(Witch.class, new Witch(alivePlayersSupplier, currentStagePollCommandsSupplier, removePollCommandConsumer));
+        roles.put(Hunter.class, new Hunter(alivePlayersSupplier));
         roles.put(Villager.class, new Villager(addPlayerToRoleConsumer, alivePlayersSupplier, mayor));
         roles.put(Cupid.class, new Cupid(alivePlayersSupplier, addPlayerToRoleConsumer));
         roles.put(Lover.class, new Lover(alivePlayersSupplier, addPollCommandConsumer));
