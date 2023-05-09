@@ -2,18 +2,13 @@ package ch.uzh.ifi.hase.soprafs23.logic.role.gameroles;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.KillPlayerPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.NullResultPollDecider;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.TiedPollDecider;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -44,24 +39,30 @@ public class HunterTest {
         );
     }
 
-    /*@Test
-    void testCreateDayPoll() {
-        List<Player> expected = getAlivePlayers();
-        TiedPollDecider tiedPollDecider = mock(NullResultPollDecider.class);
-        Hunter hunter = new Hunter(null, createMockAlivePlayersGetter(expected), tiedPollDecider);
-        Poll poll = hunter.createDayPoll().get();
-        assertThat(
-                "Contains all alive players in any order as participants",
-                poll.getPollParticipants().stream().map(PollParticipant::getPlayer).toList(),
-                containsInAnyOrder(expected.toArray())
-        );
-        assertThat(
-                "Contains all alive players in any order as options",
-                poll.getPollOptions().stream().map(PollOption::getPlayer).toList(),
-                containsInAnyOrder(expected.toArray())
-        );
-        assertTrue(poll.getPollOptions().stream().findFirst().get().getPollCommand() instanceof KillPlayerPollCommand);
-    }*/
+    private List<Player> getPlayers() {
+        Player p1 = mock(Player.class);
+        Player p2 = mock(Player.class);
+        Player p3 = mock(Player.class);
+        return List.of(p1, p2, p3);
+    }
+
+    @Test
+    void testCreateDayPoll_HunterDead() {
+        NullResultPollDecider nullResultPollDecider = mock(NullResultPollDecider.class);
+        Hunter hunter = new Hunter(null, this::getPlayers);
+        Player p1 = mock(Player.class);
+        hunter.addPlayer(p1);
+        hunter.onPlayerKilled();
+        Optional<Poll> poll = hunter.createDayPoll();
+        checkHunterKilledPoll(poll, p1);
+    }
+
+    private void checkHunterKilledPoll(Optional<Poll> poll, Player p1) {
+        assertTrue(poll.isPresent());
+        assertEquals(1, poll.get().getPollParticipants().size());
+        assertEquals(p1, poll.get().getPollParticipants().stream().findFirst().get().getPlayer());
+        assertEquals(3, poll.get().getPollOptions().size());
+    }
 
     @Test
     void testAddPlayer() {
