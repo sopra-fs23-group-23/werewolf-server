@@ -59,6 +59,7 @@ public class LoverTest {
         lover.addPlayer(p1);
         lover.addPlayer(p2);
         p1.killPlayer();
+        p1.setUnrevivable();
         assertFalse(p2.isAlive(), "Lover2 should be dead after killing lover1");
     }
 }

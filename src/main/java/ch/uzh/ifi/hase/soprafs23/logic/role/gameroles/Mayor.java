@@ -104,7 +104,7 @@ public class Mayor extends Role implements TiedPollDecider, DayVoter, NightVoter
     }
 
     @Override
-    public void onPlayerKilled() {
+    public void onPlayerKilled_Unrevivable() {
         this.mayorDied = true;
     }
     

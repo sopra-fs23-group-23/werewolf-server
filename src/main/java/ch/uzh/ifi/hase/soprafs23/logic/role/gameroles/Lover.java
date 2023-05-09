@@ -58,7 +58,7 @@ public class Lover extends Role implements Fraction, PlayerObserver {
     }
 
     @Override
-    public void onPlayerKilled() {
+    public void onPlayerKilled_Unrevivable() {
         if (!killCommandExecuted) {
             killCommandExecuted = true;
             killLovers();

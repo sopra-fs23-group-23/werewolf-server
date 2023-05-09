@@ -109,7 +109,7 @@ public class MayorTest {
         Mayor mayor = new Mayor(this::getPlayers, tiedPollDecider, null);
         Player p1 = mock(Player.class);
         mayor.addPlayer(p1);
-        mayor.onPlayerKilled();
+        mayor.onPlayerKilled_Unrevivable();
         Optional<Poll> poll = mayor.createNightPoll();
         checkMayorKilledPoll(poll, p1);
     }
@@ -120,7 +120,7 @@ public class MayorTest {
         Mayor mayor = new Mayor(this::getPlayers, tiedPollDecider, null);
         Player p1 = mock(Player.class);
         mayor.addPlayer(p1);
-        mayor.onPlayerKilled();
+        mayor.onPlayerKilled_Unrevivable();
         Optional<Poll> poll = mayor.createDayPoll();
         checkMayorKilledPoll(poll, p1);
     }

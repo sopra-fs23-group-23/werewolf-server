@@ -9,6 +9,7 @@ public class Player {
     private Long id;
     private String name;
     private boolean alive = true;
+    private boolean revivable = true;
     private List<PlayerObserver> observers = new ArrayList<>();
     private List<PrivateInstantPollCommand> privatePollCommands = new ArrayList<>();
     private final String avatarUrl;
@@ -32,6 +33,10 @@ public class Player {
         return alive;
     }
 
+    public boolean isRevivable() {
+        return revivable;
+    }
+
     public String getAvatarUrl() {
         return avatarUrl;
     }
@@ -42,12 +47,19 @@ public class Player {
 
     public void killPlayer() {
         this.alive = false;
+    }
+
+    /**
+     * @pre player died
+     */
+    public void setUnrevivable() {
+        this.revivable = false;
         notifyObservers();
     }
 
     private void notifyObservers() {
         for (PlayerObserver playerObserver : observers) {
-            playerObserver.onPlayerKilled();
+            playerObserver.onPlayerKilled_Unrevivable();
         }
     }
 

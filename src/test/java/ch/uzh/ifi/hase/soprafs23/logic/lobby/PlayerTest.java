@@ -32,7 +32,7 @@ public class PlayerTest {
         private boolean playerAlive = true;
 
         @Override
-        public void onPlayerKilled() {
+        public void onPlayerKilled_Unrevivable() {
             playerAlive = false;
         }
 
@@ -49,6 +49,7 @@ public class PlayerTest {
         player.addObserver(observer);
         assertTrue(observer.isPlayerAlive());
         player.killPlayer();
+        player.setUnrevivable();
         assertFalse(observer.isPlayerAlive());
     }
 
