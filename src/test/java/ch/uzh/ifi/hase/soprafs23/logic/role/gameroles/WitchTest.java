@@ -6,7 +6,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.KillPlayerPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.RemoveCommandInstantPollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.RemoveCommandPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.WitchKillPlayerPollCommand;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -83,7 +83,7 @@ public class WitchTest {
         Optional<Poll> poll = witch.createNightPoll();
         assertEquals(1, poll.get().getPollParticipants().size());
         assertEquals(1, poll.get().getPollOptions().size());
-        assertTrue(poll.get().getPollOptions().stream().findFirst().get().getPollCommand() instanceof RemoveCommandInstantPollCommand);
+        assertTrue(poll.get().getPollOptions().stream().findFirst().get().getPollCommand() instanceof RemoveCommandPollCommand);
     }
 
     @Test
