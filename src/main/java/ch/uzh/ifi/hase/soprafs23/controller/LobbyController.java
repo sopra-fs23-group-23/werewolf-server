@@ -91,7 +91,7 @@ public class LobbyController {
         lobbyService.validateUserIsInLobby(user, lobby);
         lobbyService.validateUserIsInLobby(userToGetRole, lobby);
         Player playerToGetRole = lobbyService.getPlayerOfUser(userToGetRole, lobby);
-        if (playerToGetRole.isAlive()) {
+        if (playerToGetRole.isAlive() || playerToGetRole.isRevivable()) {
             // if player is alive, only the user himself can see his role
             userService.validateTokenMatch(userToGetRole, token);
         }
