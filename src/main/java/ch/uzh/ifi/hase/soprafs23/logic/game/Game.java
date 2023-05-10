@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.NullPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.StageFinishedCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.role.FractionRole;
@@ -32,7 +33,7 @@ public class Game implements StageObserver{
     private int stageCount = 0;
     private int pollCount = 0;
     private boolean finished = false;
-    private List<PollCommand> lastStagePollCommands = new ArrayList<>();
+    private List<PollCommand> pollCommands = new ArrayList<>();
     private List<GameObserver> observers = new ArrayList<>();
 
     /**
@@ -115,8 +116,12 @@ public class Game implements StageObserver{
         currentStage.addPollCommand(pollCommand);
     }
 
-    public List<PollCommand> getLastStagePollCommands() {
-        return lastStagePollCommands;
+    /**
+     * 
+     * @return List<PollCommand> without NullPollCommands
+     */
+    public List<PollCommand> getPollCommands() {
+        return pollCommands;
     }
 
     public Poll getCurrentPoll() throws IllegalStateException{
@@ -133,20 +138,37 @@ public class Game implements StageObserver{
         return winner.get();
     }
 
-    @Override
-    public void onStageFinished() {
-        List<PollCommand> currentStagePollCommands = new ArrayList<>(currentStage.getPollCommands());
+    private void executeCurrentStageStageFinishedCommands(List<PollCommand> currentStagePollCommands) {
         currentStagePollCommands.stream()
             .filter(StageFinishedCommand.class::isInstance)
             .map(StageFinishedCommand.class::cast)
             .forEach(p->p.executeAfterStageFinished());
+    }
+
+    private void checkForWinner() {
         for (FractionRole fraction : lobby.getFractions()) {
             if(fraction.hasWon()) {
                 finishGame(fraction);
                 return;
             }
         }
-        lastStagePollCommands = currentStage.getPollCommands();
+    }
+
+    private List<PollCommand> filterOutNullPollCommands(List<PollCommand> pollCommands) {
+        return pollCommands.stream()
+            .filter(pollCommand -> !(pollCommand instanceof NullPollCommand))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * @post no NullPollCommands in pollCommands
+     */
+    @Override
+    public void onStageFinished() {
+        List<PollCommand> currentStagePollCommands = new ArrayList<>(currentStage.getPollCommands());
+        executeCurrentStageStageFinishedCommands(currentStagePollCommands);
+        checkForWinner();
+        pollCommands.addAll(filterOutNullPollCommands(currentStage.getPollCommands()));
         startNextStage(calculateNextStage());
     }
 

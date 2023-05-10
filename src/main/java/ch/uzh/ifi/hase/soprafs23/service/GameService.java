@@ -22,7 +22,6 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.NullPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PrivatePollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
@@ -55,12 +54,8 @@ public class GameService implements GameObserver{
         return games.get(lobby.getId());
     }
 
-    private List<PollCommand> filterOutNullPollCommands(List<PollCommand> pollCommands) {
-        return pollCommands.stream().filter(p->!(p instanceof NullPollCommand)).toList();
-    }
-
     public GameGetDTO toGameGetDTO(Game game) {
-        List<PollCommand> pollCommands = filterOutNullPollCommands(game.getLastStagePollCommands());
+        List<PollCommand> pollCommands = game.getPollCommands();
         List<PollCommandGetDTO> pollCommandGetDTOs = pollCommands.stream().map(LogicDTOMapper::convertPollCommandToPollCommandGetDTO).toList();
         return LogicDTOMapper.convertGameToGameGetDTO(game, pollCommandGetDTOs);
     }
