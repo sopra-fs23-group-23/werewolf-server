@@ -49,6 +49,12 @@ public class Player {
         this.alive = false;
     }
 
+    public void revivePlayer() {
+        if (revivable) {
+            this.alive = true;   
+        }
+    }
+
     public void setDeadPlayerUnrevivable() {
         if (!this.alive) {
             this.revivable = false;

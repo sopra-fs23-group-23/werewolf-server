@@ -6,7 +6,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.KillPlayerPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.RemoveCommandPollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.WitchSavePlayerPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.WitchKillPlayerPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.NullResultPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
@@ -73,7 +73,7 @@ public class Witch extends Role implements DoubleNightVoter {
             return Optional.of(new Poll(
                     this.getClass(),
                     "Save this player from dying with your heal potion.",
-                    killedPlayerPollCommands.stream().map(killPollCommand -> new PollOption(killPollCommand.getAffectedPlayer(), new RemoveCommandPollCommand(this.removePollCommand, killPollCommand, this::decreaseResurrectPotions, killPollCommand.getAffectedPlayer()))).toList(),
+                    killedPlayerPollCommands.stream().map(killPollCommand -> new PollOption(killPollCommand.getAffectedPlayer(), new WitchSavePlayerPollCommand(this.removePollCommand, killPollCommand, this::decreaseResurrectPotions, killPollCommand.getAffectedPlayer()))).toList(),
                     this.getPlayers().stream().map(p->new PollParticipant(p)).toList(),
                     15,
                     new NullResultPollDecider()));

@@ -58,8 +58,7 @@ public class Stage implements PollObserver{
     }
 
     public void removePollCommand(PollCommand pollCommand) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'removePollCommand'");
+        pollCommands.remove(pollCommand);
     }
 
     public void addPollCommand(PollCommand pollCommand) {
