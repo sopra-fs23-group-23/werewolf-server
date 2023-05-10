@@ -18,6 +18,7 @@ import java.util.function.Supplier;
 public class Hunter extends Role implements DayVoter, NightVoter, PlayerObserver {
     private Supplier<List<Player>> alivePlayersGetter;
     private boolean died = false;
+    private boolean hasShot = false;
 
     public Hunter(Supplier<List<Player>> alivePlayersGetter) {
         this.alivePlayersGetter = alivePlayersGetter;
@@ -43,8 +44,9 @@ public class Hunter extends Role implements DayVoter, NightVoter, PlayerObserver
     }
 
     private Optional<Poll> createHunterDiedPoll() {
-        if (died) {
+        if (died && !hasShot) {
             List<Player> alivePlayers = alivePlayersGetter.get();
+            hasShot = true;
             return Optional.of(new Poll(
                 this.getClass(),
                 "Who do you want to take with you to your death?",
