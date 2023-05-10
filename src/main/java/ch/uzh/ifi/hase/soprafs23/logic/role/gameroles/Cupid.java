@@ -13,11 +13,12 @@ import ch.uzh.ifi.hase.soprafs23.logic.poll.PrivateResultPollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PrivateAddPlayerToRolePollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.DistinctRandomTiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
-import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.FirstNightVoter;
+import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
 
-public class Cupid extends Role implements FirstNightVoter {
+public class Cupid extends Role implements NightVoter {
     private BiConsumer<Player, Class<? extends Role>> addPlayerToRole;
     private Supplier<List<Player>> alivePlayersGetter;
+    private boolean firstNight = true;
 
     public Cupid(Supplier<List<Player>> alivePlayersGetter, BiConsumer<Player, Class<? extends Role>> addPlayerToRole) {
         this.addPlayerToRole = addPlayerToRole;
@@ -25,16 +26,20 @@ public class Cupid extends Role implements FirstNightVoter {
     }
 
     @Override
-    public Optional<Poll> createFirstNightPoll() {
-        return Optional.of(
-            new DistinctPrivateResultPoll(
-                this.getClass(),
-                "Which two players should fall in love?",
-                alivePlayersGetter.get().stream().map(player -> new PrivateResultPollOption(player, new PrivateAddPlayerToRolePollCommand(addPlayerToRole, player, Lover.class, player))).toList(),
-                getPlayers().stream().map(player -> new PollParticipant(player, 2)).findFirst().get(),
-                15,
-                new DistinctRandomTiedPollDecider())
-        );
+    public Optional<Poll> createNightPoll() {
+        if(firstNight) {
+            firstNight = false;
+            return Optional.of(
+                new DistinctPrivateResultPoll(
+                    this.getClass(),
+                    "Which two players should fall in love?",
+                    alivePlayersGetter.get().stream().map(player -> new PrivateResultPollOption(player, new PrivateAddPlayerToRolePollCommand(addPlayerToRole, player, Lover.class, player))).toList(),
+                    getPlayers().stream().map(player -> new PollParticipant(player, 2)).findFirst().get(),
+                    15,
+                    new DistinctRandomTiedPollDecider())
+            );
+        }
+        return Optional.empty();
     }
 
     @Override

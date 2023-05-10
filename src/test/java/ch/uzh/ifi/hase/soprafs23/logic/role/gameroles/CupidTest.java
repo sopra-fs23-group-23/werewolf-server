@@ -53,7 +53,7 @@ public class CupidTest {
         expectedCupid.stream().forEach(cupid::addPlayer);
         List<Player> expected = alivePlayers;
 
-        Poll poll = cupid.createFirstNightPoll().get();
+        Poll poll = cupid.createNightPoll().get();
 
         assertThat(
             "Contains cupid as participant",
