@@ -75,11 +75,10 @@ public class LobbyTest {
     @Test
     void testAssignRoles(){
         Player admin = new Player(12l, "admin");
-        Player p1 = new Player(13l, "player1");
-        Player p2 = new Player(14l, "player2");
         Lobby l = new Lobby(1l, admin);
-        l.addPlayer(p1);
-        l.addPlayer(p2);
+        for (int i = 0; i < Lobby.MIN_SIZE; i++) {
+            l.addPlayer(new Player((long) i, "player" + i));
+        }
         l.instantiateRoles(null, null, null, null, null);
         l.assignRoles();
 
