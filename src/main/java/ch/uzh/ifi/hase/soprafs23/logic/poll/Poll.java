@@ -34,6 +34,15 @@ public class Poll{
         observers.stream().forEach(o->o.onPollFinished());
     }
 
+    /**
+     * @pre pollOption >= 1
+     * @param role
+     * @param question
+     * @param pollOptions
+     * @param pollParticipants
+     * @param durationSeconds
+     * @param tiedPollDecider
+     */
     public Poll(Class<? extends Role> role, String question, List<PollOption> pollOptions, List<PollParticipant> pollParticipants, int durationSeconds,
             TiedPollDecider tiedPollDecider) {
         this.role = role;
@@ -73,12 +82,26 @@ public class Poll{
         finish(this::setResultCommand);
     }
 
-    protected void finish(Consumer<PollCommand> resultCommandConsumer) {
-        List<PollOption> pollOptionsOrderedBySupporters = pollOptions.stream().sorted(Comparator.comparing(PollOption::getSupportersAmount).reversed()).toList();
+    private List<PollOption> getPollOptionsOrderedBySupporters() {
+        return pollOptions.stream()
+            .sorted(Comparator.comparing(PollOption::getSupportersAmount)
+            .reversed())
+            .toList();
+    }
+
+    private boolean isTie(List<PollOption> pollOptionsOrderedBySupporters) {
+        if (pollOptionsOrderedBySupporters.size() < 2) {
+            return false;
+        }
         PollOption first = pollOptionsOrderedBySupporters.get(0);
         PollOption second = pollOptionsOrderedBySupporters.get(1);
-        boolean tie = first.getSupportersAmount() == second.getSupportersAmount();
-        if (!tie) {
+        return first.getSupportersAmount() == second.getSupportersAmount();
+    }
+
+    protected void finish(Consumer<PollCommand> resultCommandConsumer) {
+        List<PollOption> pollOptionsOrderedBySupporters = getPollOptionsOrderedBySupporters();
+        PollOption first = pollOptionsOrderedBySupporters.get(0);
+        if (!isTie(pollOptionsOrderedBySupporters)) {
             resultCommandConsumer.accept(first.getPollCommand());
             notifyObserversFinished();
         } else {

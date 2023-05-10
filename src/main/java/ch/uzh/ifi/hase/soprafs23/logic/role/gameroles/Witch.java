@@ -74,7 +74,7 @@ public class Witch extends Role implements DoubleNightVoter {
                     this.getClass(),
                     "Save this player from dying with your heal potion.",
                     killedPlayerPollCommands.stream().map(killPollCommand -> new PollOption(killPollCommand.getAffectedPlayer(), new RemoveCommandPollCommand(this.removePollCommand, killPollCommand, this::decreaseResurrectPotions, killPollCommand.getAffectedPlayer()))).toList(),
-                    this.getPlayers().stream().filter(Player::isAlive).map(p->new PollParticipant(p)).toList(),
+                    this.getPlayers().stream().map(p->new PollParticipant(p)).toList(),
                     15,
                     new NullResultPollDecider()));
         }
