@@ -14,6 +14,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.LobbyObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicEntityMapper;
 
@@ -127,8 +128,11 @@ public class LobbyService implements LobbyObserver{
      * @param lobby
      * @return
      */
-    public Collection<RoleGetDTO> getPlayerRoleInformation(Player player, Lobby lobby) {
-        return lobby.getRolesOfPlayer(player).stream().map(role -> LogicDTOMapper.convertRoleToRoleGetDTO(role)).toList();
+    public Collection<RoleGetDTO> getPlayerRoleInformation(Player player, Lobby lobby, Comparator<Role> comparator) {
+        return lobby.getRolesOfPlayer(player).stream()
+            .sorted(comparator)
+            .map(role -> LogicDTOMapper.convertRoleToRoleGetDTO(role))
+            .toList();
     }
 
     public void instantiateRoles(Lobby lobby, Game game) {

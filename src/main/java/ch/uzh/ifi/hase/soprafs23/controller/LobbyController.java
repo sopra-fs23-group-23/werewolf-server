@@ -22,6 +22,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.logic.role.RoleInformationComparator;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
@@ -95,6 +96,6 @@ public class LobbyController {
             // if player is alive, only the user himself can see his role
             userService.validateTokenMatch(userToGetRole, token);
         }
-        return lobbyService.getPlayerRoleInformation(playerToGetRole, lobby);
+        return lobbyService.getPlayerRoleInformation(playerToGetRole, lobby, new RoleInformationComparator());
     }
 }

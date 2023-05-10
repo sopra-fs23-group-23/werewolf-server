@@ -11,7 +11,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
+import ch.uzh.ifi.hase.soprafs23.logic.role.RoleInformationComparator;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Witch;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -210,8 +213,23 @@ public class LobbyServiceTest {
 
         Mockito.when(lobby.getRolesOfPlayer(player)).thenReturn(rolesReturn);
         
-        ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>(lobbyService.getPlayerRoleInformation(player, lobby));
+        ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>(lobbyService.getPlayerRoleInformation(player, lobby, new RoleInformationComparator()));
         assertEquals("Werewolf", roleGetDTOS.get(0).getRoleName());
+        assertEquals(0, roleGetDTOS.get(0).getAmount());
+    }
+
+    @Test
+    void testGetPlayerRoleInformation_Witch() {
+        Collection<Role> rolesReturn = new ArrayList<>();
+        Lobby lobby = mock(Lobby.class);
+        Player player = mock(Player.class);
+        rolesReturn.add(new Villager(null, null, null));
+        rolesReturn.add(new Witch(null, null, null));
+
+        Mockito.when(lobby.getRolesOfPlayer(player)).thenReturn(rolesReturn);
+        
+        ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>(lobbyService.getPlayerRoleInformation(player, lobby, new RoleInformationComparator()));
+        assertEquals("Witch", roleGetDTOS.get(0).getRoleName());
         assertEquals(0, roleGetDTOS.get(0).getAmount());
     }
 
