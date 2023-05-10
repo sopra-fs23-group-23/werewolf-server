@@ -90,10 +90,11 @@ public class Poll{
     }
 
     private boolean isTie(List<PollOption> pollOptionsOrderedBySupporters) {
-        if (pollOptionsOrderedBySupporters.size() < 2) {
-            return false;
-        }
         PollOption first = pollOptionsOrderedBySupporters.get(0);
+        if (pollOptionsOrderedBySupporters.size() < 2) {
+            return first.getSupportersAmount() == 0;
+        }
+        
         PollOption second = pollOptionsOrderedBySupporters.get(1);
         return first.getSupportersAmount() == second.getSupportersAmount();
     }
