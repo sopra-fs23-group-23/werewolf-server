@@ -44,6 +44,7 @@ public class PrivateResultPollTest {
         privateResultPoll.finish();
 
         assertEquals(NullPollCommand.class, privateResultPoll.getResultCommand().getClass());
+        verify(expectedResultCommand).execute();
         verify(player).addPrivatePollCommand(expectedResultCommand);
     }
 }
