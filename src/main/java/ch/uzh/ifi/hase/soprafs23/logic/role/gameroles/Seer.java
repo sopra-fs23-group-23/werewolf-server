@@ -8,8 +8,9 @@ import java.util.function.Supplier;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
-import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.PrivateResultPoll;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.PrivateResultPollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PrivateRevealRolesNotificationPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.NullResultPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
@@ -29,10 +30,10 @@ public class Seer extends Role implements NightVoter {
         Player seerPlayer = getPlayers().get(0);
          if (seerPlayer.isAlive()) {
                 List<Player> alivePlayers = alivePlayersGetter.get();
-                return Optional.of(new Poll(
+                return Optional.of(new PrivateResultPoll(
                     this.getClass(),
                     "Whose roles do you want to reveal?",
-                    alivePlayers.stream().map(player->new PollOption(player, new PrivateRevealRolesNotificationPollCommand(player, seerPlayer, rolesPerPlayer))).toList(),
+                    alivePlayers.stream().map(player->new PrivateResultPollOption(player, new PrivateRevealRolesNotificationPollCommand(player, seerPlayer, rolesPerPlayer))).toList(),
                     this.getPlayers().stream().map(p->new PollParticipant(p)).toList(),
                     15,
                     new NullResultPollDecider()
