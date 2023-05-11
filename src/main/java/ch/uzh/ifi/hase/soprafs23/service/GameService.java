@@ -213,8 +213,12 @@ public class GameService implements GameObserver{
         }
     }
 
-
-    /* TODO Miro
-    *   On player dead, apply Agora.muteDeadPlayer(player, cname)
-    * */
+    @Override
+    public void onPlayerDiedUnrevivable(Game game, Player player) {
+        try{
+            Agora.muteDeadPlayer(player, game.getLobby().getId().toString());
+        }catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

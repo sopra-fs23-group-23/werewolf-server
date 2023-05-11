@@ -32,7 +32,7 @@ public class PlayerTest {
         private boolean playerAlive = true;
 
         @Override
-        public void onPlayerKilled_Unrevivable() {
+        public void onPlayerKilled_Unrevivable(Player player) {
             playerAlive = false;
         }
 

@@ -64,7 +64,7 @@ public class Player {
 
     private void notifyObservers() {
         for (PlayerObserver playerObserver : observers) {
-            playerObserver.onPlayerKilled_Unrevivable();
+            playerObserver.onPlayerKilled_Unrevivable(this);
         }
     }
 

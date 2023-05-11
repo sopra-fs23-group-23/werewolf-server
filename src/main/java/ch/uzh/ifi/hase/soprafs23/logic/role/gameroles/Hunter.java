@@ -75,7 +75,7 @@ public class Hunter extends Role implements DayVoter, NightVoter, PlayerObserver
     }
 
     @Override
-    public void onPlayerKilled_Unrevivable() {
+    public void onPlayerKilled_Unrevivable(Player player) {
         died = true;
     }
 }
