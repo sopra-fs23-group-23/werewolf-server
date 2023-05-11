@@ -11,6 +11,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
+import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.logic.lobby.PlayerObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.NullPollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
@@ -23,7 +25,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.FirstDayVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.StageVoter;
 
-public class Game implements StageObserver{
+public class Game implements StageObserver, PlayerObserver{
     private Lobby lobby;
     private Stage currentStage;
     private boolean started = false;
@@ -42,6 +44,7 @@ public class Game implements StageObserver{
     public Game(Lobby lobby) {
         assert lobby.getLobbySize() <= Lobby.MAX_SIZE && lobby.getLobbySize() >= Lobby.MIN_SIZE;
         this.lobby = lobby;
+        lobby.getPlayers().forEach(player -> player.addObserver(this));
     }
 
     public void addObserver(GameObserver observer) {
@@ -217,6 +220,11 @@ public class Game implements StageObserver{
         pollCount++;
         currentPoll = Optional.of(poll);
         observers.forEach(o -> o.onNewPoll(this));
+    }
+
+    @Override
+    public void onPlayerKilled_Unrevivable(Player player) {
+        observers.forEach(gameObserver -> gameObserver.onPlayerDiedUnrevivable(this, player));
     }
     
 }
