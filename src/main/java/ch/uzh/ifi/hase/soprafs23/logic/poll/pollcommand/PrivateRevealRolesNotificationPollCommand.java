@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
+import ch.uzh.ifi.hase.soprafs23.logic.role.RoleInformationComparator;
 
 public class PrivateRevealRolesNotificationPollCommand extends PrivatePollCommand {
     private final Function<Player, Collection<Role>> rolesPerPlayer;
@@ -25,7 +26,7 @@ public class PrivateRevealRolesNotificationPollCommand extends PrivatePollComman
 
     @Override
     public String toString() {
-        return "[" + rolesOfPlayer.stream().map(Role::getName).collect(Collectors.joining(", ")) + "]";
+        return "[" + rolesOfPlayer.stream().sorted(new RoleInformationComparator()).map(Role::getName).collect(Collectors.joining(", ")) + "]";
     }
     
 }
