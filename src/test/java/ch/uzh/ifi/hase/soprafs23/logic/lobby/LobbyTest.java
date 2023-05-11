@@ -79,7 +79,7 @@ public class LobbyTest {
         for (int i = 0; i < Lobby.MIN_SIZE; i++) {
             l.addPlayer(new Player((long) i, "player" + i));
         }
-        l.instantiateRoles(null, null, null, null, null);
+        l.instantiateRoles(null, null, null, null, null, null);
         l.assignRoles();
 
         Collection<Role> roles = l.getRoles();
@@ -120,7 +120,7 @@ public class LobbyTest {
     @Test
     void testGetFractions() {
         Lobby lobby = new Lobby(1L, mock(Player.class));
-        lobby.instantiateRoles(null, null, null, null, null);
+        lobby.instantiateRoles(null, null, null, null, null, null);
         List<FractionRole> fractions = lobby.getFractions();
         assertEquals(3, fractions.size(), "Wrong number of fractions");
         assertTrue(fractions.get(0) instanceof Lover, "First fraction is not Lover");

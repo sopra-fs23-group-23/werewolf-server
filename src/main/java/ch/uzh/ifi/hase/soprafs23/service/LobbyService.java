@@ -136,7 +136,7 @@ public class LobbyService implements LobbyObserver{
     }
 
     public void instantiateRoles(Lobby lobby, Game game) {
-        lobby.instantiateRoles(lobby::getAlivePlayers, lobby::addPlayerToRole, game::getCurrentStagePollCommands, game::removePollCommandFromCurrentStage, game::addPollCommandToCurrentStage);
+        lobby.instantiateRoles(lobby::getAlivePlayers, lobby::addPlayerToRole, game::getCurrentStagePollCommands, game::removePollCommandFromCurrentStage, game::addPollCommandToCurrentStage, lobby::getRolesOfPlayer);
     }
 
     /**

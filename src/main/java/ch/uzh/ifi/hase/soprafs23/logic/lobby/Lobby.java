@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.logic.lobby;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
@@ -15,6 +16,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Cupid;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Hunter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Lover;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Mayor;
+import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Seer;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Witch;
@@ -125,7 +127,8 @@ public class Lobby {
         BiConsumer<Player, Class<? extends Role>> addPlayerToRoleConsumer,
         Supplier<List<PollCommand>> currentStagePollCommandsSupplier,
         Consumer<PollCommand> removePollCommandConsumer,
-        Consumer<PollCommand> addPollCommandConsumer
+        Consumer<PollCommand> addPollCommandConsumer,
+        Function<Player, Collection<Role>> getRolesOfPlayerFunction
     ) {
         roles.put(Werewolf.class, new Werewolf(alivePlayersSupplier));
         Mayor mayor = new Mayor(alivePlayersSupplier, new RandomTiedPollDecider(), Scheduler.getInstance());
@@ -135,6 +138,7 @@ public class Lobby {
         roles.put(Villager.class, new Villager(addPlayerToRoleConsumer, alivePlayersSupplier, mayor));
         roles.put(Cupid.class, new Cupid(alivePlayersSupplier, addPlayerToRoleConsumer));
         roles.put(Lover.class, new Lover(alivePlayersSupplier, addPollCommandConsumer));
+        roles.put(Seer.class, new Seer(alivePlayersSupplier, getRolesOfPlayerFunction));
     }
 
     private void addSpecialVillagerRoles(Map<Class<? extends Role>, List<Player>> mapOfPlayersPerRole, List<Player> villagers) {
@@ -142,7 +146,7 @@ public class Lobby {
         mapOfPlayersPerRole.put(Cupid.class, List.of(villagers.get(0)));
         mapOfPlayersPerRole.put(Witch.class, List.of(villagers.get(1)));
         mapOfPlayersPerRole.put(Hunter.class, List.of(villagers.get(2)));
-
+        mapOfPlayersPerRole.put(Seer.class, List.of(villagers.get(3)));
     }
 
 
