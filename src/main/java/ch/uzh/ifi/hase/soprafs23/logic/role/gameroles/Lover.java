@@ -44,8 +44,13 @@ public class Lover extends FractionRole implements PlayerObserver {
 
     @Override
     public String getDescription() {
-        // TODO Auto-generated method stub
-        return "TODO";
+        return " The lovers are players who have a very strong bond through the magic of the Cupid. " +
+                "Their love for each other is so strong that if one of these two players dies, the other person can no longer " +
+                "bear life without their great love and therefore also takes their own life. " +
+                "The goal of these lovers is to still be alive at the end of the game together with their partner. "+
+                "This goal is stronger than the goal originally defined by the faction. It can therefore happen that in " +
+                "a relationship between a werewolf and a villager, the werewolf betrays his pack towards the end of the " +
+                "game and tries to kill other werewolves with his lover during the day.";
     }
 
     private void killLovers() {
