@@ -4,33 +4,28 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 
 import java.util.function.Consumer;
 
-public class WitchSavePlayerPollCommand implements PollCommand{
+public class WitchSavePlayerPollCommand extends PollCommand{
     private Consumer<PollCommand> removeCommand;
     private Runnable decreaseHealPotion;
     private PollCommand pollCommand;
-    private Player player;
 
     public WitchSavePlayerPollCommand(Consumer<PollCommand> removeCommand, PollCommand pollCommand, Runnable decreaseHealPotion, Player player){
+        super(player);
         this.removeCommand = removeCommand;
         this.pollCommand = pollCommand;
         this.decreaseHealPotion = decreaseHealPotion;
-        this.player = player;
     }
 
     @Override
     public void execute() {
+        super.execute();
         removeCommand.accept(pollCommand);
         decreaseHealPotion.run();
-        player.revivePlayer();
+        getAffectedPlayer().revivePlayer();
     }
 
     @Override
     public String toString() {
-        return String.format("%s was saved from dying by the witch.", player.getName());
-    }
-
-    @Override
-    public Player getAffectedPlayer() {
-        return player;
+        return String.format("%s was saved from dying by the witch.", getAffectedPlayer().getName());
     }
 }

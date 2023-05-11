@@ -1,9 +1,12 @@
 package ch.uzh.ifi.hase.soprafs23.rest.dto;
 
+import java.util.Date;
+
 public class PollCommandGetDTO {
-    public String type;
-    public PlayerGetDTO affectedPlayer;
-    public String message;
+    private String type;
+    private PlayerGetDTO affectedPlayer;
+    private String message;
+    private Date executionTime;
     
     public String getType() {
         return type;
@@ -22,5 +25,11 @@ public class PollCommandGetDTO {
     }
     public void setAffectedPlayer(PlayerGetDTO affectedPlayer) {
         this.affectedPlayer = affectedPlayer;
+    }
+    public Date getExecutionTime() {
+        return executionTime;
+    }
+    public void setExecutionTime(Date executionTime) {
+        this.executionTime = executionTime;
     }
 }

@@ -2,31 +2,25 @@ package ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 
-public class KillPlayerPollCommand implements PollCommand, StageFinishedCommand{
-    private Player player;
+public class KillPlayerPollCommand extends PollCommand implements StageFinishedCommand {
 
     public KillPlayerPollCommand(Player player) {
-        this.player = player;
+        super(player);
     }
 
     @Override
     public void execute() {
-        player.killPlayer();
+        super.execute();
+        getAffectedPlayer().killPlayer();
     }
 
     @Override
     public void executeAfterStageFinished() {
-        player.setDeadPlayerUnrevivable();
+        getAffectedPlayer().setDeadPlayerUnrevivable();
     }
 
     @Override
     public String toString() {
-        return String.format("%s was killed.", player.getName());
+        return String.format("%s was killed.", getAffectedPlayer().getName());
     }
-
-    @Override
-    public Player getAffectedPlayer() {
-        return player;
-    }
-    
 }

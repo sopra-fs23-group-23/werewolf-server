@@ -69,6 +69,7 @@ public final class LogicDTOMapper {
         PollCommandGetDTO pollCommandGetDTO = new PollCommandGetDTO();
         pollCommandGetDTO.setType(pollCommand.getClass().getSimpleName());
         pollCommandGetDTO.setAffectedPlayer(convertPlayerToPlayerGetDTO(pollCommand.getAffectedPlayer()));
+        pollCommandGetDTO.setExecutionTime(pollCommand.getExecutionTime());
         pollCommandGetDTO.setMessage(pollCommand.toString());
         return pollCommandGetDTO;
     }

@@ -2,33 +2,21 @@ package ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 
-public class PrivateLoverNotificationPollCommand implements PrivatePollCommand {
-    private final Player otherLover;
-    private final Player informationOwner;
+public class PrivateLoverNotificationPollCommand extends PrivatePollCommand {
 
     public PrivateLoverNotificationPollCommand(Player otherLover, Player informationOwner) {
-        this.otherLover = otherLover;
-        this.informationOwner = informationOwner;
+        super(otherLover, informationOwner);
     }
 
     @Override
     public void execute() {
+        super.execute();
         // This command serves purely as a notification
     }
 
     @Override
-    public Player getAffectedPlayer() {
-        return otherLover;
-    }
-
-    @Override
-    public Player getInformationOwner() {
-        return informationOwner;
-    }
-
-    @Override
     public String toString() {
-        return "You are in love with " + otherLover.getName() + ".";
+        return "You are in love with " + getAffectedPlayer().getName() + ".";
     }
     
 }
