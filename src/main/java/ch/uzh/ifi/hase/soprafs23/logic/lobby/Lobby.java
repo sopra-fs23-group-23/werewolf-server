@@ -27,8 +27,7 @@ public class Lobby {
     private Map<Class<? extends Role>, Role> roles;
     private boolean open;
 
-    // TODO temporary on 3, change to 5
-    public static final int MIN_SIZE = 3;
+    public static final int MIN_SIZE = 5;
     public static final int MAX_SIZE = 20;
 
     public Lobby(Long id, Player admin) {
