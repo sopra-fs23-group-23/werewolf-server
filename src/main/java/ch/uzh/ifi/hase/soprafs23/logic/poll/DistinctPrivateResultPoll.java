@@ -2,7 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.logic.poll;
 
 import java.util.List;
 
-import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PrivatePollCommand;
+import ch.uzh.ifi.hase.soprafs23.logic.poll.pollcommand.PollCommand;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider.DistinctRandomTiedPollDecider;
 import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 
@@ -23,11 +23,9 @@ public class DistinctPrivateResultPoll extends PrivateResultPoll {
             .toList();
     }
 
-    private List<PrivatePollCommand> toPrivateInstantPollCommands(List<PollOption> pollOptions) {
+    private List<PollCommand> toPollCommands(List<PollOption> pollOptions) {
         return pollOptions.stream()
-            .map(PrivateResultPollOption.class::cast)
-            .map(PrivateResultPollOption::getPollCommand)
-            .map(PrivatePollCommand.class::cast)
+            .map(PollOption::getPollCommand)
             .toList();
     }
 
@@ -37,17 +35,14 @@ public class DistinctPrivateResultPoll extends PrivateResultPoll {
         if (selectedPollOptions.size() < requiredSelections) {
             tiedPollDecider.executeTiePoll(this, selectedPollOptions, this::finish);
         } else {
-            executeSelectedPrivateInstantPollCommands(toPrivateInstantPollCommands(selectedPollOptions));
+            executeSelectedPollCommands(toPollCommands(selectedPollOptions));
             super.notifyObserversFinished();
         }
     }
 
-    private void executeSelectedPrivateInstantPollCommands(List<PrivatePollCommand> privateInstantPollCommands) {
-        privateInstantPollCommands.stream()
-            .forEach(privateInstantPollCommand -> {
-                privateInstantPollCommand.execute();
-                privateInstantPollCommand.getInformationOwner().addPrivatePollCommand(privateInstantPollCommand);
-            });
+    private void executeSelectedPollCommands(List<PollCommand> selectedPollCommands) {
+        selectedPollCommands.stream()
+            .forEach(super::executeAndAddToInformationOwner);
     }
 
     @Override
