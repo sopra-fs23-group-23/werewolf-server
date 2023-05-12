@@ -98,6 +98,20 @@ public class LobbyServiceTest {
     }
 
     @Test
+    void testRemoveUserFromLobby() {
+        Lobby lobby = mock(Lobby.class);
+        User user = mock(User.class);
+        Player player = mock(Player.class);
+
+        when(user.getId()).thenReturn(1l);
+        when(lobby.getPlayerById(1l)).thenReturn(player);
+
+        lobbyService.removeUserFromLobby(user, lobby);
+
+        verify(lobby).removePlayer(player);
+    }
+
+    @Test
     void testJoinUserToLobby_userInAnotherLobby() {
         User admin1 = createTestAdmin();
         User admin2 = createTestAdmin();

@@ -103,8 +103,26 @@ public class LobbyService implements LobbyObserver{
         lobby.addPlayer(LogicEntityMapper.createPlayerFromUser(user));
     }
 
+    /**
+     * @pre user is in lobby
+     * @param user
+     * @param lobby
+     */
+    public void removeUserFromLobby(User user, Lobby lobby) {
+        Player player = getPlayerOfUser(user, lobby);
+        lobby.removePlayer(player);
+    }
+
+    public void dissolveLobby(Lobby lobby) {
+        lobby.dissolve();
+    }
+
+    public boolean userIsAdmin(User user, Lobby lobby) {
+        return user.getId().equals(lobby.getAdmin().getId());
+    }
+
     public void validateUserIsAdmin(User user, Lobby lobby) {
-        if (!user.getId().equals(lobby.getAdmin().getId())) {
+        if (!userIsAdmin(user, lobby)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the admin may perform this action.");
         }
     }

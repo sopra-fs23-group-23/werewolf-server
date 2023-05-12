@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
@@ -84,6 +85,42 @@ public class LobbyControllerTest {
             .andExpect(status().isNoContent());
 
         verify(lobbyService).joinUserToLobby(joiningUser, lobby);
+    }
+
+    @Test
+    void testLeaveLobby_adminLeave() throws Exception {
+        User user = mock(User.class);
+        Lobby lobby = mock(Lobby.class);
+
+        Mockito.when(userService.getUserByToken("token")).thenReturn(user);
+        Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
+        Mockito.when(lobbyService.userIsAdmin(user, lobby)).thenReturn(true);
+
+        MockHttpServletRequestBuilder deleteRequest = delete("/lobbies/1")
+            .header(USERAUTH_HEADER, "token");
+
+        mockMvc.perform(deleteRequest)
+            .andExpect(status().isNoContent());
+
+        verify(lobbyService).dissolveLobby(lobby);
+    }
+
+    @Test
+    void testLeaveLobby_userLeave() throws Exception {
+        User user = mock(User.class);
+        Lobby lobby = mock(Lobby.class);
+
+        Mockito.when(userService.getUserByToken("token")).thenReturn(user);
+        Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
+        Mockito.when(lobbyService.userIsAdmin(user, lobby)).thenReturn(false);
+
+        MockHttpServletRequestBuilder deleteRequest = delete("/lobbies/1")
+            .header(USERAUTH_HEADER, "token");
+
+        mockMvc.perform(deleteRequest)
+            .andExpect(status().isNoContent());
+
+        verify(lobbyService).removeUserFromLobby(user, lobby);
     }
 
     @Test

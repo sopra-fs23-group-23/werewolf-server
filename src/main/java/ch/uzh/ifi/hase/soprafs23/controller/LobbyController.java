@@ -3,11 +3,11 @@ package ch.uzh.ifi.hase.soprafs23.controller;
 import static ch.uzh.ifi.hase.soprafs23.service.LobbyService.LOBBYID_PATHVARIABLE;
 import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
 
-import java.io.IOException;
 import java.util.Collection;
 
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
@@ -54,11 +52,26 @@ public class LobbyController {
     @PutMapping("/lobbies/{lobbyId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
-    public void joinLobby(@PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @RequestHeader(USERAUTH_HEADER) String userToken) throws JsonProcessingException, IOException {
+    public void joinLobby(@PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @RequestHeader(USERAUTH_HEADER) String userToken) {
         User user = userService.getUserByToken(userToken);
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
         lobbyService.validateLobbyIsOpen(lobby);
         lobbyService.joinUserToLobby(user, lobby);
+    }
+
+    @DeleteMapping("/lobbies/{lobbyId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public void leaveLobby(@PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @RequestHeader(USERAUTH_HEADER) String userToken) {
+        User user = userService.getUserByToken(userToken);
+        Lobby lobby = lobbyService.getLobbyById(lobbyId);
+        lobbyService.validateLobbyIsOpen(lobby);
+        lobbyService.validateUserIsInLobby(user, lobby);
+        if (lobbyService.userIsAdmin(user, lobby)) {
+            lobbyService.dissolveLobby(lobby);
+        } else {
+            lobbyService.removeUserFromLobby(user, lobby);
+        }
     }
 
     @GetMapping("/lobbies/{lobbyId}")
