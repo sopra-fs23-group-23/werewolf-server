@@ -72,6 +72,15 @@ public class Lobby {
         }
     }
 
+    public void reInstatiatePlayers() {
+        // this is a dirty fix, but too lazy to refactor design...
+        List<Player> newPlayers = new ArrayList<>();
+        for (Player player : players) {
+            newPlayers.add(new Player(player.getId(), player.getName()));
+        }
+        players = new HashSet<>(newPlayers);
+    }
+
     public Collection<Player> getPlayers() {
         return players;
     }

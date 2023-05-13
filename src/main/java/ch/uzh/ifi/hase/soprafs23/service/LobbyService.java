@@ -170,6 +170,10 @@ public class LobbyService implements LobbyObserver{
         lobby.setOpen(false);
     }
 
+    public void reInstatiatePlayers(Lobby lobby) {
+        lobby.reInstatiatePlayers();
+    }
+
     /**
      * @pre lobbies contains lobby
      * @param lobby
