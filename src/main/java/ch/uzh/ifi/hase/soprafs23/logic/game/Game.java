@@ -42,7 +42,6 @@ public class Game implements StageObserver, PlayerObserver{
      * @param lobby
      */
     public Game(Lobby lobby) {
-        assert lobby.getLobbySize() <= Lobby.MAX_SIZE && lobby.getLobbySize() >= Lobby.MIN_SIZE;
         this.lobby = lobby;
         lobby.getPlayers().forEach(player -> player.addObserver(this));
     }
@@ -167,7 +166,9 @@ public class Game implements StageObserver, PlayerObserver{
         executeCurrentStageStageFinishedCommands(currentStagePollCommands);
         checkForWinner();
         pollCommands.addAll(filterOutNullPollCommands(currentStage.getPollCommands()));
-        startNextStage(calculateNextStage());
+        if (!finished) {
+            startNextStage(calculateNextStage());
+        }
     }
 
     private void finishGame(FractionRole winningFraction) {
