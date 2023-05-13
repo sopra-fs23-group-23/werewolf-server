@@ -166,23 +166,27 @@ public class GameService implements GameObserver{
     }
 
     /**
-     * @pre hashmap games contains game
+     * removes game of lobby from games map, if lobby has not started a new game
+     * @pre game finished
      * @param game
      */
-    public void removeGame(Game game) {
-        assert games.containsKey(game.getLobby().getId());
-        games.remove(game.getLobby().getId());
-        // TODO this is temporary and might be subject to change
-        game.getLobby().dissolve();
+    public void removeStaleGame(Game game) {
+        Long lobbyId = game.getLobby().getId();
+        if (games.containsKey(lobbyId)) {
+            Game possiblyNewGame = games.get(lobbyId);
+            if (possiblyNewGame.equals(game)) {
+                games.remove(lobbyId);
+            }
+        }
     }
 
     @Override
     public void onGameFinished(Game game) {
-        if (games.containsKey(game.getLobby().getId())) {
-            Scheduler.getInstance().schedule(()->removeGame(game), 30);
-        }
+        Lobby lobby = game.getLobby();
+        lobby.setOpen(true);
+        Scheduler.getInstance().schedule(() -> removeStaleGame(game), 20);
         try {
-            Agora.deleteAllRules(game.getLobby().getId().toString());
+            Agora.deleteAllRules(lobby.getId().toString());
         }
         catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);

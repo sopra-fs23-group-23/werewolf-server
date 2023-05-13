@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -211,4 +212,49 @@ public class GameServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->gameService.validateGameFinished(game));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
     }
+
+    @Test
+    void testOnNewPoll() {
+        Game game = mock(Game.class);
+        Poll poll = mock(Poll.class);
+        Date date = mock(Date.class);
+
+        when(game.getCurrentPoll()).thenReturn(poll);
+        when(poll.calculateScheduledFinish(Mockito.any())).thenReturn(date);
+
+
+        when(game.getCurrentPoll()).thenReturn(poll);
+
+        gameService.onNewPoll(game);
+
+        verify(poll).setScheduledFinish(date);
+    }
+
+    @Test
+    void removeStaleGame() {
+        Lobby lobby = mock(Lobby.class);
+        when(lobby.getId()).thenReturn(1l);
+        when(lobby.getLobbySize()).thenReturn(Lobby.MIN_SIZE);
+
+        Game game = gameService.createNewGame(lobby);
+        gameService.removeStaleGame(game);
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->gameService.getGame(lobby));
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+    }
+
+    @Test
+    void removeStaleGame_newGame() {
+        Lobby lobby = mock(Lobby.class);
+        when(lobby.getId()).thenReturn(1l);
+        when(lobby.getLobbySize()).thenReturn(Lobby.MIN_SIZE);
+
+        Game game = gameService.createNewGame(lobby);
+        Game newGame = gameService.createNewGame(lobby);
+        gameService.removeStaleGame(game);
+
+        assertEquals(newGame, gameService.getGame(lobby));
+    }
+
+    
 }
