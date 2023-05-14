@@ -114,14 +114,6 @@ public class Agora {
         createHttpRequest(HttpMethod.POST, requestBody);
     }
 
-    //creates "join_channel" ban for whole channel. Shall be used to kick all Players quickly from channel in the morning
-
-    // TODO probably delete this since not needed until now
-    public static void kickAll(String cname) throws IOException, InterruptedException {
-        String requestBody = createRequestBody(Optional.empty(), Optional.of(cname), "join_channel", Reason.KICK_ALL);
-        createHttpRequest(HttpMethod.POST, requestBody);
-    }
-
     //creates "publish_audio" ban for player who died and should be muted in death view.
     public static void muteDeadPlayer(Player player, String cname) throws IOException, InterruptedException {
         String requestBody = createRequestBody(Optional.of(player), Optional.of(cname), "publish_audio", Reason.MUTE_DEAD);

@@ -100,14 +100,6 @@ public class AgoraTest {
     }
 
     @Test
-    void testKickAll() throws IOException, InterruptedException {
-        Agora.kickAll("Testchannel");
-        String expectedRequestBody = "{\"privileges\":[\"join_channel\"],\"reason\":2,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"cname\":\"Testchannel\",\"time_in_seconds\":10}";
-        JsonNode jsonNode = Agora.createHttpRequest(HttpMethod.POST, expectedRequestBody);
-        assertTrue(jsonNode.toString().contains("success"));
-    }
-
-    @Test
     void testMuteDeadPlayer() throws IOException, InterruptedException {
         Player player = new Player((long) 123, "John");
         Agora.muteDeadPlayer(player, "Testchannel");
