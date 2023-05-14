@@ -104,6 +104,20 @@ class GameIntegrationTest {
     }
 
     @Test
+    void testGameTwoStage() {
+        FractionRole fraction = mock(FractionRole.class);
+        when(lobby.getFractions()).thenReturn(List.of(fraction));
+        when(fraction.hasWon()).thenReturn(false, true);
+        game.startGame();
+        Stage stage = game.getCurrentStage();
+        assertEquals(StageType.Night, stage.getType());
+        assertTrue(mockGameObserver.onNewStageCalled);
+        assertTrue(mockGameObserver.onGameFinishedCalled);
+        assertTrue(game.isFinished());
+        assertEquals(fraction, game.getWinner());
+    }
+
+    @Test
     void testGetVotersOfType() {
         Role r1 = new Villager(null, null, null);
         Role r2 = new Werewolf(null);

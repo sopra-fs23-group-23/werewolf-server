@@ -190,7 +190,6 @@ public class Game implements StageObserver, PlayerObserver{
     }
 
     public static void forVoterRolesOfType(Collection<Role> roles, Class<? extends StageVoter> stageVoterClass, Consumer<? super Role> stageVoterClassAction) {
-        // TODO test
         roles.stream()
             .filter(stageVoterClass::isInstance)
             .sorted()
