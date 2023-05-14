@@ -39,7 +39,6 @@ public class GameService implements GameObserver{
      * @param lobby
      */
     public Game createNewGame(Lobby lobby) {
-        assert lobby.getLobbySize() <= Lobby.MAX_SIZE && lobby.getLobbySize() >= Lobby.MIN_SIZE;
         Game game = new Game(lobby);
         game.addObserver(this);
         games.put(lobby.getId(), game);
@@ -153,7 +152,6 @@ public class GameService implements GameObserver{
      * @param game
      */
     public FractionGetDTO getFractionGetDTO(Game game) {
-        assert game.isFinished();
         return LogicDTOMapper.convertFractionToFractionGetDTO(game.getWinner());
     }
 
