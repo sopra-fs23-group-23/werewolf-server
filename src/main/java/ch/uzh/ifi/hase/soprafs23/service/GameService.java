@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -185,16 +184,10 @@ public class GameService implements GameObserver{
         Lobby lobby = game.getLobby();
         lobby.setOpen(true);
         Scheduler.getInstance().schedule(() -> removeStaleGame(game), 20);
-        try {
-            Agora.deleteAllRules(lobby.getId().toString());
-        }
-        catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
+        Agora.deleteAllRules(lobby.getId().toString());
     }
 
-    private void applyKickingRules(Game game) throws IOException, InterruptedException{
+    private void applyKickingRules(Game game) {
         if (game.getCurrentStage().getType() == StageType.Night) {
             List<Player> villagers = game.getLobby().getPlayersByRole(Villager.class)
                     .stream()
@@ -210,19 +203,11 @@ public class GameService implements GameObserver{
 
     @Override
     public void onNewStage(Game game) {
-        try {
-            applyKickingRules(game);
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        applyKickingRules(game);
     }
 
     @Override
     public void onPlayerDiedUnrevivable(Game game, Player player) {
-        try{
-            Agora.muteDeadPlayer(player, game.getLobby().getId().toString());
-        }catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        Agora.muteDeadPlayer(player, game.getLobby().getId().toString());
     }
 }

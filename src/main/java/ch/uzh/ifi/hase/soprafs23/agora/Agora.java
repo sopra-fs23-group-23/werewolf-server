@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.agora;
 
 import ch.uzh.ifi.hase.soprafs23.constant.Reason;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpMethod;
@@ -46,7 +47,7 @@ public class Agora {
 
     // Send Http Request by providing requestBody and method (GET, POST, DELETE allowed). Agora Server answer is given back (e.g. all Rules if GET)
     // For GET no requestBody is needed, therefore just pass "" as requestBody
-    static JsonNode createHttpRequest(HttpMethod method, String requestBody) throws IOException, InterruptedException {
+    static JsonNode createHttpRequest(HttpMethod method, String requestBody) throws IOException, RuntimeException {
         HttpClient client = HttpClient.newHttpClient();
 
         // Create HTTP request builder object
@@ -70,20 +71,33 @@ public class Agora {
         HttpRequest request = requestBuilder.build();
 
         // Send HTTP request
-        HttpResponse<String> response = client.send(request,
-                HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response;
+        try {
+            response = client.send(request,
+                    HttpResponse.BodyHandlers.ofString());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        }
 
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readTree(response.body());
     }
     // gets all kicking rules
-    public static JsonNode getRules() throws IOException, InterruptedException {
+    public static JsonNode getRules() throws IOException, RuntimeException {
         return createHttpRequest(HttpMethod.GET, "").get("rules");
     }
 
     //deletes rules that match with provided filter for Reason and Player. If no player provided all rules by given Reason are deleted.
-    public static void deleteRules(Reason reason, String cname) throws IOException, InterruptedException {
-        JsonNode allRules = getRules();
+    public static void deleteRules(Reason reason, String cname) {
+        JsonNode allRules;
+        try {
+            allRules = getRules();
+        } catch (IOException | RuntimeException e) {
+            System.err.println("Failed to get rules in deleteRules:");
+            e.printStackTrace();
+            return;
+        }
         List<JsonNode> reasonRules = StreamSupport.stream(allRules.spliterator(), false)
                 .filter(r -> r.get("reason").asInt() == reason.ordinal() + 1 && Objects.equals(r.get("cname").asText(), cname))
                 .map(JsonNode.class::cast)
@@ -91,12 +105,25 @@ public class Agora {
 
         ObjectMapper objectMapper = new ObjectMapper();
         for (JsonNode rule : reasonRules) {
-            String requestBody = objectMapper.writeValueAsString(Map.of("appid", appId, "id", String.valueOf(rule.get("id"))));
-            createHttpRequest(HttpMethod.DELETE, requestBody);
+            String requestBody;
+            try {
+                requestBody = objectMapper.writeValueAsString(Map.of("appid", appId, "id", String.valueOf(rule.get("id"))));
+                createHttpRequest(HttpMethod.DELETE, requestBody);
+            } catch (IOException | RuntimeException e) {
+                System.err.println("Failed to delete rule in deleteRules:");
+                e.printStackTrace();
+            }
         }
     }
-    public static void deleteAllRules(String cname) throws IOException, InterruptedException {
-        JsonNode allRules = getRules();
+    public static void deleteAllRules(String cname) {
+        JsonNode allRules;
+        try {
+            allRules = getRules();
+        } catch (IOException | RuntimeException e) {
+            System.err.println("Failed to get rules in deleteAllRules:");
+            e.printStackTrace();
+            return;
+        }
         List<JsonNode> reasonRules = StreamSupport.stream(allRules.spliterator(), false)
                 .filter(r -> Objects.equals(r.get("cname").asText(), cname))
                 .map(JsonNode.class::cast)
@@ -104,19 +131,37 @@ public class Agora {
 
         ObjectMapper objectMapper = new ObjectMapper();
         for (JsonNode rule : reasonRules) {
-            String requestBody = objectMapper.writeValueAsString(Map.of("appid", appId, "id", String.valueOf(rule.get("id"))));
-            createHttpRequest(HttpMethod.DELETE, requestBody);
+            String requestBody;
+            try {
+                requestBody = objectMapper.writeValueAsString(Map.of("appid", appId, "id", String.valueOf(rule.get("id"))));
+                createHttpRequest(HttpMethod.DELETE, requestBody);
+            } catch (IOException | RuntimeException e) {
+                System.err.println("Failed to delete rule in deleteAllRules:");
+                e.printStackTrace();
+            }
+            
         }
     }
     //creates "join_channel" ban for Player. Shall be used to kick villagers from channel during night
-    public static void kickVillager(Player player, String cname) throws IOException, InterruptedException {
-        String requestBody = createRequestBody(Optional.of(player), Optional.of(cname), "join_channel", Reason.KICK_VILLAGER);
-        createHttpRequest(HttpMethod.POST, requestBody);
+    public static void kickVillager(Player player, String cname) {
+        String requestBody;
+        try {
+            requestBody = createRequestBody(Optional.of(player), Optional.of(cname), "join_channel", Reason.KICK_VILLAGER);
+            createHttpRequest(HttpMethod.POST, requestBody);
+        } catch (IOException e) {
+            System.err.println("Failed to kick villager in kickVillager:");
+            e.printStackTrace();
+        }
     }
 
     //creates "publish_audio" ban for player who died and should be muted in death view.
-    public static void muteDeadPlayer(Player player, String cname) throws IOException, InterruptedException {
-        String requestBody = createRequestBody(Optional.of(player), Optional.of(cname), "publish_audio", Reason.MUTE_DEAD);
-        createHttpRequest(HttpMethod.POST, requestBody);
+    public static void muteDeadPlayer(Player player, String cname) {
+        try {
+            String requestBody = createRequestBody(Optional.of(player), Optional.of(cname), "publish_audio", Reason.MUTE_DEAD);
+            createHttpRequest(HttpMethod.POST, requestBody);    
+        } catch (IOException e) {
+            System.err.println("Failed to mute dead player in muteDeadPlayer:");
+            e.printStackTrace();
+        }
     }
 }
