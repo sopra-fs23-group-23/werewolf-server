@@ -164,8 +164,8 @@ public class Game implements StageObserver, PlayerObserver{
     public void onStageFinished() {
         List<PollCommand> currentStagePollCommands = new ArrayList<>(currentStage.getPollCommands());
         executeCurrentStageStageFinishedCommands(currentStagePollCommands);
-        checkForWinner();
         pollCommands.addAll(filterOutNullPollCommands(currentStage.getPollCommands()));
+        checkForWinner();
         if (!finished) {
             startNextStage(calculateNextStage());
         }
