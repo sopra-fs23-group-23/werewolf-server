@@ -114,6 +114,21 @@ public class LobbyController {
         return lobbyService.getPlayerRoleInformation(playerToGetRole, lobby, new RoleInformationComparator());
     }
 
+    @GetMapping("/users/{uid}/lobby")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public LobbyGetDTO getLobbyOfUser(@PathVariable("uid") Long userId, @RequestHeader(USERAUTH_HEADER) String token) {
+        User user = userService.getUserByToken(token);
+        if(!Objects.equals(user.getId(), userId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot get lobby of other user.");
+        }
+        Lobby lobby = lobbyService.getLobbyOfUser(userId);
+        if(lobby == null) {
+            return null;
+        }
+        return LogicDTOMapper.convertLobbyToLobbyGetDTO(lobby);
+    }
+
     @PutMapping("/lobbies/{lobbyId}/settings")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody

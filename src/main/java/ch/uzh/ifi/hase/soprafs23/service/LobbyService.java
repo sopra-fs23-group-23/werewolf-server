@@ -56,6 +56,15 @@ public class LobbyService implements LobbyObserver{
         return lobbies.get(lobbyId);
     }
 
+    public Lobby getLobbyOfUser(Long userId) {
+        return lobbies
+                .values()
+                .stream()
+                .filter(lobby -> lobby.getPlayers().stream().anyMatch(player -> Objects.equals(player.getId(), userId)))
+                .findFirst()
+                .orElse(null);
+    }
+
     private boolean userInALobby(User user) {
         return lobbies.values().stream().anyMatch(
             l -> l.getPlayers().stream().anyMatch(p->p.getId().equals(user.getId()))
