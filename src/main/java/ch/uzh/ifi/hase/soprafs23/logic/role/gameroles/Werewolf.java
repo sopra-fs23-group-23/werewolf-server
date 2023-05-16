@@ -14,14 +14,11 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.FractionRole;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
 
 public class Werewolf extends FractionRole implements NightVoter {
-    private final static String name = "Werewolf";
-    private final static String description = "The werewolves take on the role of the antagonists in this game. " +
-            "They win as soon as no villagers are left alive. Every night the werewolves wake up and vote on " +
-            "their next victim. The person with the most votes dies. However, the werewolves have to be careful," +
-            " as no one dies if they can’t agree.";
+    private final int voteDurationSeconds;
 
-    public Werewolf(Supplier<List<Player>> alivePlayersGetter) {
+    public Werewolf(int voteDurationSeconds, Supplier<List<Player>> alivePlayersGetter) {
         super(alivePlayersGetter);
+        this.voteDurationSeconds = voteDurationSeconds;
     }
 
     @Override
@@ -32,18 +29,23 @@ public class Werewolf extends FractionRole implements NightVoter {
             "Who do you want to kill tonight?",
             alivePlayers.stream().map(p->new PollOption(p, new KillPlayerPollCommand(p))).toList(),
             getPlayers().stream().filter(Player::isAlive).map(p->new PollParticipant(p)).toList(),
-            15,
+            voteDurationSeconds,
             new NullResultPollDecider()));
     }
 
     @Override
     public String getName() {
-        return name;
+        return "Werewolf";
     }
 
     @Override
     public String getDescription() {
-        return description;
+        return """
+        The werewolves take on the role of the antagonists in this game. 
+        They win as soon as no villagers are left alive. Every night the werewolves wake up and vote on 
+        their next victim. The person with the most votes dies. However, the werewolves have to be careful, 
+        as no one dies if they can’t agree.
+        """;
     }
     
 }

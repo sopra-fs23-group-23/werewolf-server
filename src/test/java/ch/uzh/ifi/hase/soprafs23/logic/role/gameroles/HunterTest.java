@@ -28,7 +28,7 @@ public class HunterTest {
 
     @Test
     void testCreateDayPoll_HunterDead() {
-        Hunter hunter = new Hunter(this::getPlayers);
+        Hunter hunter = new Hunter(10, this::getPlayers);
         Player p1 = mock(Player.class);
         hunter.addPlayer(p1);
         hunter.onPlayerKilled_Unrevivable(p1);
@@ -38,7 +38,7 @@ public class HunterTest {
 
     @Test
     void testCreateNightPoll_HunterDead() {
-        Hunter hunter = new Hunter(this::getPlayers);
+        Hunter hunter = new Hunter(10, this::getPlayers);
         Player p1 = mock(Player.class);
         hunter.addPlayer(p1);
         hunter.onPlayerKilled_Unrevivable(p1);
@@ -48,7 +48,7 @@ public class HunterTest {
 
     @Test
     void testAddPlayer() {
-        Hunter hunter = new Hunter(null);
+        Hunter hunter = new Hunter(10, null);
         Player p1 = mock(Player.class);
         Player p2 = mock(Player.class);
         hunter.addPlayer(p1);

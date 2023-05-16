@@ -123,4 +123,11 @@ public final class LogicDTOMapper {
         );
         return fractionGetDTO;
     }
+
+    public static LobbySettingsDTO convertLobbyToLobbySettingsDTO(Lobby lobby) {
+        LobbySettingsDTO lobbySettingsDTO = new LobbySettingsDTO();
+        lobbySettingsDTO.setSingleVoteDurationSeconds(lobby.getSingleVoteDurationSeconds());
+        lobbySettingsDTO.setPartyVoteDurationSeconds(lobby.getPartyVoteDurationSeconds());
+        return lobbySettingsDTO;
+    }
 }

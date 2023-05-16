@@ -122,6 +122,10 @@ public class Poll{
         return durationSeconds;
     }
 
+    public void setDurationSeconds(int durationSeconds) {
+        this.durationSeconds = durationSeconds;
+    }
+
     public Date getScheduledFinish() {
         return scheduledFinish;
     }

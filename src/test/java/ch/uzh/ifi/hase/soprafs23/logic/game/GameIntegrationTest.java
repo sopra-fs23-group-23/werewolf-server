@@ -119,9 +119,9 @@ class GameIntegrationTest {
 
     @Test
     void testGetVotersOfType() {
-        Role r1 = new Villager(null, null, null);
-        Role r2 = new Werewolf(null);
-        Role r3 = new Mayor(null, null, null);
+        Role r1 = new Villager(0,null, null, null);
+        Role r2 = new Werewolf(0, null);
+        Role r3 = new Mayor(0, null, null, null);
 
         MockPollFunction mockPollFunction = new MockPollFunction();
 

@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
 
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbySettingsDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -21,9 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
@@ -218,5 +222,45 @@ public class LobbyControllerTest {
 
         mockMvc.perform(getRequest)
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void testUpdateLobbySettings() throws Exception {
+        User user = mock(User.class);
+        Lobby lobby = mock(Lobby.class);
+        LobbySettingsDTO lobbySettingsDTO = new LobbySettingsDTO();
+        lobbySettingsDTO.setPartyVoteDurationSeconds(90);
+        lobbySettingsDTO.setSingleVoteDurationSeconds(30);
+
+        Mockito.when(userService.getUserByToken("token")).thenReturn(user);
+        Mockito.when(lobbyService.getLobbyById(1L)).thenReturn(lobby);
+
+        MockHttpServletRequestBuilder putRequest = put("/lobbies/1/settings")
+                .header(USERAUTH_HEADER, "token")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(lobbySettingsDTO));
+
+        mockMvc.perform(putRequest)
+                .andExpect(status().isNoContent());
+        verify(lobbyService).validateUserIsAdmin(user, lobby);
+    }
+
+    @Test
+    void testGetLobbySettings() throws Exception {
+        User user = mock(User.class);
+        Lobby lobby = mock(Lobby.class);
+
+        Mockito.when(userService.getUserByToken("token")).thenReturn(user);
+        Mockito.when(lobbyService.getLobbyById(1L)).thenReturn(lobby);
+        Mockito.when(lobby.getSingleVoteDurationSeconds()).thenReturn(30);
+        Mockito.when(lobby.getPartyVoteDurationSeconds()).thenReturn(90);
+
+        MockHttpServletRequestBuilder getRequest = get("/lobbies/1/settings")
+                .header(USERAUTH_HEADER, "token");
+
+        mockMvc.perform(getRequest)
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.partyVoteDurationSeconds", is(90)))
+                    .andExpect(jsonPath("$.singleVoteDurationSeconds", is(30)));
     }
 }

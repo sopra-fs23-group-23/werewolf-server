@@ -18,6 +18,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class Witch extends Role implements DoubleNightVoter {
+    private final int voteDurationSeconds;
     private Supplier<List<Player>> alivePlayersGetter;
     private Supplier<List<PollCommand>> currentStageCommands;
     private Consumer<PollCommand> removePollCommand;
@@ -25,11 +26,12 @@ public class Witch extends Role implements DoubleNightVoter {
     private int remainingKillPotions = 1;
     private int remainingResurrectPotions = 1;
     
-    public Witch(Supplier<List<Player>> alivePlayersGetter, Supplier<List<PollCommand>> currentStageCommands,
+    public Witch(int voteDurationSeconds, Supplier<List<Player>> alivePlayersGetter, Supplier<List<PollCommand>> currentStageCommands,
                  Consumer<PollCommand> removePollCommand){
         this.alivePlayersGetter = alivePlayersGetter;
         this.currentStageCommands = currentStageCommands;
         this.removePollCommand = removePollCommand;
+        this.voteDurationSeconds = voteDurationSeconds;
     }
 
     private Player getWitch() {
@@ -75,7 +77,7 @@ public class Witch extends Role implements DoubleNightVoter {
                     "Save this player from dying with your heal potion.",
                     killedPlayerPollCommands.stream().map(killPollCommand -> new PollOption(killPollCommand.getAffectedPlayer(), new WitchSavePlayerPollCommand(this.removePollCommand, killPollCommand, this::decreaseResurrectPotions, killPollCommand.getAffectedPlayer()))).toList(),
                     this.getPlayers().stream().map(p->new PollParticipant(p)).toList(),
-                    15,
+                    voteDurationSeconds,
                     new NullResultPollDecider()));
         }
         return Optional.empty();
@@ -90,7 +92,7 @@ public class Witch extends Role implements DoubleNightVoter {
                     "Select a player to kill with your poison potion.",
                     alivePlayers.stream().map(p->new PollOption(p, new WitchKillPlayerPollCommand(p, this::decreaseKillPotion))).toList(),
                     this.getPlayers().stream().filter(Player::isAlive).map(p->new PollParticipant(p)).toList(),
-                    15,
+                    voteDurationSeconds,
                     new NullResultPollDecider()));
         }
         return Optional.empty();

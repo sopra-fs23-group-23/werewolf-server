@@ -16,11 +16,13 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public class Hunter extends Role implements DayVoter, NightVoter, PlayerObserver {
+    private final int voteDurationSeconds;
     private Supplier<List<Player>> alivePlayersGetter;
     private boolean died = false;
     private boolean hasShot = false;
 
-    public Hunter(Supplier<List<Player>> alivePlayersGetter) {
+    public Hunter(int voteDurationSeconds, Supplier<List<Player>> alivePlayersGetter) {
+        this.voteDurationSeconds = voteDurationSeconds;
         this.alivePlayersGetter = alivePlayersGetter;
     }
 
@@ -52,7 +54,7 @@ public class Hunter extends Role implements DayVoter, NightVoter, PlayerObserver
                 "Who do you want to take with you to your death?",
                 alivePlayers.stream().map(p->new PollOption(p, new KillPlayerPollCommand(p))).toList(),
                 getPlayers().stream().map(p->new PollParticipant(p)).toList(),
-                15,
+                voteDurationSeconds,
                 new NullResultPollDecider()
             ));
         } else {

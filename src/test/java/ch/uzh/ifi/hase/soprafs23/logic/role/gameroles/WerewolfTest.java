@@ -50,7 +50,7 @@ public class WerewolfTest {
             alivePlayers.get(0),
             alivePlayers.get(2)
         );
-        Werewolf werewolf = new Werewolf(createMockAlivePlayersGetter(alivePlayers));
+        Werewolf werewolf = new Werewolf(0, createMockAlivePlayersGetter(alivePlayers));
         expectedWerewolves.stream().forEach(werewolf::addPlayer);
         when(alivePlayers.get(3).isAlive()).thenReturn(false);
         werewolf.addPlayer(alivePlayers.get(3));

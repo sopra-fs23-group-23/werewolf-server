@@ -16,13 +16,15 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
 
 public class Cupid extends Role implements NightVoter {
+    private final int voteDurationSeconds;
     private BiConsumer<Player, Class<? extends Role>> addPlayerToRole;
     private Supplier<List<Player>> alivePlayersGetter;
     private boolean firstNight = true;
 
-    public Cupid(Supplier<List<Player>> alivePlayersGetter, BiConsumer<Player, Class<? extends Role>> addPlayerToRole) {
+    public Cupid(int voteDurationSeconds, Supplier<List<Player>> alivePlayersGetter, BiConsumer<Player, Class<? extends Role>> addPlayerToRole) {
         this.addPlayerToRole = addPlayerToRole;
         this.alivePlayersGetter = alivePlayersGetter;
+        this.voteDurationSeconds = voteDurationSeconds;
     }
 
     @Override
@@ -35,7 +37,7 @@ public class Cupid extends Role implements NightVoter {
                     "Which two players should fall in love?",
                     alivePlayersGetter.get().stream().map(player -> new PrivateResultPollOption(player, new PrivateAddPlayerToRolePollCommand(addPlayerToRole, player, Lover.class, player))).toList(),
                     getPlayers().stream().map(player -> new PollParticipant(player, 2)).findFirst().get(),
-                    15,
+                    voteDurationSeconds,
                     new DistinctRandomTiedPollDecider())
             );
         }

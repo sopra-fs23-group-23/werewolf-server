@@ -18,7 +18,7 @@ public class LogicDTOMapperTest {
 
     @Test
     public void testConvertFractionToFractionGetDTO() {
-        FractionRole fraction = new Werewolf(mockLobby::getAlivePlayers);
+        FractionRole fraction = new Werewolf(0, mockLobby::getAlivePlayers);
 
         FractionGetDTO fractionGetDTO = LogicDTOMapper.convertFractionToFractionGetDTO(fraction);
 
@@ -27,7 +27,7 @@ public class LogicDTOMapperTest {
 
     @Test
     public void testConvertRoleToRoleWithPlayersGetDTO() {
-        Role role = new Werewolf(mockLobby::getAlivePlayers);
+        Role role = new Werewolf(0, mockLobby::getAlivePlayers);
         Player player = new Player(1L, "TestPlayer");
 
         role.addPlayer(player);

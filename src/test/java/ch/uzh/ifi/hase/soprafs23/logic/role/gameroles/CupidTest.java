@@ -49,7 +49,7 @@ public class CupidTest {
         List<Player> expectedCupid = List.of(
             alivePlayers.get(2)
         );
-        Cupid cupid = new Cupid(createMockAlivePlayersGetter(alivePlayers), null);
+        Cupid cupid = new Cupid(10, createMockAlivePlayersGetter(alivePlayers), null);
         expectedCupid.stream().forEach(cupid::addPlayer);
         List<Player> expected = alivePlayers;
 

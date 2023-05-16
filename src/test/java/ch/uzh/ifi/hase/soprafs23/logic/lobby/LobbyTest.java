@@ -127,4 +127,18 @@ public class LobbyTest {
         assertTrue(fractions.get(1) instanceof Werewolf, "Second fraction is not Werewolf");
         assertTrue(fractions.get(2) instanceof Villager, "Third fraction is not Villager");
     }
+
+    @Test
+    void testSetSingleVoteDurationSeconds() {
+        Lobby lobby = new Lobby(1L, mock(Player.class));
+        lobby.setSingleVoteDurationSeconds(10);
+        assertEquals(10, lobby.getSingleVoteDurationSeconds(), "Single vote duration seconds not set correctly");
+    }
+
+    @Test
+    void testSetPartyVoteDurationSeconds() {
+        Lobby lobby = new Lobby(1L, mock(Player.class));
+        lobby.setPartyVoteDurationSeconds(10);
+        assertEquals(10, lobby.getPartyVoteDurationSeconds(), "Party vote duration seconds not set correctly");
+    }
 }

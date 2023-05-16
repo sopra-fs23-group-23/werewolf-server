@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -22,6 +23,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 import ch.uzh.ifi.hase.soprafs23.logic.role.RoleInformationComparator;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbyGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbySettingsDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
@@ -110,5 +112,26 @@ public class LobbyController {
             userService.validateTokenMatch(userToGetRole, token);
         }
         return lobbyService.getPlayerRoleInformation(playerToGetRole, lobby, new RoleInformationComparator());
+    }
+
+    @PutMapping("/lobbies/{lobbyId}/settings")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public void updateLobbySettings(@PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @RequestHeader(USERAUTH_HEADER) String token,
+                                    @RequestBody LobbySettingsDTO settingsDTO) {
+        User user = userService.getUserByToken(token);
+        Lobby lobby = lobbyService.getLobbyById(lobbyId);
+        lobbyService.validateUserIsAdmin(user, lobby);
+        lobbyService.updateLobbySettings(lobby, settingsDTO);
+    }
+
+    @GetMapping("/lobbies/{lobbyId}/settings")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public LobbySettingsDTO getLobbySettings(@PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId, @RequestHeader(USERAUTH_HEADER) String token) {
+        User user = userService.getUserByToken(token);
+        Lobby lobby = lobbyService.getLobbyById(lobbyId);
+        lobbyService.validateUserIsInLobby(user, lobby);
+        return LogicDTOMapper.convertLobbyToLobbySettingsDTO(lobby);
     }
 }

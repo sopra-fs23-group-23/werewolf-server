@@ -25,8 +25,8 @@ public class PrivateRevealRolesNotificationPollCommandTest {
         private List<Role> mockRolesPerPlayerConsumer(Player player) {
             assertEquals(expectedPlayer, player);
             return List.of(
-                new Villager(null, null, null),
-                new Witch(null, null, null),
+                new Villager(0, null, null, null),
+                new Witch(0, null, null, null),
                 new Lover(null, null)
             );
         }

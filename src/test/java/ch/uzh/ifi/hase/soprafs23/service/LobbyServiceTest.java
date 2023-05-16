@@ -15,7 +15,10 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.RoleInformationComparator;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Witch;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbySettingsDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
+
+import org.apache.catalina.connector.Request;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
@@ -204,7 +207,7 @@ public class LobbyServiceTest {
     void testGetAllRolesInformation() {
         Collection<Role> rolesReturn= new ArrayList<>();
         Lobby mock = mock(Lobby.class);
-        rolesReturn.add(new Werewolf(mock::getAlivePlayers));
+        rolesReturn.add(new Werewolf(0, mock::getAlivePlayers));
         Mockito.when(mock.getRoles()).thenReturn(rolesReturn);
         ArrayList<RoleGetDTO> roleGetDTOS = new ArrayList<>(lobbyService.getAllRolesInformation(mock));
         assertEquals("Werewolf", roleGetDTOS.get(0).getRoleName());
@@ -223,7 +226,7 @@ public class LobbyServiceTest {
         Collection<Role> rolesReturn = new ArrayList<>();
         Lobby lobby = mock(Lobby.class);
         Player player = mock(Player.class);
-        rolesReturn.add(new Werewolf(lobby::getAlivePlayers));
+        rolesReturn.add(new Werewolf(0, lobby::getAlivePlayers));
 
         Mockito.when(lobby.getRolesOfPlayer(player)).thenReturn(rolesReturn);
         
@@ -237,8 +240,8 @@ public class LobbyServiceTest {
         Collection<Role> rolesReturn = new ArrayList<>();
         Lobby lobby = mock(Lobby.class);
         Player player = mock(Player.class);
-        rolesReturn.add(new Villager(null, null, null));
-        rolesReturn.add(new Witch(null, null, null));
+        rolesReturn.add(new Villager(0, null, null, null));
+        rolesReturn.add(new Witch(0, null, null, null));
 
         Mockito.when(lobby.getRolesOfPlayer(player)).thenReturn(rolesReturn);
         
@@ -256,5 +259,40 @@ public class LobbyServiceTest {
         Mockito.when(lobby.getPlayerById(1l)).thenReturn(player);
         
         assertEquals(player, lobbyService.getPlayerOfUser(user, lobby));
+    }
+
+    @Test
+    void testUpdateLobbySettings_min() {
+        Lobby lobby = mock(Lobby.class);
+        LobbySettingsDTO lobbySettingsDTO = new LobbySettingsDTO();
+        lobbySettingsDTO.setPartyVoteDurationSeconds(15);
+        lobbySettingsDTO.setSingleVoteDurationSeconds(15);
+
+        lobbyService.updateLobbySettings(lobby, lobbySettingsDTO);
+
+        verify(lobby).setPartyVoteDurationSeconds(15);
+        verify(lobby).setSingleVoteDurationSeconds(15);
+    }
+
+    @Test
+    void testUpdateLobbySettings_onlySingle() {
+        Lobby lobby = mock(Lobby.class);
+        LobbySettingsDTO lobbySettingsDTO = new LobbySettingsDTO();
+        lobbySettingsDTO.setSingleVoteDurationSeconds(15);
+
+        lobbyService.updateLobbySettings(lobby, lobbySettingsDTO);
+
+        verify(lobby).setSingleVoteDurationSeconds(15);
+    }
+
+    @Test
+    void testUpdateLobbySettings_belowMin() {
+        Lobby lobby = mock(Lobby.class);
+        LobbySettingsDTO lobbySettingsDTO = new LobbySettingsDTO();
+        lobbySettingsDTO.setPartyVoteDurationSeconds(1);
+        lobbySettingsDTO.setSingleVoteDurationSeconds(1);
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> lobbyService.updateLobbySettings(lobby, lobbySettingsDTO));
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
     }
 }

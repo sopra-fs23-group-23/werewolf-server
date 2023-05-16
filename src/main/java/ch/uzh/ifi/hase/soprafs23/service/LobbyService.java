@@ -6,6 +6,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import javax.transaction.Transactional;
 
 import ch.uzh.ifi.hase.soprafs23.logic.game.Game;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbySettingsDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -155,6 +156,23 @@ public class LobbyService implements LobbyObserver{
 
     public void instantiateRoles(Lobby lobby, Game game) {
         lobby.instantiateRoles(lobby::getAlivePlayers, lobby::addPlayerToRole, game::getCurrentStagePollCommands, game::removePollCommandFromCurrentStage, game::addPollCommandToCurrentStage, lobby::getRolesOfPlayer);
+    }
+
+    private void validateSecondsBetween(String nrDesc, int nr, int min, int max) {
+        if (nr < min || nr > max) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("%s must be between %d and %d seconds", nrDesc, min, max));
+        }
+    }
+
+    public void updateLobbySettings(Lobby lobby,LobbySettingsDTO settingsDTO) {
+        if (settingsDTO.getPartyVoteDurationSeconds() != null) {
+            validateSecondsBetween("Party voting duration", settingsDTO.getPartyVoteDurationSeconds(), Lobby.MIN_PARTY_VOTE_DURATION_SECONDS, Lobby.MAX_PARTY_VOTE_DURATION_SECONDS);
+            lobby.setPartyVoteDurationSeconds(settingsDTO.getPartyVoteDurationSeconds());
+        }
+        if (settingsDTO.getSingleVoteDurationSeconds() != null) {
+            validateSecondsBetween("Single voting duration", settingsDTO.getSingleVoteDurationSeconds(), Lobby.MIN_SINGLE_VOTE_DURATION_SECONDS, Lobby.MAX_SINGLE_VOTE_DURATION_SECONDS);
+            lobby.setSingleVoteDurationSeconds(settingsDTO.getSingleVoteDurationSeconds());
+        }
     }
 
     /**

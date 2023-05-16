@@ -17,12 +17,14 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.Role;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.NightVoter;
 
 public class Seer extends Role implements NightVoter {
+    private final int voteDurationSeconds;
     private final Supplier<List<Player>> alivePlayersGetter;
     private final Function<Player, Collection<Role>> rolesPerPlayer;
 
-    public Seer(Supplier<List<Player>> alivePlayersGetter, Function<Player, Collection<Role>> rolesPerPlayer) {
+    public Seer(int voteDurationSeconds, Supplier<List<Player>> alivePlayersGetter, Function<Player, Collection<Role>> rolesPerPlayer) {
         this.alivePlayersGetter = alivePlayersGetter;
         this.rolesPerPlayer = rolesPerPlayer;
+        this.voteDurationSeconds = voteDurationSeconds;
     }
 
     @Override
@@ -35,7 +37,7 @@ public class Seer extends Role implements NightVoter {
                     "Whose roles do you want to reveal?",
                     alivePlayers.stream().map(player->new PrivateResultPollOption(player, new PrivateRevealRolesNotificationPollCommand(player, seerPlayer, rolesPerPlayer))).toList(),
                     this.getPlayers().stream().map(p->new PollParticipant(p)).toList(),
-                    15,
+                    voteDurationSeconds,
                     new NullResultPollDecider()
                 ));
          }

@@ -45,7 +45,7 @@ public class FractionRoleTest {
     @Test
     void testHasWon() {
         List<Player> expected = getAlivePlayers();
-        Villager villager = new Villager(null, createMockAlivePlayersGetter(expected), mock(TiedPollDecider.class));
+        Villager villager = new Villager(0, null, createMockAlivePlayersGetter(expected), mock(TiedPollDecider.class));
         villager.addPlayer(expected.get(0));
         villager.addPlayer(expected.get(1));
         villager.addPlayer(expected.get(3));
@@ -57,8 +57,8 @@ public class FractionRoleTest {
     @Test
     void testHasWon_multipleFractions() {
         List<Player> expected = getAlivePlayers();
-        Villager villager = new Villager(null, createMockAlivePlayersGetter(expected), mock(TiedPollDecider.class));
-        Werewolf werewolf = new Werewolf(createMockAlivePlayersGetter(expected));
+        Villager villager = new Villager(0, null, createMockAlivePlayersGetter(expected), mock(TiedPollDecider.class));
+        Werewolf werewolf = new Werewolf(0, createMockAlivePlayersGetter(expected));
         Lover lover = new Lover(createMockAlivePlayersGetter(expected), null);
         villager.addPlayer(expected.get(0));
         villager.addPlayer(expected.get(1));

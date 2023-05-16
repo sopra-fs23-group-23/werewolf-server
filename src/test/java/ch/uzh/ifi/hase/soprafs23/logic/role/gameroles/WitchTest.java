@@ -32,7 +32,7 @@ public class WitchTest {
         Supplier<List<Player>> mockAlivePlayerGetter = createMockAlivePlayersGetter(getAlivePlayers());
         Supplier<List<PollCommand>> mockCurrentStageCommands = this::mockPollCommandsList;
         Consumer<PollCommand> mockConsumerPollCommand = game::removePollCommandFromCurrentStage;
-        witch = new Witch(mockAlivePlayerGetter, mockCurrentStageCommands, mockConsumerPollCommand);
+        witch = new Witch(0, mockAlivePlayerGetter, mockCurrentStageCommands, mockConsumerPollCommand);
         Player player = createMockPlayer();
         witch.addPlayer(player);
     }
@@ -70,7 +70,7 @@ public class WitchTest {
 
     @Test
     void testCreateNightPoll_Empty(){
-        Witch newWitch = new Witch(null,this::mockPollCommandsList,null);
+        Witch newWitch = new Witch(0, null,this::mockPollCommandsList,null);
         Player player = createMockPlayer();
         newWitch.addPlayer(player);
         when(player.isAlive()).thenReturn(false);
@@ -88,7 +88,7 @@ public class WitchTest {
 
     @Test
     void testCreateSecondNightPoll_Empty(){
-        Witch newWitch = new Witch(null,this::mockPollCommandsList,null);
+        Witch newWitch = new Witch(0, null,this::mockPollCommandsList,null);
         Player player = createMockPlayer();
         newWitch.addPlayer(player);
         when(player.isAlive()).thenReturn(false);

@@ -18,20 +18,16 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.FirstDayVoter;
 
 public class Villager extends FractionRole implements DayVoter, FirstDayVoter{
+    private final int voteDurationSeconds;
     private BiConsumer<Player, Class<? extends Role>> addPlayerToRole;
     private TiedPollDecider tiedPollDecider;
 
-    private final static String name = "Villager";
-    private final static String description = "Since a few days there are hidden werewolves among you villagers. " +
-            "These pose a threat to the peaceful village life. Therefore, the villagers win as soon as there are no " +
-            "werewolves left alive. Every day there is the possibility to democratically choose a person to be " +
-            "executed. Through this execution you will be able to rid the village of werewolves.";
-
-    public Villager(BiConsumer<Player, Class<? extends Role>> addPlayerToRole,
+    public Villager(int voteDurationSeconds, BiConsumer<Player, Class<? extends Role>> addPlayerToRole,
             Supplier<List<Player>> alivePlayersGetter, TiedPollDecider tiedPollDecider) {
         super(alivePlayersGetter);
         this.addPlayerToRole = addPlayerToRole;
         this.tiedPollDecider = tiedPollDecider;
+        this.voteDurationSeconds = voteDurationSeconds;
     }
 
     @Override
@@ -42,19 +38,25 @@ public class Villager extends FractionRole implements DayVoter, FirstDayVoter{
             "Who do you suspect to be a werewolf?",
             alivePlayers.stream().map(p->new PollOption(p, new KillPlayerPollCommand(p))).toList(), 
             alivePlayers.stream().map(p->new PollParticipant(p)).toList(),
-            15,
+            voteDurationSeconds,
             tiedPollDecider
         ));
     }
 
     @Override
     public String getName() {
-        return name;
+        return "Villager";
     }
 
     @Override
     public String getDescription() {
-        return description;
+        return """
+            Since a few days there are hidden werewolves among you villagers. 
+            These pose a threat to the peaceful village life. Therefore, the villagers win as soon as there are no 
+            werewolves left alive. Every day there is the possibility to democratically choose a person to be 
+            executed. Through this execution you will be able to rid the village of werewolves.
+                """;
+
     }
 
     @Override
@@ -65,7 +67,7 @@ public class Villager extends FractionRole implements DayVoter, FirstDayVoter{
             "Who should become the mayor?",
             alivePlayers.stream().map(p->new PollOption(p, new AddPlayerToRolePollCommand(addPlayerToRole, p, Mayor.class))).toList(), 
             alivePlayers.stream().map(p->new PollParticipant(p)).toList(),
-            15,
+            voteDurationSeconds,
             tiedPollDecider
         ));
     }

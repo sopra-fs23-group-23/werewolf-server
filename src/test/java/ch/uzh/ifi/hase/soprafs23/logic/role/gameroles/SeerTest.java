@@ -37,7 +37,7 @@ public class SeerTest {
 
         MockFunctions mockFunctions = new MockFunctions(List.of(p1, p2));
 
-        Seer seer = new Seer(mockFunctions::getAlivePlayers, null);
+        Seer seer = new Seer(0, mockFunctions::getAlivePlayers, null);
         seer.addPlayer(p1);
         Optional<Poll> poll = seer.createNightPoll();
         assertTrue(poll.isPresent());
@@ -51,7 +51,7 @@ public class SeerTest {
     void testCreateNightPoll_SeerDead() {
         Player p1 = mock(Player.class);
         when(p1.isAlive()).thenReturn(false);
-        Seer seer = new Seer(null, null);
+        Seer seer = new Seer(0, null, null);
         seer.addPlayer(p1);
         Optional<Poll> poll = seer.createNightPoll();
         assertTrue(poll.isEmpty());

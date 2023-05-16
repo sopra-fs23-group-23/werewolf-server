@@ -49,7 +49,7 @@ public class VillagerTest {
     void testCreateDayPoll() {
         List<Player> expected = getAlivePlayers();
         TiedPollDecider tiedPollDecider = mock(TiedPollDecider.class);
-        Villager villager = new Villager(null, createMockAlivePlayersGetter(expected), tiedPollDecider);
+        Villager villager = new Villager(0, null, createMockAlivePlayersGetter(expected), tiedPollDecider);
         Poll poll = villager.createDayPoll().get();
         assertThat(
             "Contains all alive players in any order as participants",
@@ -68,7 +68,7 @@ public class VillagerTest {
     void testCreateFirstDayPoll() {
         List<Player> expected = getAlivePlayers();
         TiedPollDecider tiedPollDecider = mock(TiedPollDecider.class);
-        Villager villager = new Villager(null, createMockAlivePlayersGetter(expected), tiedPollDecider);
+        Villager villager = new Villager(0, null, createMockAlivePlayersGetter(expected), tiedPollDecider);
         Poll poll = villager.createFirstDayPoll().get();
         assertThat(
             "Contains all alive players in any order as participants",

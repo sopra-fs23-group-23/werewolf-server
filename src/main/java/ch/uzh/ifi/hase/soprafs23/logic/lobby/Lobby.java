@@ -28,9 +28,15 @@ public class Lobby {
     private List<LobbyObserver> observers = new ArrayList<>();
     private Map<Class<? extends Role>, Role> roles;
     private boolean open;
+    private int partyVoteDurationSeconds = 90;
+    private int singleVoteDurationSeconds = 15;
 
     public static final int MIN_SIZE = 5;
     public static final int MAX_SIZE = 20;
+    public static final int MIN_PARTY_VOTE_DURATION_SECONDS = 15;
+    public static final int MAX_PARTY_VOTE_DURATION_SECONDS = 180;
+    public static final int MIN_SINGLE_VOTE_DURATION_SECONDS = 15;
+    public static final int MAX_SINGLE_VOTE_DURATION_SECONDS = 60;
 
     public Lobby(Long id, Player admin) {
         this.id = id;
@@ -62,7 +68,6 @@ public class Lobby {
      * @param player
      */
     public void addPlayer(Player player) {
-        assert getLobbySize() <= MAX_SIZE && isOpen() && !players.contains(player);
         players.add(player);
     }
 
@@ -131,6 +136,30 @@ public class Lobby {
         roles.get(role).addPlayer(player);
     }
 
+    public int getPartyVoteDurationSeconds() {
+        return partyVoteDurationSeconds;
+    }
+
+    /**
+     * @pre MIN_PARTY_VOTE_DURATION_SECONDS <= partyVoteDurationSeconds <= MAX_PARTY_VOTE_DURATION_SECONDS
+     * @param partyVoteDurationSeconds
+     */
+    public void setPartyVoteDurationSeconds(int partyVoteDurationSeconds) {
+        this.partyVoteDurationSeconds = partyVoteDurationSeconds;
+    }
+
+    public int getSingleVoteDurationSeconds() {
+        return singleVoteDurationSeconds;
+    }
+
+    /**
+     * @pre MIN_SINGLE_VOTE_DURATION_SECONDS <= singleVoteDurationSeconds <= MAX_SINGLE_VOTE_DURATION_SECONDS
+     * @param singleVoteDurationSeconds
+     */
+    public void setSingleVoteDurationSeconds(int singleVoteDurationSeconds) {
+        this.singleVoteDurationSeconds = singleVoteDurationSeconds;
+    }
+
     public void instantiateRoles(
         Supplier<List<Player>> alivePlayersSupplier,
         BiConsumer<Player, Class<? extends Role>> addPlayerToRoleConsumer,
@@ -139,15 +168,15 @@ public class Lobby {
         Consumer<PollCommand> addPollCommandConsumer,
         Function<Player, Collection<Role>> getRolesOfPlayerFunction
     ) {
-        roles.put(Werewolf.class, new Werewolf(alivePlayersSupplier));
-        Mayor mayor = new Mayor(alivePlayersSupplier, new RandomTiedPollDecider(), Scheduler.getInstance());
+        roles.put(Werewolf.class, new Werewolf(partyVoteDurationSeconds, alivePlayersSupplier));
+        Mayor mayor = new Mayor(singleVoteDurationSeconds, alivePlayersSupplier, new RandomTiedPollDecider(), Scheduler.getInstance());
         roles.put(Mayor.class, mayor);
-        roles.put(Witch.class, new Witch(alivePlayersSupplier, currentStagePollCommandsSupplier, removePollCommandConsumer));
-        roles.put(Hunter.class, new Hunter(alivePlayersSupplier));
-        roles.put(Villager.class, new Villager(addPlayerToRoleConsumer, alivePlayersSupplier, mayor));
-        roles.put(Cupid.class, new Cupid(alivePlayersSupplier, addPlayerToRoleConsumer));
+        roles.put(Witch.class, new Witch(singleVoteDurationSeconds, alivePlayersSupplier, currentStagePollCommandsSupplier, removePollCommandConsumer));
+        roles.put(Hunter.class, new Hunter(singleVoteDurationSeconds, alivePlayersSupplier));
+        roles.put(Villager.class, new Villager(partyVoteDurationSeconds, addPlayerToRoleConsumer, alivePlayersSupplier, mayor));
+        roles.put(Cupid.class, new Cupid(singleVoteDurationSeconds, alivePlayersSupplier, addPlayerToRoleConsumer));
         roles.put(Lover.class, new Lover(alivePlayersSupplier, addPollCommandConsumer));
-        roles.put(Seer.class, new Seer(alivePlayersSupplier, getRolesOfPlayerFunction));
+        roles.put(Seer.class, new Seer(singleVoteDurationSeconds, alivePlayersSupplier, getRolesOfPlayerFunction));
     }
 
     private void addSpecialVillagerRoles(Map<Class<? extends Role>, List<Player>> mapOfPlayersPerRole, List<Player> villagers) {
