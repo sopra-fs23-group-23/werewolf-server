@@ -18,6 +18,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.game.GameObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.game.Scheduler;
 import ch.uzh.ifi.hase.soprafs23.logic.game.StageType;
 import ch.uzh.ifi.hase.soprafs23.logic.lobby.Lobby;
+import ch.uzh.ifi.hase.soprafs23.logic.lobby.LobbyObserver;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.Poll;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollOption;
 import ch.uzh.ifi.hase.soprafs23.logic.poll.PollParticipant;
@@ -31,7 +32,7 @@ import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 
 @Service
 @Transactional
-public class GameService implements GameObserver{
+public class GameService implements GameObserver, LobbyObserver{
     private Map<Long, Game> games = new HashMap<>();
 
     /**
@@ -41,6 +42,9 @@ public class GameService implements GameObserver{
     public Game createNewGame(Lobby lobby) {
         Game game = new Game(lobby);
         game.addObserver(this);
+        if (!lobby.isObserver(this)) {
+            lobby.addObserver(this);
+        }
         games.put(lobby.getId(), game);
         return game;
     }
@@ -162,26 +166,10 @@ public class GameService implements GameObserver{
         Scheduler.getInstance().schedule(poll::finish, poll.getDurationSeconds());
     }
 
-    /**
-     * removes game of lobby from games map, if lobby has not started a new game
-     * @pre game finished
-     * @param game
-     */
-    public void removeStaleGame(Game game) {
-        Long lobbyId = game.getLobby().getId();
-        if (games.containsKey(lobbyId)) {
-            Game possiblyNewGame = games.get(lobbyId);
-            if (possiblyNewGame.equals(game)) {
-                games.remove(lobbyId);
-            }
-        }
-    }
-
     @Override
     public void onGameFinished(Game game) {
         Lobby lobby = game.getLobby();
         lobby.setOpen(true);
-        Scheduler.getInstance().schedule(() -> removeStaleGame(game), 20);
         Agora.deleteAllRules(lobby.getId().toString());
     }
 
@@ -207,5 +195,12 @@ public class GameService implements GameObserver{
     @Override
     public void onPlayerDiedUnrevivable(Game game, Player player) {
         Agora.muteDeadPlayer(player, game.getLobby().getId().toString());
+    }
+
+    @Override
+    public void onLobbyDissolved(Lobby lobby) {
+        if (games.containsKey(lobby.getId())) {
+            games.remove(lobby.getId());
+        }
     }
 }

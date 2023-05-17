@@ -141,4 +141,13 @@ public class LobbyTest {
         lobby.setPartyVoteDurationSeconds(10);
         assertEquals(10, lobby.getPartyVoteDurationSeconds(), "Party vote duration seconds not set correctly");
     }
+
+    @Test
+    void testIsObserver() {
+        LobbyObserver observer = mock(LobbyObserver.class);
+        Lobby l = new Lobby(1l, mock(Player.class));
+        assertFalse(l.isObserver(observer));
+        l.addObserver(observer);
+        assertTrue(l.isObserver(observer));
+    }
 }

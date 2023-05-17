@@ -47,6 +47,10 @@ public class Lobby {
         this.roles = new HashMap<>();
     }
 
+    public boolean isObserver(LobbyObserver observer) {
+        return observers.contains(observer);
+    }
+
     public void addObserver(LobbyObserver observer) {
         observers.add(observer);
     }

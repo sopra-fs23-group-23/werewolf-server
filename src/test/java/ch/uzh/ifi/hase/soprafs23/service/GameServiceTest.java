@@ -41,6 +41,7 @@ public class GameServiceTest {
         Lobby lobby = createValidMockLobby();
         Game game = gameService.createNewGame(lobby);
         assertEquals(game, gameService.getGame(lobby));
+        verify(lobby).addObserver(gameService);
     }
 
     @Test
@@ -231,30 +232,13 @@ public class GameServiceTest {
     }
 
     @Test
-    void removeStaleGame() {
+    void testOnLobbyDissolved() {
         Lobby lobby = mock(Lobby.class);
         when(lobby.getId()).thenReturn(1l);
-        when(lobby.getLobbySize()).thenReturn(Lobby.MIN_SIZE);
+        gameService.createNewGame(lobby);
+        gameService.getGame(lobby);
 
-        Game game = gameService.createNewGame(lobby);
-        gameService.removeStaleGame(game);
-
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, ()->gameService.getGame(lobby));
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        gameService.onLobbyDissolved(lobby);
+        assertThrows(ResponseStatusException.class, ()->gameService.getGame(lobby));
     }
-
-    @Test
-    void removeStaleGame_newGame() {
-        Lobby lobby = mock(Lobby.class);
-        when(lobby.getId()).thenReturn(1l);
-        when(lobby.getLobbySize()).thenReturn(Lobby.MIN_SIZE);
-
-        Game game = gameService.createNewGame(lobby);
-        Game newGame = gameService.createNewGame(lobby);
-        gameService.removeStaleGame(game);
-
-        assertEquals(newGame, gameService.getGame(lobby));
-    }
-
-    
 }
