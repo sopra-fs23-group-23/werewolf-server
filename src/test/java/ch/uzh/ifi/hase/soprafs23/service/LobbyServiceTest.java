@@ -67,6 +67,20 @@ public class LobbyServiceTest {
         Lobby actual = lobbyService.getLobbyById(expected.getId());
         assertEquals(expected, actual);
     }
+    @Test
+    void testGetLobbyOfUser_admin() {
+        User user = createTestUser(1L, "user");
+        Lobby lobby = lobbyService.createNewLobby(user);
+        assertEquals(lobby, lobbyService.getLobbyOfUser(1L));
+    }
+
+    @Test
+    void testGetLobbyOfUser_nonAdmin() {
+        User admin = createTestUser(1L, "admin");
+        User user = createTestUser(2L, "user");
+        Lobby lobby = lobbyService.createNewLobby(user);
+        assertEquals(lobby, lobbyService.getLobbyOfUser(2L));
+    }
 
     @Test
     void testGetLobbyById_nonExistent() {

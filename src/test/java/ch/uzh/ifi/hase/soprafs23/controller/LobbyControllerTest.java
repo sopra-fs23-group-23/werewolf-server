@@ -225,6 +225,25 @@ public class LobbyControllerTest {
     }
 
     @Test
+    void testGetLobbyOfUser() throws Exception {
+        User user = mock(User.class);
+        //Player player = mock(Player.class);
+        Lobby lobby = new Lobby(1L, new Player(1L, "admin"));
+
+        Mockito.when(userService.getUser(1L)).thenReturn(user);
+        doNothing().when(userService).validateTokenMatch(user, "token");
+        Mockito.when(lobbyService.getLobbyOfUser(1L)).thenReturn(lobby);
+
+        MockHttpServletRequestBuilder getRequest = get("/users/1/lobby").
+                header(USERAUTH_HEADER, "token");
+
+        mockMvc.perform(getRequest)
+                .andExpect(status().isOk());
+
+        verify(lobbyService).getLobbyOfUser(1L);
+    }
+
+    @Test
     void testUpdateLobbySettings() throws Exception {
         User user = mock(User.class);
         Lobby lobby = mock(Lobby.class);
