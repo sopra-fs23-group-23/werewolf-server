@@ -1,15 +1,20 @@
-# SoPra RESTful Service Template FS23
-## Getting started with Spring Boot
--   Documentation: https://docs.spring.io/spring-boot/docs/current/reference/html/index.html
--   Guides: http://spring.io/guides
-    -   Building a RESTful Web Service: http://spring.io/guides/gs/rest-service/
-    -   Building REST services with Spring: https://spring.io/guides/tutorials/rest/
+# Werewolves
+The popular game werewolves now becomes digital. In this social deduction game, different fractions (werewolves, villagers etc.) try to seize control of the village through an interactive voting system. During the night the werewolves awake and kill one of the sleeping unknowing villagers. Furthermore hidden magical creatures like the witch, cupid or seer act in their secretive manner. During the day the villagers try to free their town by voting on who's secretly a werewolf.
 
-## Setup this Template with your IDE of choice
+An integrated voicechat allows the crucial discussions during the voting phases to take place.
+## Technologies
+
+- Gradle
+- Java Spring boot
+- REST Interface
+- H2 in-memory db
+- Agora.io voicechat
+
+## Launch & Deployment
 Download your IDE of choice (e.g., [IntelliJ](https://www.jetbrains.com/idea/download/), [Visual Studio Code](https://code.visualstudio.com/), or [Eclipse](http://www.eclipse.org/downloads/)). Make sure Java 17 is installed on your system (for Windows, please make sure your `JAVA_HOME` environment variable is set to the correct version of Java).
 
 ### IntelliJ
-1. File -> Open... -> SoPra server template
+1. File -> Open... -> werewolf-server
 2. Accept to import the project as a `gradle project`
 3. To build right click the `build.gradle` file and choose `Run Build`
 
@@ -20,7 +25,7 @@ The following extensions can help you get started more easily:
 -   `vscjava.vscode-spring-boot-dashboard`
 -   `vscjava.vscode-java-pack`
 
-**Note:** You'll need to build the project first with Gradle, just click on the `build` command in the _Gradle Tasks_ extension. Then check the _Spring Boot Dashboard_ extension if it already shows `soprafs23` and hit the play button to start the server. If it doesn't show up, restart VS Code and check again.
+**Note:** You'll need to build the project first with Gradle, just click on the `build` command in the _Gradle Tasks_ extension. Then check the _Spring Boot Dashboard_ extension if it already shows `werewolf-server` and hit the play button to start the server. If it doesn't show up, restart VS Code and check again.
 
 ## Building with Gradle
 You can use the local Gradle Wrapper to build the application.
@@ -50,37 +55,82 @@ You can verify that the server is running by visiting `localhost:8080` in your b
 ./gradlew test
 ```
 
-### Development Mode
-You can start the backend in development mode, this will automatically trigger a new build and reload the application
-once the content of a file has been changed.
+### Generate Jacoco Reports
 
-Start two terminal windows and run:
+```bash
+./gradlew test jacocoTestReport
+```
 
-`./gradlew build --continuous`
+## Contributing
 
-and in the other one:
+We welcome contributions to enhance and improve the Werewolves game. If you would like to contribute, please follow these steps:
 
-`./gradlew bootRun`
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Make the necessary changes and commit them.
+4. Push your branch to your forked repository.
+5. Submit a pull request to the main repository.
 
-If you want to avoid running all tests with every change, use the following command instead:
+We appreciate your contributions and will review your pull request as soon as possible.
 
-`./gradlew build --continuous -xtest`
+## High-level components
 
-## API Endpoint Testing with Postman
-We recommend using [Postman](https://www.getpostman.com) to test your API Endpoints.
+### Lobby ([Lobby.java](./src/main/java/ch/uzh/ifi/hase/soprafs23/logic/lobby/Lobby.java))
+The lobby aggregates players and roles and is responsible for assigning players to their respective roles.  
+Because a lobby can be used for multiple games, it does not aggregate a game object.
 
-## Debugging
-If something is not working and/or you don't know what is going on. We recommend using a debugger and step-through the process step-by-step.
+### Game ([Game.java](./src/main/java/ch/uzh/ifi/hase/soprafs23/logic/game/Game.java))
+The Game class aggregates information about the current state of the game, like the current stage or the  
+results of passed polls. It also serves as the main access point to logic components for the service layer.
 
-To configure a debugger for SpringBoot's Tomcat servlet (i.e. the process you start with `./gradlew bootRun` command), do the following:
+### Poll ([Poll.java](./src/main/java/ch/uzh/ifi/hase/soprafs23/logic/poll/Poll.java))
+Voting is the main component of the game, all actions are executed via votes of one or more players.  
+This complexity is modeled in the poll class (Poll instead of Vote, in order to not confuse the noun and verb vote).
+The poll class aggregates its participants, its options with their corresponding actions and what happens when a poll is tied.
 
-1. Open Tab: **Run**/Edit Configurations
-2. Add a new Remote Configuration and name it properly
-3. Start the Server in Debug mode: `./gradlew bootRun --debug-jvm`
-4. Press `Shift + F9` or the use **Run**/Debug "Name of your task"
-5. Set breakpoints in the application where you need it
-6. Step through the process one step at a time
+## Roadmap
 
-## Testing
-Have a look here: https://www.baeldung.com/spring-boot-testing
-Test
+The application was built in a modular approach to easily allow extending it.
+The following features are not yet implemented but could improve the Game play:
+
+### 1. Additional roles
+
+Implementing further roles could make the Game more interesting. E.g.
+
+- Wolf cub
+- Jester
+- "Blinzelmädchen" /-"bübchen"
+- Vampire
+- Guard
+
+Also see https://werwolf.fandom.com/de/wiki/Werwolf-Rollen-Sammlung for further roles.
+
+### 2. User Statistics
+
+Storing Game Statistics for every user would provide interesting insights into the abilities of each user. The following benchmarks could be interesting:
+
+- How many Games has a user played / won ?
+- How often has the user played which role ? How often did the user win in those roles?
+- In which day-night cycle was the user usually killed
+
+
+### 3. Lobby Join System
+
+Currently users are only able to play a game, if they have a group of friends that are currently online and exchange the join lobby code. To allow users to play the game with strangers it would make sense to develop an open lobby listing feature, where users can view and select from available lobbies. This can be implemented by providing a user interface that displays the open lobbies along with relevant details such as lobby name, number of players, and game settings. Players can then select a lobby from the list and join directly.
+
+Additionally users that are in a lobby should be able to invite users (by their username or similar) to join the game.
+
+## Authors and acknowledgment
+
+The application was developed for the SOPRA 23 course by:
+
+- Jan Lüthi (@Dev-Lj)
+- Michel Sabbatini (@Atomis14)
+- Marvin Wiedenkeller (@ChlineSaurus)
+- Miro Vannini (@mirovv)
+- David Scherrer (@djscherrer)
+
+A special thank you to our TA Jerome Maier (@jemaie) for supporting us during the project.
+
+## License
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
