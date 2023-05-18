@@ -133,4 +133,4 @@ The application was developed for the SOPRA 23 course by:
 A special thank you to our TA Jerome Maier (@jemaie) for supporting us during the project.
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE.md](License.md) file for details
