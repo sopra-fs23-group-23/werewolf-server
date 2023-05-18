@@ -130,7 +130,7 @@ The application was developed for the SOPRA 23 course by:
 - Miro Vannini ([@mirovv](https://github.com/mirovv))
 - David Scherrer ([@djscherrer](https://github.com/djscherrer))
 
-A special thank you to our TA Jerome Maier (@jemaie) for supporting us during the project.
+A special thank you to our TA Jerome Maier for supporting us during the project.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE.md](License.md) file for details
