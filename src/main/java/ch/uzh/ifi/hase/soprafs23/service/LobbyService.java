@@ -206,7 +206,6 @@ public class LobbyService implements LobbyObserver{
      * @param lobby
      */
     public void removeLobby(Lobby lobby) {
-        assert lobbies.containsKey(lobby.getId());
         lobbies.remove(lobby.getId());
     }
 

@@ -8,7 +8,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.lobby.Player;
 public abstract class FractionRole extends Role{
     private final Supplier<List<Player>> alivePlayersGetter;
 
-    public FractionRole(Supplier<List<Player>> alivePlayersGetter) {
+    protected FractionRole(Supplier<List<Player>> alivePlayersGetter) {
         this.alivePlayersGetter = alivePlayersGetter;
     }
     

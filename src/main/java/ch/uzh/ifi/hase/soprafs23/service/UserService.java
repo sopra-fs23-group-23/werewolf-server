@@ -70,7 +70,6 @@ public class UserService {
     public User getUser(Long id) {
         Optional<User> user = this.userRepository.findById(id);
         if (!user.isPresent()) {
-            System.out.println("MS1");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with userId %d does not exist.", id));
         }
         return user.get();

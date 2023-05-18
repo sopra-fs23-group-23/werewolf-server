@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.logic.lobby;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -66,15 +67,15 @@ public class PlayerTest {
     void testEquality() {
         Player p1 = new Player(1l, "a");
         Player p2 = new Player(1l, "a");
-        assertTrue(p1.equals(p2), "Players, which are equal not considered equal by .equal()");
-        assertTrue(p1.hashCode() == p2.hashCode(), "Equal players do not have equal hashcodes");
+        assertEquals(p1, p2, "Players, which are equal not considered equal by .equal()");
+        assertEquals(p1.hashCode(), p2.hashCode(), "Equal players do not have equal hashcodes");
     }
 
     @Test
     void testInequality() {
         Player p1 = new Player(1l, "a");
         Player p2 = new Player(2l, "a");
-        assertFalse(p1.equals(p2), "Players, which are not equal considered equal by .equal()");
-        assertFalse(p1.hashCode() == p2.hashCode(), "Inequal players have equal hashcodes");
+        assertNotEquals(p1, p2, "Players, which are not equal considered equal by .equal()");
+        assertNotEquals(p1.hashCode(), p2.hashCode(), "Inequal players have equal hashcodes");
     }
 }

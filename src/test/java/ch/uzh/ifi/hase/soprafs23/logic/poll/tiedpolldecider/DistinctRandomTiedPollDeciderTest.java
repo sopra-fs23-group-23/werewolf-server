@@ -1,7 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.logic.poll.tiedpolldecider;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -56,7 +56,7 @@ public class DistinctRandomTiedPollDeciderTest {
         verify(poll).finish();
         List<PollOption> selected = pollOptions.stream().filter(option -> option.getSupportersAmount()==1).toList();
         assertEquals(2, selected.size());
-        assertFalse(selected.get(0).equals(selected.get(1)), "The selected options should be different");
+        assertNotEquals(selected.get(0), selected.get(1), "The selected options should be different");
     }
 
     @Test
@@ -71,7 +71,7 @@ public class DistinctRandomTiedPollDeciderTest {
         verify(poll).finish();
         List<PollOption> selected = pollOptions.stream().filter(option -> option.getSupportersAmount()==1).toList();
         assertEquals(2, selected.size());
-        assertFalse(selected.get(0).equals(selected.get(1)), "The selected options should be different");
+        assertNotEquals(selected.get(0), selected.get(1), "The selected options should be different");
         assertTrue(selected.contains(pollOption2), "The selected options should contain the already selected option");
     }
 }

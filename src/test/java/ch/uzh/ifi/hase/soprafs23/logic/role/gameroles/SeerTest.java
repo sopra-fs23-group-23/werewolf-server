@@ -42,7 +42,7 @@ public class SeerTest {
         Optional<Poll> poll = seer.createNightPoll();
         assertTrue(poll.isPresent());
         assertTrue(poll.get() instanceof PrivateResultPoll);
-        assertTrue(poll.get().getPollOptions().size() == 2);
+        assertEquals(2, poll.get().getPollOptions().size());
         assertEquals(p1, poll.get().getPollParticipants().stream().findFirst().get().getPlayer());
         assertTrue(poll.get().getPollOptions().stream().findFirst().get().getPollCommand() instanceof PrivateRevealRolesNotificationPollCommand);
     }

@@ -148,7 +148,7 @@ public class UserServiceTest {
 
         // Call function and verify that it throws an exception
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userService.updateUser(updatedUser, userId));
-        assertEquals(exception.getStatus(), HttpStatus.CONFLICT);
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
     }
 
     @Test

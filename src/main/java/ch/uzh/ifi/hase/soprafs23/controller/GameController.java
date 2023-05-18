@@ -3,8 +3,6 @@ package ch.uzh.ifi.hase.soprafs23.controller;
 import static ch.uzh.ifi.hase.soprafs23.service.LobbyService.LOBBYID_PATHVARIABLE;
 import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
 
-import java.io.IOException;
-
 import ch.uzh.ifi.hase.soprafs23.rest.dto.FractionGetDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -45,7 +43,7 @@ public class GameController {
     @PostMapping("/games/{lobbyId}")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public void createNewGame(@RequestHeader(USERAUTH_HEADER) String userToken, @PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId) throws IOException {
+    public void createNewGame(@RequestHeader(USERAUTH_HEADER) String userToken, @PathVariable(LOBBYID_PATHVARIABLE) Long lobbyId) {
         User user = userService.getUserByToken(userToken);
         Lobby lobby = lobbyService.getLobbyById(lobbyId);
         lobbyService.validateUserIsAdmin(user, lobby);

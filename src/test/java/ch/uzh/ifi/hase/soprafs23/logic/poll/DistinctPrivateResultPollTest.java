@@ -67,7 +67,4 @@ public class DistinctPrivateResultPollTest {
         verify(p1).addPrivatePollCommand(pollCommand1);
         verify(p2).addPrivatePollCommand(pollCommand2);
     }
-
-    @Test
-    void testFinish_notEnoughVotes() {}
 }

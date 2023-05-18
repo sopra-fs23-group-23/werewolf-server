@@ -11,6 +11,9 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Witch;
 
 public class RolePrioritiser {
+
+    private RolePrioritiser() {}
+
     private static List<Class<? extends Role>> priority = List.of(
         Cupid.class,
         Mayor.class,
@@ -21,8 +24,12 @@ public class RolePrioritiser {
         Witch.class
     );
 
+    /**
+     * @pre priority.contains(role.getClass())
+     * @param role
+     * @return
+     */
     public static int getPriority(Role role) {
-        assert priority.contains(role.getClass());
         return priority.indexOf(role.getClass());
     }
 }
