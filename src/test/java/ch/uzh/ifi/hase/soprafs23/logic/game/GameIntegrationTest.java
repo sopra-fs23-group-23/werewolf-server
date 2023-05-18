@@ -24,8 +24,6 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
 import ch.uzh.ifi.hase.soprafs23.logic.role.stagevoter.DayVoter;
 
 class GameIntegrationTest {
-    // TODO: unit test rest of Game class
-
     private class MockPollFunction {
         private boolean called = false;
         private List<Role> callers = new ArrayList<>();

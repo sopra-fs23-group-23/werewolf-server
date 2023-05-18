@@ -38,7 +38,6 @@ public class UserService {
         return this.userRepository.findAll();
     }
 
-    // TODO split up this method & call methods in controller
     public User createUser(User newUser) {
         validateUsername(newUser);
         validatePassword(newUser);

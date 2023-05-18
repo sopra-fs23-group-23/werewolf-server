@@ -11,7 +11,7 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Seer;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Villager;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Werewolf;
 import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Witch;
-// TODO TEST
+
 public class RoleInformationComparator implements Comparator<Role>{
     private static final List<Class<? extends Role>> roleInformationOrder = List.of(
         Cupid.class,

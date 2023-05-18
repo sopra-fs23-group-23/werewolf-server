@@ -184,7 +184,6 @@ public class Lobby {
     }
 
     private void addSpecialVillagerRoles(Map<Class<? extends Role>, List<Player>> mapOfPlayersPerRole, List<Player> villagers) {
-        // TODO make this dynamic
         mapOfPlayersPerRole.put(Cupid.class, List.of(villagers.get(0)));
         mapOfPlayersPerRole.put(Witch.class, List.of(villagers.get(1)));
         mapOfPlayersPerRole.put(Hunter.class, List.of(villagers.get(2)));

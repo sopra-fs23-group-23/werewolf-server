@@ -4,8 +4,6 @@ import static ch.uzh.ifi.hase.soprafs23.service.LobbyService.LOBBYID_PATHVARIABL
 import static ch.uzh.ifi.hase.soprafs23.service.UserService.USERAUTH_HEADER;
 
 import java.util.Collection;
-import java.util.Objects;
-
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,7 +26,6 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbySettingsDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.logicmapper.LogicDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * This class handles all requests related to lobby

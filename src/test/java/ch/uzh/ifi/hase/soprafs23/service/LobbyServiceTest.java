@@ -18,7 +18,6 @@ import ch.uzh.ifi.hase.soprafs23.logic.role.gameroles.Witch;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.LobbySettingsDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.RoleGetDTO;
 
-import org.apache.catalina.connector.Request;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
@@ -76,7 +75,6 @@ public class LobbyServiceTest {
 
     @Test
     void testGetLobbyOfUser_nonAdmin() {
-        User admin = createTestUser(1L, "admin");
         User user = createTestUser(2L, "user");
         Lobby lobby = lobbyService.createNewLobby(user);
         assertEquals(lobby, lobbyService.getLobbyOfUser(2L));
