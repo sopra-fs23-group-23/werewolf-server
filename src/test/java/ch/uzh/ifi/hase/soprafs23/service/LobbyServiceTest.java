@@ -307,4 +307,34 @@ public class LobbyServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> lobbyService.updateLobbySettings(lobby, lobbySettingsDTO));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
     }
+
+    @Test
+    void testDissolveLobby() {
+        Lobby lobby = mock(Lobby.class);
+        lobbyService.dissolveLobby(lobby);
+        verify(lobby).dissolve();
+    }
+
+    @Test
+    void testUserIsAdmin() {
+        User admin = mock(User.class);
+        Lobby lobby = mock(Lobby.class);
+        Player player = mock(Player.class);
+        Mockito.when(admin.getId()).thenReturn(1l);
+        Mockito.when(lobby.getAdmin()).thenReturn(player);
+        Mockito.when(player.getId()).thenReturn(1l);
+        assertTrue(lobbyService.userIsAdmin(admin, lobby));
+    }
+
+    @Test
+    void testValidateUserIsAdmin_notAdmin() {
+        User admin = mock(User.class);
+        Lobby lobby = mock(Lobby.class);
+        Player player = mock(Player.class);
+        Mockito.when(admin.getId()).thenReturn(1l);
+        Mockito.when(lobby.getAdmin()).thenReturn(player);
+        Mockito.when(player.getId()).thenReturn(2l);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> lobbyService.validateUserIsAdmin(admin, lobby));
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
+    }
 }
