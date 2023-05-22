@@ -4,8 +4,8 @@ import ch.uzh.ifi.hase.soprafs23.constant.VoiceChatRole;
 
 public class RTCTokenBuilder {
 
-    private static String appId = "348d6a205d75436e916896366c5e315c";
-    private static String appCertificate = "2e1e585ed3f74218ae249f7d14656fe2";
+    private static String appId = "2d64cdbec0324225b28f83ed19f75397";
+    private static String appCertificate = "8214500e1ebd4e10bcd411dd4df44395";
     private static int expirationTimeInSeconds = 7200;
 
     public String buildTokenWithUserAccount(String channelName, String account, VoiceChatRole role) {
