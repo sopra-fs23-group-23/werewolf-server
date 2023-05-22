@@ -24,6 +24,9 @@ public class Werewolf extends FractionRole implements NightVoter {
     @Override
     public Optional<Poll> createNightPoll() {
         List<Player> alivePlayers = super.getAllAlivePlayers();
+        if (alivePlayers.isEmpty()) {
+            return Optional.empty();
+        }
         return Optional.of(new Poll(
             this.getClass(),
             "Who do you want to kill tonight?",

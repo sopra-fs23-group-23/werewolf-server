@@ -7,6 +7,7 @@ import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInA
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
@@ -69,6 +70,17 @@ public class WerewolfTest {
             containsInAnyOrder(expected.toArray())
         );
         assertTrue(poll.getPollOptions().stream().findFirst().get().getPollCommand() instanceof KillPlayerPollCommand);
+    }
+
+    private List<Player> getAlivePlayers_AllDead() {
+        return List.of();
+    }
+
+    @Test
+    void testCreateNightPoll_noAlivePlayers() {
+        Werewolf werewolf = new Werewolf(0, this::getAlivePlayers_AllDead);
+        Optional<Poll> poll = werewolf.createNightPoll();
+        assertTrue(poll.isEmpty());
     }
 
 }
