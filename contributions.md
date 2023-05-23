@@ -158,5 +158,14 @@ https://github.com/sopra-fs23-group-23/werewolf-client/issues/20
 https://github.com/sopra-fs23-group-23/werewolf-server/issues/157  
 https://github.com/sopra-fs23-group-23/werewolf-server/issues/158  
 https://github.com/sopra-fs23-group-23/werewolf-server/issues/159    
-
-
+## Week 8 (18.05 - 24.05)
+### Michel Sabbatini
+Joker
+### Miro Vannini
+Joker
+### Marvin Wiedenkeller
+Joker
+### David Scherrer
+Joker
+### Jan Lüthi
+Joker
