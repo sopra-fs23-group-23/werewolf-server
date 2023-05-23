@@ -24,9 +24,9 @@ import java.util.stream.StreamSupport;
 @Transactional
 public class Agora {
 
-    private static final String authorizationHeader = "Basic MTVhNjhhYzliNjU1NDI3ZDk0YTQ4MjNiZTI5MDFhM2Q6Yjg5MmU5M2M4NjVkNDZhZGI3NzBiN2M1YmUwMjE0N2Y=";
+    private static final String authorizationHeader = "Basic OWViMGU1MzY3YmYxNDI5MGI0MzQ5MzZhZDk4YzM1Yjk6MjkzNGRhN2U1MjA2NDMyY2FhYWQzNTM3OTVhZDA4M2E=";
 
-    private static final String appId = "348d6a205d75436e916896366c5e315c";
+    private static final String appId = "2d64cdbec0324225b28f83ed19f75397";
 
     //Creates RequestBody for ban rule. Ban is applied to either Optional player or Optional channelname to apply ban to whole channel. State privilege for ban and reason.
     //Privilege is either "join_channel" or "publish_audio"
