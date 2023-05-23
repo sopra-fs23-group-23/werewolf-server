@@ -23,14 +23,14 @@ public class AgoraTest {
     private JsonNode createSampleKickVillagerRule() throws IOException, InterruptedException{
         Player player = new Player((long) 123, "John");
         Agora.kickVillager(player, "Testchannel");
-        String expectedRequestBody = "{\"uid\":123,\"cname\":\"Testchannel\",\"privileges\":[\"join_channel\"],\"reason\":1,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"time_in_seconds\":10}";
+        String expectedRequestBody = "{\"uid\":123,\"cname\":\"Testchannel\",\"privileges\":[\"join_channel\"],\"reason\":1,\"appid\":\"2d64cdbec0324225b28f83ed19f75397\",\"time_in_seconds\":10}";
         return Agora.createHttpRequest(HttpMethod.POST, expectedRequestBody);
     }
 
     private JsonNode createSampleMuteDeadRule() throws IOException, InterruptedException{
         Player player = new Player((long) 1234, "Eggmann");
         Agora.muteDeadPlayer(player, "Testchannel");
-        String expectedRequestBody = "{\"uid\":1234,\"cname\":\"Testchannel\",\"privileges\":[\"publish_audio\"],\"reason\":3,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"time_in_seconds\":10}";
+        String expectedRequestBody = "{\"uid\":1234,\"cname\":\"Testchannel\",\"privileges\":[\"publish_audio\"],\"reason\":3,\"appid\":\"2d64cdbec0324225b28f83ed19f75397\",\"time_in_seconds\":10}";
         return Agora.createHttpRequest(HttpMethod.POST, expectedRequestBody);
     }
 
@@ -43,7 +43,7 @@ public class AgoraTest {
     @Test
     void createRequestBody() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Player aPlayer = new Player((long) 10, "Willy");
-        String expectedRequestBody = "{\"uid\":10,\"privileges\":[\"join_channel\"],\"reason\":1,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"cname\":\"Testchannel\",\"time\":120}";
+        String expectedRequestBody = "{\"uid\":10,\"privileges\":[\"join_channel\"],\"reason\":1,\"appid\":\"2d64cdbec0324225b28f83ed19f75397\",\"cname\":\"Testchannel\",\"time\":120}";
 
         Method privateMethod = Agora.class.getDeclaredMethod("createRequestBody", Optional.class, Optional.class, String.class, Reason.class);
         privateMethod.setAccessible(true);
@@ -82,7 +82,7 @@ public class AgoraTest {
     void testKickVillager() throws IOException, InterruptedException {
         Player player = new Player((long) 123, "John");
         Agora.kickVillager(player, "Testchannel");
-        String expectedRequestBody = "{\"uid\":123,\"privileges\":[\"join_channel\"],\"reason\":1,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"time_in_seconds\":10}";
+        String expectedRequestBody = "{\"uid\":123,\"privileges\":[\"join_channel\"],\"reason\":1,\"appid\":\"2d64cdbec0324225b28f83ed19f75397\",\"time_in_seconds\":10}";
         JsonNode jsonNode = Agora.createHttpRequest(HttpMethod.POST, expectedRequestBody);
         assertTrue(jsonNode.toString().contains("success"));
     }
@@ -103,7 +103,7 @@ public class AgoraTest {
     void testMuteDeadPlayer() throws IOException, InterruptedException {
         Player player = new Player((long) 123, "John");
         Agora.muteDeadPlayer(player, "Testchannel");
-        String expectedRequestBody = "{\"uid\":123,\"privileges\":[\"publish_audio\"],\"reason\":3,\"appid\":\"348d6a205d75436e916896366c5e315c\",\"time_in_seconds\":10}";
+        String expectedRequestBody = "{\"uid\":123,\"privileges\":[\"publish_audio\"],\"reason\":3,\"appid\":\"2d64cdbec0324225b28f83ed19f75397\",\"time_in_seconds\":10}";
         JsonNode jsonNode = Agora.createHttpRequest(HttpMethod.POST, expectedRequestBody);
         assertTrue(jsonNode.toString().contains("success"));
     }
