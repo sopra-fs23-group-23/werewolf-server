@@ -59,11 +59,13 @@ public class Witch extends Role implements DoubleNightVoter {
 
     @Override
     public String getDescription() {
-        return "The witch is part of the villager faction. Therefore, her goal is to save the village from the werewolves. " +
-        "Thanks to her alchemical knowledge, the witch has two powerful potions which she may use once each. " +
-        "The witch wakes up every night after the werewolves. When she does so, she is shown who the victim of the werewolves is. " +
-        "Once in the game, she may save the victim of that night with a healing potion. " +
-        "In addition, the witch has the possibility to poison a person once in the game.";
+        return """
+                 The witch is part of the villager faction. Therefore, her goal is to save the village from the werewolves.
+                 Thanks to her alchemical knowledge, the witch has two powerful potions which she may use once each.
+                 The witch wakes up every night after the werewolves. When she does so, she is shown who the victim of the werewolves is.
+                 Once in the game, she may save the victim of that night with a healing potion.
+                 In addition, the witch has the possibility to poison a person once in the game.
+                """;
     }
 
     @Override

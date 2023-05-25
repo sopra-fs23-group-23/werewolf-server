@@ -52,12 +52,10 @@ public class Cupid extends Role implements NightVoter {
     @Override
     public String getDescription() {
         return """
-            As the cupid you play in the villagers' faction. Your goal is therefore to exterminate the werewolves. 
+            The hunter plays in the villagers' faction.
             The cupid has the ability to choose two people on the first night who will fall in love with each other. 
             If one of these two players dies, the other person can no longer bear life without their great love and therefore also takes their own life. 
-            The goal of these lovers is to still be alive at the end of the game together with their partner. 
-            This goal is stronger than the goal originally defined by the faction. It can therefore happen that in a relationship between a werewolf and a villager, 
-            the werewolf betrays his pack towards the end of the game and tries to kill other werewolves with his lover during the day. 
+            The goal of these lovers is to still be alive at the end of the game together with their partner. Even if they are werewolf and villager.
                 """;
     }
     
