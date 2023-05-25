@@ -130,7 +130,9 @@ The application was developed for the SOPRA 23 course by:
 - Miro Vannini ([@mirovv](https://github.com/mirovv))
 - David Scherrer ([@djscherrer](https://github.com/djscherrer))
 
-A special thank you to our TA Jerome Maier for supporting us during the project.
+We would like to thank the following people for their contributions during the project:
+- Jerome Maier, for his support as our TA.
+- Milo Ranft, for the many drawings of the roles and landscapes.
 
 ## License
 This project is licensed under the GNU GPLv3 License - see the [LICENSE.md](License.md) file for details

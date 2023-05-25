@@ -175,4 +175,23 @@ public class GameControllerTest {
         verify(gameService).validateParticipant(poll, user);
         verify(gameService).removeVote(poll, participant, option);
     }
+
+    @Test
+    void testGetWinner() throws Exception {
+        // Test GameController winner
+        Mockito.when(userService.getUserByToken("token")).thenReturn(user);
+        Mockito.when(lobbyService.getLobbyById(1l)).thenReturn(lobby);
+        Mockito.when(gameService.getGame(lobby)).thenReturn(game);
+
+
+        MockHttpServletRequestBuilder getRequest = get("/games/1/winner")
+            .header(USERAUTH_HEADER, "token");
+
+        mockMvc.perform(getRequest)
+            .andExpect(status().isOk());
+
+        verify(gameService).validateGameFinished(game);
+        verify(lobbyService).validateUserIsInLobby(user, lobby);
+        verify(gameService).getFractionGetDTO(game);
+    }
 }
