@@ -70,9 +70,10 @@ public class Hunter extends Role implements DayVoter, NightVoter, PlayerObserver
     @Override
     public String getDescription() {
         return """
-            The hunter plays in the villagers' faction. His goal is therefore to free the village of werewolves.
-            Since the hunter carries his bow and quiver with him everywhere, he can fire one last arrow in the event of his death.
-            This enables him to choose a person who is still alive and who will die as well.
+            The hunter plays in the villagers' faction.
+            His goal is therefore to free the village of werewolves.
+            Since the hunter always carries his bow and quiver with him, he can fire one last arrow in the event of his death.
+            This enables him to choose a player who is taken to death with him.
             """;
     }
 
